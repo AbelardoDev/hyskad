@@ -10,6 +10,8 @@ import org.springframework.data.auditing.DateTimeProvider;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+import com.hyskad.shared.security.UsuarioActual;
+
 /**
  * Reloj único de la aplicación (UTC, RN-53) y JPA Auditing. Las pruebas pueden reemplazar el
  * bean {@link Clock} para fijar el tiempo.
@@ -28,9 +30,9 @@ public class TiempoConfig {
         return () -> Optional.of(Instant.now(clock));
     }
 
-    /** Usuario autenticado para created_by/updated_by. Vacío hasta que llegue la autenticación (F03). */
+    /** Usuario autenticado para created_by/updated_by; vacío en procesos internos y rutas públicas. */
     @Bean
-    AuditorAware<Long> auditorActual() {
-        return Optional::empty;
+    AuditorAware<Long> auditorActual(UsuarioActual usuarioActual) {
+        return usuarioActual::id;
     }
 }

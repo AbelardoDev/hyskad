@@ -9,6 +9,9 @@ spring:
     port: ${MAIL_PORT:1025}
   jpa:
     show-sql: false
+  flyway:
+    # Usuarios de prueba (uno por rol), solo en dev. Ver README.
+    locations: classpath:db/migration,classpath:db/dev-data
 
 management:
   endpoint:
@@ -18,6 +21,12 @@ management:
 hyskad:
   base-url: ${APP_BASE_URL:http://localhost:4200}
   mail-from: ${MAIL_FROM:no-reply@hyskad.local}
+  jwt:
+    # Clave SOLO para desarrollo local; en prod JWT_SECRET es obligatoria y no tiene valor por defecto.
+    secret: ${JWT_SECRET:cBIXqjjwFp2ZwC1xSjZ40uoXswaRfqX4ohIqyxEW3A21SRJwY6kKpgAPFerqi4Wf}
+  auth:
+    # Sin HTTPS en local: la cookie no puede llevar Secure.
+    cookie-secure: false
 
 logging:
   level:

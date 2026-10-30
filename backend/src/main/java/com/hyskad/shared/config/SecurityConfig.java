@@ -3,17 +3,23 @@ package com.hyskad.shared.config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 /**
- * Seguridad base: API sin estado, todo autenticado salvo health y la documentación. Los errores
- * 401/403 de la cadena de filtros se delegan al {@code GlobalExceptionHandler} para que salgan
- * como ProblemDetail. La autenticación con JWT llega en F03.
+ * API sin estado autenticada con el JWT del propio backend (OAuth2 Resource Server). CSRF va
+ * deshabilitado: el access token viaja en la cabecera {@code Authorization} y la cookie de refresh
+ * es {@code SameSite=Strict} y solo aplica a {@code /api/v1/auth}. Los errores 401/403 de la cadena
+ * de filtros se delegan al {@code GlobalExceptionHandler} para que salgan como ProblemDetail. Las
+ * cabeceras de seguridad por defecto de Spring Security quedan activas.
  */
 @Configuration
 @EnableMethodSecurity
@@ -23,9 +29,17 @@ public class SecurityConfig {
         "/actuator/health", "/api/docs", "/api/docs/**", "/api/swagger-ui/**", "/error"
     };
 
+    private static final String[] AUTH_PUBLICAS = {
+        "/api/v1/auth/login", "/api/v1/auth/refresh", "/api/v1/auth/logout",
+        "/api/v1/auth/password/olvide", "/api/v1/auth/password/restablecer"
+    };
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
-            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver) throws Exception {
+            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver,
+            JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
+        AuthenticationEntryPoint noAutenticado = (req, res, ex) -> resolver.resolveException(req, res, null, ex);
+        AccessDeniedHandler accesoDenegado = (req, res, ex) -> resolver.resolveException(req, res, null, ex);
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
@@ -35,10 +49,15 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(RUTAS_PUBLICAS).permitAll()
+                        .requestMatchers(HttpMethod.POST, AUTH_PUBLICAS).permitAll()
                         .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth -> oauth
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
+                        .authenticationEntryPoint(noAutenticado)
+                        .accessDeniedHandler(accesoDenegado))
                 .exceptionHandling(e -> e
-                        .authenticationEntryPoint((req, res, ex) -> resolver.resolveException(req, res, null, ex))
-                        .accessDeniedHandler((req, res, ex) -> resolver.resolveException(req, res, null, ex)))
+                        .authenticationEntryPoint(noAutenticado)
+                        .accessDeniedHandler(accesoDenegado))
                 .build();
     }
 }

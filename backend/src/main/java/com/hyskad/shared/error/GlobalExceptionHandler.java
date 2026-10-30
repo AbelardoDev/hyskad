@@ -12,6 +12,8 @@ import org.slf4j.MDC;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.core.PropertyReferenceException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ProblemDetail;
@@ -58,6 +60,16 @@ public class GlobalExceptionHandler {
         ProblemDetail problema = problema(ex.getCode(), ex.getMessage(), request);
         ex.getParametros().forEach(problema::setProperty);
         return responder(problema, ex);
+    }
+
+    @ExceptionHandler(DemasiadasSolicitudesException.class)
+    ResponseEntity<ProblemDetail> demasiadasSolicitudes(DemasiadasSolicitudesException ex,
+            HttpServletRequest request) {
+        ProblemDetail problema = problema(ex.getCode(), ex.getMessage(), request);
+        registrar(problema, ex);
+        return ResponseEntity.status(problema.getStatus())
+                .header(HttpHeaders.RETRY_AFTER, String.valueOf(ex.getSegundosParaReintentar()))
+                .body(problema);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -115,6 +127,15 @@ public class GlobalExceptionHandler {
         ProblemDetail problema = problema(ErrorCode.PARAMETRO_INVALIDO,
                 "El parámetro '" + ex.getName() + "' tiene un formato inválido", request);
         problema.setProperty("errors", List.of(new ErrorCampo(ex.getName(), "TIPO_INVALIDO")));
+        return responder(problema, ex);
+    }
+
+    /** Ordenamiento por una propiedad inexistente ({@code ?sort=noExiste}). */
+    @ExceptionHandler(PropertyReferenceException.class)
+    ResponseEntity<ProblemDetail> propiedadDeOrden(PropertyReferenceException ex, HttpServletRequest request) {
+        ProblemDetail problema = problema(ErrorCode.PARAMETRO_INVALIDO,
+                "No se puede ordenar por '" + ex.getPropertyName() + "'", request);
+        problema.setProperty("errors", List.of(new ErrorCampo("sort", "TIPO_INVALIDO")));
         return responder(problema, ex);
     }
 

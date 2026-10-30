@@ -20,6 +20,7 @@
 		<springdoc.version>3.2.0</springdoc.version>
 		<bucket4j.version>8.21.0</bucket4j.version>
 		<archunit.version>1.5.1</archunit.version>
+		<greenmail.version>2.1.14</greenmail.version>
 		<jacoco.version>0.8.16</jacoco.version>
 		<jacoco.cobertura.minima>0.70</jacoco.cobertura.minima>
 	</properties>
@@ -159,6 +160,12 @@
 			<groupId>com.tngtech.archunit</groupId>
 			<artifactId>archunit-junit5</artifactId>
 			<version>${archunit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.icegreen</groupId>
+			<artifactId>greenmail-junit5</artifactId>
+			<version>${greenmail.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

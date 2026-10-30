@@ -10,12 +10,15 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
-/** Prueba de integración: contexto completo, perfil test, MySQL en Testcontainers y MockMvc. */
+/**
+ * Prueba de integración: contexto completo, perfil test, MySQL en Testcontainers, MockMvc y
+ * {@link UsuariosDePrueba}.
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import(TestcontainersConfiguration.class)
+@Import({ TestcontainersConfiguration.class, UsuariosDePrueba.class })
 public @interface IntegrationTest {
 }

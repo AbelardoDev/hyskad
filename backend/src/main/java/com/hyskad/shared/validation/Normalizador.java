@@ -18,6 +18,11 @@ public final class Normalizador {
         return numero == null ? null : numero.replaceAll("[\\s.-]", "").toUpperCase(Locale.ROOT);
     }
 
+    /** Email sin espacios alrededor y en minúsculas, para que la unicidad no dependa de mayúsculas. */
+    public static String email(String email) {
+        return email == null ? null : email.trim().toLowerCase(Locale.ROOT);
+    }
+
     /**
      * Forma de guardar un documento: el NIT como {@code 900123456-8} (RN-39) y los demás
      * normalizados. Supone que el documento ya pasó la validación.

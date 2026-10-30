@@ -29,7 +29,20 @@ cd backend && ./mvnw spring-boot:run -Dspring-boot.run.profiles=dev   # 3. API e
 cd frontend && npm install && npm start                       # 4. app en http://localhost:4200
 ```
 
-Mailpit (correos de desarrollo): <http://localhost:8025>.
+Mailpit (correos de desarrollo): <http://localhost:8025>. Swagger UI: <http://localhost:8080/api/docs>.
+
+### Usuarios de desarrollo
+
+Con el perfil `dev` se cargan estos usuarios (migración `db/dev-data/R__usuarios_dev.sql`, **nunca** en prod). Todos tienen la contraseña `Hyskad2026`:
+
+| Email | Rol |
+|---|---|
+| `admin@hyskad.local` | ADMIN |
+| `almacen@hyskad.local` | ALMACEN |
+| `vendedor@hyskad.local` | VENDEDOR |
+| `mecanico@hyskad.local` | MECANICO (idioma `en`) |
+
+En prod no hay usuarios precargados: el primer administrador se crea al arrancar con `ADMIN_EMAIL` y `ADMIN_PASSWORD`, y debe cambiar la contraseña en su primer ingreso. `JWT_SECRET` es obligatoria fuera de `dev`.
 
 ## Pruebas
 

@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | F00 | Preparación del entorno | ✅ Terminada | — | Entorno verificado 2026-10-29 |
 | F01 | Monorepo, infraestructura local y CI | ✅ Terminada | #1 | Repo público AbelardoDev/hyskad; `main` protegida por el CI |
-| F02 | Base del backend | ⬜ Pendiente | | |
+| F02 | Base del backend | ✅ Terminada | #7 | Swagger en /api/docs (dev) |
 | F03 | Autenticación, usuarios y permisos (backend) | ⬜ Pendiente | | |
 | F04A | Sistema de diseño, tema, i18n y layout | ⬜ Pendiente | | |
 | F04B | Sesión, guards y administración de usuarios (frontend) | ⬜ Pendiente | | |
@@ -28,11 +28,11 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F01 ✅ (cerrada 2026-10-29, PR #1)
+- **Fase:** F02 ✅ (cerrada 2026-10-29, PR #7)
 - **Rama:** `main`
-- **Hecho:** repo git con `main` (commit inicial). Backend Spring Boot 4.1.2 (Java 25) con MapStruct 1.6.3, springdoc 3.2.0, Bucket4j 8.21.0, ArchUnit 1.5.1, Testcontainers MySQL 8.4 y JaCoCo 0.8.16 (regla 70 % en `application`/`domain`); perfiles dev/test/prod; `PingController` temporal. Frontend Angular 22.1 (zoneless y Vitest por defecto) con Tailwind v4 (PostCSS), Transloco es/en, ESLint + Prettier, proxy `/api`, marca en `public/brand`. E2E Playwright (3 navegadores). Compose dev (MySQL + Mailpit), `.env.example`, CI, dependabot y plantilla de PR. Verificación local: `mvnw verify` (3 pruebas), lint, test (2), build y E2E (3/3) en verde; ping de punta a punta probado.
-- **Siguiente paso concreto:** iniciar F02 con `/fase F02`.
-- **Bloqueos o dudas:** hay un `mysqld` local ocupando el 3306 (pendiente de que el usuario decida si lo detiene o usa `DB_HOST_PORT=3307`). `gh` no está en el PATH: usar `C:\Program Files\GitHub CLI\gh.exe`.
+- **Hecho:** `shared` completo: `BaseEntity` + JPA Auditing con `Clock`, `PageResponse` (máx. 100), errores con `ProblemDetail` (`type` URN, `code`, `requestId`, `errors[]`), `ConsecutivoService` (PESSIMISTIC_WRITE, propagación MANDATORY), `@PlacaColombiana` y `@DocumentoValido` (DV NIT), `Normalizador`, Jackson estricto, OpenAPI en `/api/docs` (dev/test), async acotado con MDC, CORS dev, filtro `X-Request-Id`, logs ECS en prod, seguridad base (todo autenticado salvo health y docs; 401/403 como ProblemDetail). Módulo `configuracion` (caché invalidada al confirmar) y `AuditoriaService`. Migración `V1__sistema.sql`. `ArquitecturaTest` genérico. Se eliminó el ping (backend, frontend y E2E). Pruebas: 76 unitarias + 27 de integración (failsafe) + Vitest + E2E.
+- **Siguiente paso concreto:** iniciar F03 con `/fase F03`. Revisar los PRs de dependabot abiertos.
+- **Bloqueos o dudas:** ninguno. MySQL80 local quedó detenido y en arranque manual a pedido del usuario.
 
 ## Decisiones tomadas durante el desarrollo
 
@@ -40,6 +40,13 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 - 2026-10-29 · F01 · Transloco se instala ya en F01 · la página de ping no debe tener textos quemados; F04A completa la configuración de i18n.
 - 2026-10-29 · F01 · Seguridad temporal en `com.hyskad.ping.PingSecurityConfig` (solo `/api/v1/ping` y `/actuator/health` públicos, lo demás `denyAll`) · se reemplaza en F02/F03.
 - 2026-10-29 · F01 · La regla JaCoCo es por paquete (`com.hyskad.*.application*`, `*.domain*`); sin paquetes que coincidan no evalúa nada · cumple "excluir mientras no haya clases" sin flags extra.
+- 2026-10-29 · F02 · `TipoDocumento` vive en `shared.validation` (no en `clientes.domain`) · lo comparten clientes y proveedores y lo necesita `@DocumentoValido`.
+- 2026-10-29 · F02 · `SecurityConfig` base en `shared.config`: todo autenticado salvo `/actuator/health` y `/api/docs`, `/api/swagger-ui/**`; 401/403 se delegan al `GlobalExceptionHandler` · F03 agrega el JWT sobre esta misma cadena.
+- 2026-10-29 · F02 · `type` del ProblemDetail = `urn:hyskad:error:<CODE>` · ARCHITECTURE §4 exige `type` y Spring omite `about:blank`.
+- 2026-10-29 · F02 · Códigos de `errors[]`: el mensaje de la restricción si ya es un código (`PLACA_INVALIDA`, `NIT_INVALIDO`) o el nombre de la restricción en UPPER_SNAKE (`NotBlank` → `NOT_BLANK`) · el frontend los traduce sin depender de textos en inglés.
+- 2026-10-29 · F02 · Pruebas de integración con sufijo `IT` ejecutadas por `maven-failsafe-plugin`; contenedor MySQL compartido vía `TestcontainersConfiguration` + anotación `@IntegrationTest` · reutiliza el contexto de Spring entre clases.
+- 2026-10-29 · F02 · ArchUnit: `shared` se excluye como destino en las reglas de capas (es transversal) y `archRule.failOnEmptyShould=false` para que las reglas genéricas no fallen mientras un módulo no exista.
+- 2026-10-29 · F02 · Collation del contenedor dev alineada a `utf8mb4_0900_ai_ci` (ARCHITECTURE §3).
 - 2026-10-29 · F01 · Puerto de MySQL del host configurable (`DB_HOST_PORT`, por defecto 3306) · en esta máquina hay otro MySQL en el 3306.
 - 2026-10-29 · F01 · springdoc desactivado en el perfil `prod`.
 - 2026-10-29 · F01 · En Windows/Git Bash, `./mvnw` falla por TLS (schannel) contra repo.maven.apache.org; usar `mvnw.cmd` desde PowerShell. La caché de npm por defecto daba ECONNRESET; se usó `npm_config_cache=%TEMP%
@@ -48,6 +55,5 @@ pm-cache-hk`.
 ## Deuda técnica conocida
 
 <!-- Qué quedó pendiente a propósito y por qué -->
-- `PingController`, `PingSecurityConfig` y la página `features/ping` son temporales: se eliminan en F02.
-- La página de ping no usa tokens del sistema de diseño ni tiene modo oscuro (llegan en F04A).
+- La página de inicio temporal no usa tokens del sistema de diseño ni tiene modo oscuro (llegan en F04A).
 - Aviso de Mockito por auto-attach del agente en las pruebas del backend (JDK 25); sin impacto por ahora.

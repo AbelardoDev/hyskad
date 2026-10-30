@@ -22,3 +22,9 @@ hyskad:
 logging:
   level:
     com.hyskad: DEBUG
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true

@@ -46,6 +46,16 @@ Cada fallo encontrado fuera de la fase en curso se registra como *issue* en GitH
 Tipos: **U** unitaria · **I** integración · **E** E2E · **A** accesibilidad · **R** rendimiento · **M** manual.
 Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerrar cada fase).
 
+### Base del backend (F02)
+| ID | Req. | Caso | Tipo | Resultado esperado | Estado |
+|---|---|---|---|---|---|
+| CP-69 | IS2, RNF Mant. | Flyway sobre MySQL 8.4 vacío y arranque con `ddl-auto=validate` | I | Migraciones aplicadas sin fallos; el contexto levanta | Aprobado |
+| CP-70 | RNF Integridad | Cada tipo de error (validación de cuerpo y parámetros, JSON mal formado, propiedad desconocida, tipo inválido, 401, 403, 404, 405, 415, 409 concurrencia e integridad, 500) | I | `ProblemDetail` con `type`, `code` estable, `requestId` y `errors[]` en validación; sin detalles internos | Aprobado |
+| CP-71 | RN-52 | 10 hilos piden consecutivo a la vez; rollback no consume número | I | Números distintos y seguidos, sin huecos | Aprobado |
+| CP-72 | RN-38, RN-39 | Documentos CC/TI/CE/PA/PPT/NIT válidos e inválidos, incluidos NIT reales | U | Acepta/rechaza con `DOCUMENTO_INVALIDO` o `NIT_INVALIDO` | Aprobado |
+| CP-73 | RNF Mant. | Reglas de arquitectura (capas, persistencia por módulo, controllers sin repositorios ni entidades, sin ciclos) | U (ArchUnit) | Sin violaciones | Aprobado |
+| CP-74 | RNF Observ. | `X-Request-Id` recibido se reutiliza; uno inseguro se reemplaza | I | La respuesta y el MDC llevan el id | Aprobado |
+
 ### Autenticación y usuarios (F03–F04)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
@@ -67,9 +77,9 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
 | CP-14 | RF5 | Registrar cliente CC válido con autorización de datos | I, E | 201 y ficha visible | Pendiente |
-| CP-15 | RN-39 | NIT con dígito de verificación incorrecto | U, I | 400 `NIT_INVALIDO` | Pendiente |
+| CP-15 | RN-39 | NIT con dígito de verificación incorrecto | U, I | 400 `NIT_INVALIDO` | Pendiente (U backend aprobada en F02; I en F05) |
 | CP-16 | RN-40 | Documento duplicado | I | 409 | Pendiente |
-| CP-17 | RF7, RN-41 | Placas `ABC12D`, `abc-12d`, `ABC12`, `123ABC` válidas; `AB123`, `ABCD12` inválidas | U (back y front) | Normaliza y acepta/rechaza según patrón | Pendiente |
+| CP-17 | RF7, RN-41 | Placas `ABC12D`, `abc-12d`, `ABC12`, `123ABC` válidas; `AB123`, `ABCD12` inválidas | U (back y front) | Normaliza y acepta/rechaza según patrón | Pendiente (U backend aprobada en F02; front en F05) |
 | CP-18 | RF7 | Placa duplicada | I | 409 `PLACA_DUPLICADA` | Pendiente |
 | CP-19 | RF6, RN-44 | Desactivar cliente con orden activa | I | 409 | Pendiente |
 | CP-20 | RF29 | Buscar clientes por nombre parcial, documento y teléfono | I | Resultados paginados correctos | Pendiente |

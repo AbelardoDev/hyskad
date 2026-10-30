@@ -1,9 +1,5 @@
 {
-  "ping": {
-    "descripcion": "Prueba de conexión con el servidor",
-    "probar": "Probar ping",
-    "cargando": "Consultando el servidor…",
-    "respuesta": "Respuesta del servidor: {{ mensaje }}",
-    "error": "No se pudo conectar con el servidor"
+  "app": {
+    "nombre": "HYSKAD"
   }
 }

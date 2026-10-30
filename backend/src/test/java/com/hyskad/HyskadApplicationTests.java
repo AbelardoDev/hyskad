@@ -1,23 +1,30 @@
 package com.hyskad;
 
-import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.test.context.ActiveProfiles;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.mysql.MySQLContainer;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
-@ActiveProfiles("test")
-@Testcontainers
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+import com.hyskad.support.IntegrationTest;
+
+/** Flyway aplica las migraciones sobre MySQL vacío y Hibernate valida el esquema (ddl-auto=validate). */
+@IntegrationTest
 class HyskadApplicationTests {
 
-    @Container
-    @ServiceConnection
-    static MySQLContainer mysql = new MySQLContainer("mysql:8.4");
+    @Autowired
+    private JdbcTemplate jdbc;
 
     @Test
-    void contextLoads() {
+    void migracionesAplicadasYEsquemaValido() {
+        Integer fallidas = jdbc.queryForObject(
+                "select count(*) from flyway_schema_history where success = false", Integer.class);
+        String version = jdbc.queryForObject(
+                "select max(version) from flyway_schema_history where success = true", String.class);
+
+        assertThat(fallidas).isZero();
+        assertThat(version).isEqualTo("1");
+        assertThat(jdbc.queryForList("select tipo from consecutivo order by tipo", String.class))
+                .containsExactly("COMPRA", "OT", "PRESUPUESTO", "VENTA");
     }
 }

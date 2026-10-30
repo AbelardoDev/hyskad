@@ -1,0 +1,28 @@
+<main class="flex min-h-dvh flex-col items-center justify-center gap-6 p-4">
+  <img src="brand/logo.svg" alt="HYSKAD" class="h-16 w-auto" />
+  <h1 class="text-2xl font-bold">HYSKAD</h1>
+  <p>{{ 'ping.descripcion' | transloco }}</p>
+
+  <button
+    type="button"
+    class="rounded-lg border px-4 py-2 font-medium focus-visible:outline-2 focus-visible:outline-offset-2 disabled:opacity-60"
+    [disabled]="estado() === 'cargando'"
+    (click)="probarPing()"
+  >
+    {{ 'ping.probar' | transloco }}
+  </button>
+
+  <p role="status" aria-live="polite" class="min-h-6">
+    @switch (estado()) {
+      @case ('cargando') {
+        {{ 'ping.cargando' | transloco }}
+      }
+      @case ('ok') {
+        {{ 'ping.respuesta' | transloco: { mensaje: respuesta()?.mensaje } }}
+      }
+      @case ('error') {
+        {{ 'ping.error' | transloco }}
+      }
+    }
+  </p>
+</main>

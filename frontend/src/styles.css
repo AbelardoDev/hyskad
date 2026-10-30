@@ -1,0 +1,5 @@
+@import 'tailwindcss';
+
+/* El modo oscuro se activa con la clase .dark en <html> (ver docs/DESIGN-SYSTEM.md §1.4-1.5).
+   Los tokens completos del sistema de diseño llegan en F04A. */
+@custom-variant dark (&:where(.dark, .dark *));

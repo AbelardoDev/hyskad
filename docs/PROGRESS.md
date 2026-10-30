@@ -15,7 +15,7 @@
 | F05 | Clientes y motocicletas | ✅ Terminada | #11 | Plantilla CRUD en ARCHITECTURE §6.1; capturas en `docs/capturas/f05` |
 | F06 | Catálogo de productos e inventario | ✅ Terminada | #12 | Contrato de `InventarioService` en su Javadoc; capturas en `docs/capturas/f06` |
 | F07 | Proveedores y compras | ✅ Terminada | #13 | `CalculadoraTotales` (RN-04) lista para ventas y órdenes; capturas en `docs/capturas/f07` |
-| F08 | Ventas y comprobantes | ⬜ Pendiente | | |
+| F08 | Ventas y comprobantes | 🟦 En curso | | |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ⬜ Pendiente | | |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ⬜ Pendiente | | |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ⬜ Pendiente | | |

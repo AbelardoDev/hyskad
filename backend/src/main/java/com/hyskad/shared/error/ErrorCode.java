@@ -50,6 +50,8 @@ public enum ErrorCode {
     PROVEEDOR_INACTIVO(HttpStatus.CONFLICT),
     FACTURA_DUPLICADA(HttpStatus.CONFLICT),
     COMPRA_ANULADA(HttpStatus.CONFLICT),
+    // ventas
+    VENTA_ANULADA(HttpStatus.CONFLICT),
     ERROR_INTERNO(HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus status;

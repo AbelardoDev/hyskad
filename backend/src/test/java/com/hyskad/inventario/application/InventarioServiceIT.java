@@ -190,7 +190,6 @@ class InventarioServiceIT {
                 x -> inventario.reservar(x, d("1"), ORDEN),
                 x -> inventario.liberarReserva(x, d("1"), ORDEN),
                 x -> inventario.consumirReserva(x, d("1"), ORDEN),
-                x -> inventario.registrarDevolucionVenta(x, d("1"), d("1000"), VENTA),
                 x -> inventario.registrarSalidaAnulacionCompra(x, d("1"), COMPRA),
                 x -> inventario.ajustar(new AjustarInventario(x, TipoAjuste.ENTRADA, d("1"), null, "Conteo físico mensual")),
                 x -> inventario.ajustar(new AjustarInventario(x, TipoAjuste.SALIDA, d("1"), null, "Conteo físico mensual")));
@@ -198,6 +197,12 @@ class InventarioServiceIT {
             assertThat(error(() -> movimiento.accept(id))).isEqualTo(ErrorCode.PRODUCTO_INACTIVO);
         }
         assertThat(contarMovimientos(id)).isEqualTo(1);
+
+        // Excepción (RN-21 sobre RN-15): anular una venta devuelve el stock aunque el producto esté inactivo
+        inventario.registrarDevolucionVenta(id, d("2"), d("1000"), VENTA);
+        Producto actual = productos.obtener(id);
+        assertThat(actual.getStockActual()).isEqualByComparingTo("7");
+        assertThat(actual.isActivo()).isFalse();
     }
 
     @Test

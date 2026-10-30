@@ -109,5 +109,8 @@ class ProductoTest {
             assertThat(codigo(movimiento)).isEqualTo(ErrorCode.PRODUCTO_INACTIVO);
         }
         assertThatThrownBy(() -> p.registrarSalida(d("1"))).hasMessageContaining("inactivo");
+        // La devolución de una venta anulada sí entra (RN-21)
+        p.registrarDevolucion(d("2"), d("1000"));
+        assertThat(p.getStockActual()).isEqualByComparingTo("7");
     }
 }

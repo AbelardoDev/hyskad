@@ -41,6 +41,7 @@ const MAX_DIGITOS = 13;
         [value]="textoVisible()"
         [placeholder]="placeholder() ?? '0'"
         [disabled]="estaDeshabilitado()"
+        [attr.aria-label]="etiquetaAccesible() ?? null"
         [attr.aria-invalid]="invalido() || null"
         [attr.aria-describedby]="descritoPor()"
         [attr.aria-required]="requerido() || null"
@@ -62,6 +63,8 @@ export class HkMoneyInput extends ControlBase<number | null> {
 
   readonly valor = model<number | null>(null);
   readonly placeholder = input<string>();
+  /** Nombre accesible cuando no hay `hk-form-field` con etiqueta visible (p. ej. dentro de una tabla). */
+  readonly etiquetaAccesible = input<string>();
 
   protected readonly textoVisible = computed(() => {
     const valor = this.valor();

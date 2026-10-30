@@ -1,5 +1,6 @@
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { TestBed } from '@angular/core/testing';
 import { FormControl } from '@angular/forms';
 import { provideRouter, Router } from '@angular/router';
@@ -9,6 +10,8 @@ import { iniciarSesionDePrueba } from '../../core/auth/sesion-de-prueba';
 import { errorInterceptor } from '../../core/http/error.interceptor';
 import { ConfirmacionService } from '../../shared/ui/dialog/confirm-dialog';
 import { HkDiagnosticoForm } from './diagnostico-form';
+import { EnviarPresupuestoModal } from './enviar-presupuesto-modal';
+import { HkItemsOrden } from './items-orden';
 import { noMenorQue } from './nueva-orden-page';
 import { OrdenDetallePage } from './orden-detalle-page';
 import { accionTransicion } from './orden-ui';
@@ -57,10 +60,20 @@ function orden(cambios: Partial<Orden> = {}): Orden {
       },
     ],
     creadaPor: { id: 1, nombre: 'Ana Admin' },
+    servicios: [],
+    repuestos: [],
+    subtotal: 0,
+    descuento: 0,
+    ivaPorcentaje: 19,
+    impuesto: 0,
+    total: 0,
+    fechaFinalizacion: null,
     accionesPermitidas: {
       editar: true,
       asignarMecanicos: true,
       registrarDiagnostico: false,
+      editarItems: false,
+      gestionarPresupuestos: false,
       transiciones: [
         { estado: 'EN_DIAGNOSTICO', requiereNota: false, bloqueo: 'SIN_MECANICOS' },
         { estado: 'CANCELADA', requiereNota: true, bloqueo: null },
@@ -135,7 +148,10 @@ describe('OrdenDetallePage', () => {
     expect(boton('Cancelar orden')?.disabled).toBe(false);
     expect(boton('Finalizar')).toBeUndefined();
     const pestanas = Array.from(el.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
-    expect(pestanas.find((p) => texto(p).startsWith('Servicios y repuestos'))?.disabled).toBe(true);
+    expect(pestanas.find((p) => texto(p).startsWith('Servicios y repuestos'))?.disabled).toBe(
+      false,
+    );
+    expect(pestanas.find((p) => texto(p).startsWith('Pago y entrega'))?.disabled).toBe(true);
     expect(pestanas.find((p) => texto(p).startsWith('Diagnóstico'))?.disabled).toBe(false);
   });
 
@@ -165,6 +181,8 @@ describe('OrdenDetallePage', () => {
           editar: false,
           asignarMecanicos: false,
           registrarDiagnostico: false,
+          editarItems: false,
+          gestionarPresupuestos: false,
           transiciones: [],
         },
       }),
@@ -187,6 +205,8 @@ describe('HkDiagnosticoForm', () => {
           editar: true,
           asignarMecanicos: true,
           registrarDiagnostico: true,
+          editarItems: false,
+          gestionarPresupuestos: false,
           transiciones: [],
         },
       }),
@@ -282,5 +302,113 @@ describe('OrdenesPage', () => {
       (c) => c.getAttribute('aria-labelledby') === 'kanban-ENTREGADA',
     )!;
     expect(texto(entregadas)).toContain('Sin órdenes');
+  });
+});
+
+/** Orden en diagnóstico con un servicio y un repuesto, editable. */
+function conItems(cambios: Partial<Orden> = {}): Orden {
+  return orden({
+    estado: 'EN_DIAGNOSTICO',
+    diagnostico: 'Frenos gastados',
+    servicios: [
+      {
+        id: 11,
+        servicioId: 3,
+        descripcion: 'Mantenimiento de frenos',
+        precio: 45000,
+        tiempoMin: 60,
+        mecanico: null,
+      },
+    ],
+    repuestos: [
+      {
+        id: 21,
+        productoId: 7,
+        codigo: 'PAS-01',
+        nombre: 'Pastillas delanteras',
+        unidad: 'UNIDAD',
+        cantidad: 2,
+        precioUnitario: 25000,
+        subtotal: 50000,
+        stockDisponible: 8,
+        stockMinimo: 2,
+      },
+    ],
+    subtotal: 95000,
+    impuesto: 18050,
+    total: 113050,
+    accionesPermitidas: {
+      editar: true,
+      asignarMecanicos: true,
+      registrarDiagnostico: true,
+      editarItems: true,
+      gestionarPresupuestos: true,
+      transiciones: [{ estado: 'PENDIENTE_APROBACION', requiereNota: false, bloqueo: null }],
+    },
+    ...cambios,
+  });
+}
+
+describe('HkItemsOrden', () => {
+  function montar(o: Orden) {
+    const http = configurar();
+    const fixture = TestBed.createComponent(HkItemsOrden);
+    fixture.componentRef.setInput('orden', o);
+    fixture.detectChanges();
+    return { fixture, http, el: fixture.nativeElement as HTMLElement };
+  }
+
+  it('cambiar la cantidad de un repuesto envía la nueva cantidad con la versión', () => {
+    const { el, http } = montar(conItems());
+    expect(texto(el).replace(/\s/g, '')).toContain('$113.050');
+    const cantidad = el.querySelector<HTMLInputElement>(
+      'input[aria-label="Cantidad de Pastillas delanteras"]',
+    )!;
+    cantidad.value = '5';
+    cantidad.dispatchEvent(new Event('input'));
+    cantidad.dispatchEvent(new Event('change', { bubbles: true }));
+
+    const req = http.expectOne(`${API}/5/repuestos/21`);
+    expect(req.request.method).toBe('PUT');
+    expect(req.request.body).toEqual({ version: 3, cantidad: 5 });
+  });
+
+  it('fuera de diagnóstico es de solo lectura y explica por qué', () => {
+    const { el } = montar(
+      conItems({
+        estado: 'EN_REPARACION',
+        accionesPermitidas: { ...conItems().accionesPermitidas, editarItems: false },
+      }),
+    );
+    expect(el.textContent).toContain('solo se modifican mientras la orden está en diagnóstico');
+    expect(el.querySelector('input')).toBeNull();
+    expect(texto(el)).not.toContain('Agregar repuesto');
+  });
+});
+
+describe('EnviarPresupuestoModal', () => {
+  it('muestra los totales con el descuento y envía descuento, observaciones y versión', async () => {
+    const cerrar = vi.fn();
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(withInterceptors([errorInterceptor])),
+        provideHttpClientTesting(),
+        { provide: DialogRef, useValue: { close: cerrar } },
+        { provide: DIALOG_DATA, useValue: conItems() },
+      ],
+    });
+    const fixture = TestBed.createComponent(EnviarPresupuestoModal);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    const descuento = el.querySelector<HTMLInputElement>('hk-money-input input')!;
+    descuento.value = '5000';
+    descuento.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+    // 95.000 − 5.000 = 90.000 + IVA 17.100 = 107.100
+    expect(texto(el).replace(/\s/g, '')).toContain('$107.100');
+
+    el.querySelector('form')!.dispatchEvent(new Event('submit'));
+    const req = TestBed.inject(HttpTestingController).expectOne(`${API}/5/presupuestos`);
+    expect(req.request.body).toEqual({ version: 3, descuento: 5000, observaciones: null });
   });
 });

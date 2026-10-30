@@ -16,7 +16,12 @@ export interface OpcionesDialogo<D> {
   lado?: 'izquierda' | 'derecha';
   /** Si es `false`, ni Esc ni el clic en el fondo lo cierran (formularios con cambios, por ejemplo). */
   cerrable?: boolean;
+  /** En pantallas de teléfono el modal sube como hoja inferior a todo el ancho. */
+  hojaEnMovil?: boolean;
 }
+
+/** Ancho en el que un modal con `hojaEnMovil` se abre como hoja inferior. */
+const CONSULTA_MOVIL = '(max-width: 639.98px)';
 
 const ANCHOS = { sm: '24rem', md: '32rem', lg: '42rem', xl: '56rem' } as const;
 
@@ -33,6 +38,15 @@ export class DialogosService {
     componente: ComponentType<C>,
     opciones: OpcionesDialogo<D> = {},
   ): DialogRef<R, C> {
+    if (opciones.hojaEnMovil && globalThis.matchMedia?.(CONSULTA_MOVIL).matches) {
+      return this.abrir<C, D, R>(componente, opciones, {
+        width: '100vw',
+        maxWidth: '100vw',
+        maxHeight: '90dvh',
+        positionStrategy: this.overlay.position().global().bottom('0').centerHorizontally(),
+        panelClass: ['hk-dialogo-panel', 'hk-hoja-panel'],
+      });
+    }
     return this.abrir<C, D, R>(componente, opciones, {
       width: `min(${ANCHOS[opciones.tamano ?? 'md']}, calc(100vw - 2rem))`,
       maxHeight: 'calc(100dvh - 2rem)',

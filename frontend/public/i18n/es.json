@@ -266,7 +266,10 @@
     "KILOMETRAJE_MENOR": "El kilometraje no puede ser menor que la última lectura",
     "MECANICO_INVALIDO": "Solo se pueden asignar mecánicos activos",
     "MECANICO_REPETIDO": "Ese mecánico ya está en la lista",
-    "NOTA_REQUERIDA": "Escribe el motivo"
+    "NOTA_REQUERIDA": "Escribe el motivo",
+    "PRESUPUESTO_NO_PENDIENTE": "El presupuesto ya no está pendiente",
+    "SERVICIO_INACTIVO": "El servicio está inactivo",
+    "DECISION_INVALIDA": "La decisión debe ser aprobado o rechazado"
   },
   "roles": {
     "ADMIN": "Administrador",
@@ -1078,7 +1081,7 @@
     "bloqueos": {
       "SIN_MECANICOS": "Asigna al menos un mecánico",
       "SIN_DIAGNOSTICO": "Registra primero el diagnóstico",
-      "SIN_ITEMS": "Agrega servicios o repuestos (disponible pronto)",
+      "SIN_ITEMS": "Agrega al menos un servicio o repuesto",
       "SIN_PAGO": "Registra primero el pago (disponible pronto)"
     },
     "confirmar_transicion": {
@@ -1103,6 +1106,86 @@
     "historial": {
       "creada": "Orden recibida",
       "a": "a"
+    },
+    "items": {
+      "servicios": "Servicios",
+      "repuestos": "Repuestos",
+      "agregar": "Agregar",
+      "agregar_servicio": "Agregar servicio",
+      "agregar_repuesto": "Agregar repuesto",
+      "sin_servicios": "Todavía no hay servicios en la orden",
+      "sin_repuestos": "Todavía no hay repuestos en la orden",
+      "producto": "Producto",
+      "buscar_producto": "Busca por código o nombre…",
+      "opcion_producto": "{{disponible}} disponibles · {{precio}}",
+      "disponible": "Disponible",
+      "precio": "Precio",
+      "cantidad": "Cantidad",
+      "bajo_minimo": "Con esta reserva el disponible queda en el mínimo ({{minimo}}) o por debajo.",
+      "origen": "Origen del servicio",
+      "origenes": {
+        "catalogo": "Del catálogo",
+        "libre": "Mano de obra libre"
+      },
+      "servicio": "Servicio",
+      "buscar_servicio": "Busca en el catálogo…",
+      "descripcion": "Descripción",
+      "precio_ayuda": "Sugerido por el catálogo; puedes ajustarlo para esta orden.",
+      "sin_mecanico": "Sin mecánico",
+      "de_catalogo": "Del catálogo",
+      "mano_obra": "Mano de obra libre",
+      "precio_de": "Precio de {{item}}",
+      "cantidad_de": "Cantidad de {{item}}",
+      "quitar": "Quitar {{item}}",
+      "quitar_corto": "Quitar",
+      "totales": "Totales de la orden",
+      "solo_lectura_estado": "Los servicios y repuestos solo se modifican mientras la orden está en diagnóstico.",
+      "solo_lectura_permiso": "No tienes permiso para modificar los servicios y repuestos de esta orden.",
+      "confirmar_quitar": {
+        "titulo": "¿Quitar de la orden?",
+        "mensaje": "{{item}} sale de la orden. Si es un repuesto, su reserva vuelve al inventario."
+      }
+    },
+    "presupuestos": {
+      "titulo_documento": "Presupuesto",
+      "documento_de": "Presupuesto {{numero}}",
+      "enviar_titulo": "Enviar presupuesto · {{numero}}",
+      "enviar_texto": "Se congelan los ítems y totales actuales y la orden queda pendiente de aprobación.",
+      "observaciones": "Observaciones para el cliente",
+      "vista_previa": "Vista previa",
+      "error": "No se pudieron cargar los presupuestos",
+      "vacio": "Todavía no hay presupuestos",
+      "vacio_texto": "Se envían desde diagnóstico, con el diagnóstico registrado y al menos un ítem.",
+      "version": "versión {{version}}",
+      "estados": {
+        "PENDIENTE": "Pendiente",
+        "APROBADO": "Aprobado",
+        "RECHAZADO": "Rechazado",
+        "REEMPLAZADO": "Reemplazado"
+      },
+      "ver_items": "Ver ítems ({{n}})",
+      "imprimir": "Imprimir",
+      "aprobar": "Aprobar",
+      "rechazar": "Rechazar",
+      "enviado": "Presupuesto {{numero}} enviado",
+      "confirmar_aprobar": {
+        "titulo": "¿Aprobar {{numero}}?",
+        "mensaje": "El cliente aprobó el presupuesto: la orden pasa a reparación."
+      },
+      "confirmar_rechazar": {
+        "titulo": "¿Rechazar {{numero}}?",
+        "mensaje": "La orden se cancela y se liberan todos sus repuestos reservados. Escribe el motivo del cliente."
+      },
+      "confirmar_retirar": {
+        "titulo": "¿Retirar {{numero}}?"
+      },
+      "hecho": {
+        "APROBADO": "Presupuesto {{numero}} aprobado",
+        "RECHAZADO": "Presupuesto {{numero}} rechazado",
+        "RETIRO": "Presupuesto {{numero}} retirado"
+      },
+      "volver": "Volver a la orden",
+      "no_encontrado": "Presupuesto no encontrado"
     }
   }
 }

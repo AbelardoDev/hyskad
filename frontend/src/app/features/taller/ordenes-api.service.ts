@@ -55,7 +55,87 @@ export interface AccionesPermitidas {
   editar: boolean;
   asignarMecanicos: boolean;
   registrarDiagnostico: boolean;
+  /** Agregar, editar o quitar servicios y repuestos (solo en diagnóstico, RN-28). */
+  editarItems: boolean;
+  /** Enviar, decidir y retirar presupuestos. */
+  gestionarPresupuestos: boolean;
   transiciones: TransicionPermitida[];
+}
+
+/** Servicio de la orden; sin `servicioId` es mano de obra libre (RN-30). */
+export interface ServicioOrden {
+  id: number;
+  servicioId: number | null;
+  descripcion: string;
+  precio: number;
+  tiempoMin: number | null;
+  mecanico: UsuarioResumen | null;
+}
+
+/** Repuesto reservado (RN-29) con el disponible actual del producto. */
+export interface RepuestoOrden {
+  id: number;
+  productoId: number;
+  codigo: string;
+  nombre: string;
+  unidad: string;
+  cantidad: number;
+  precioUnitario: number;
+  subtotal: number;
+  stockDisponible: number;
+  stockMinimo: number;
+}
+
+export type EstadoPresupuesto = 'PENDIENTE' | 'APROBADO' | 'RECHAZADO' | 'REEMPLAZADO';
+
+/** Presupuesto con ítems y totales congelados (RN-31). */
+export interface Presupuesto {
+  id: number;
+  ordenId: number;
+  numero: string;
+  version: number;
+  estado: EstadoPresupuesto;
+  items: {
+    tipo: 'SERVICIO' | 'REPUESTO';
+    descripcion: string;
+    cantidad: number;
+    precioUnitario: number;
+    subtotal: number;
+  }[];
+  subtotal: number;
+  descuento: number;
+  ivaPorcentaje: number;
+  impuesto: number;
+  total: number;
+  observaciones: string | null;
+  fechaEnvio: string;
+  enviadoPor: UsuarioResumen | null;
+  fechaDecision: string | null;
+  decididoPor: UsuarioResumen | null;
+  observacionesDecision: string | null;
+}
+
+/** Presupuesto imprimible con el taller, el cliente y la moto. */
+export interface DocumentoPresupuesto {
+  taller: { nombre: string; nit: string; direccion: string; telefono: string };
+  numeroOrden: string;
+  cliente: {
+    nombreCompleto: string;
+    tipoDocumento: TipoDocumento;
+    numeroDocumento: string;
+    telefono: string;
+  };
+  moto: { placa: string; marca: string; modelo: string; anio: number | null };
+  presupuesto: Presupuesto;
+  leyenda: string;
+}
+
+export interface DatosServicioOrden {
+  servicioId: number | null;
+  descripcion: string | null;
+  precio: number | null;
+  tiempoMin: number | null;
+  mecanicoId: number | null;
 }
 
 /** Detalle de la orden (`OrdenResponse`). */
@@ -96,6 +176,14 @@ export interface Orden {
     fecha: string;
   }[];
   creadaPor: UsuarioResumen | null;
+  servicios: ServicioOrden[];
+  repuestos: RepuestoOrden[];
+  subtotal: number;
+  descuento: number;
+  ivaPorcentaje: number;
+  impuesto: number;
+  total: number;
+  fechaFinalizacion: string | null;
   accionesPermitidas: AccionesPermitidas;
 }
 
@@ -214,6 +302,105 @@ export class OrdenesApiService {
       estado,
       nota,
     });
+  }
+
+  agregarServicio(
+    orden: Orden,
+    datos: DatosServicioOrden,
+    context?: HttpContext,
+  ): Observable<Orden> {
+    return this.http.post<Orden>(
+      `${API}/${orden.id}/servicios`,
+      { version: orden.version, ...datos },
+      { context },
+    );
+  }
+
+  actualizarServicio(
+    orden: Orden,
+    itemId: number,
+    datos: DatosServicioOrden,
+    context?: HttpContext,
+  ): Observable<Orden> {
+    return this.http.put<Orden>(
+      `${API}/${orden.id}/servicios/${itemId}`,
+      { version: orden.version, ...datos },
+      { context },
+    );
+  }
+
+  quitarServicio(orden: Orden, itemId: number): Observable<Orden> {
+    return this.http.delete<Orden>(`${API}/${orden.id}/servicios/${itemId}`, {
+      params: new HttpParams().set('version', orden.version),
+    });
+  }
+
+  agregarRepuesto(
+    orden: Orden,
+    productoId: number,
+    cantidad: number,
+    context?: HttpContext,
+  ): Observable<Orden> {
+    return this.http.post<Orden>(
+      `${API}/${orden.id}/repuestos`,
+      { version: orden.version, productoId, cantidad },
+      { context },
+    );
+  }
+
+  cambiarCantidadRepuesto(
+    orden: Orden,
+    itemId: number,
+    cantidad: number,
+    context?: HttpContext,
+  ): Observable<Orden> {
+    return this.http.put<Orden>(
+      `${API}/${orden.id}/repuestos/${itemId}`,
+      { version: orden.version, cantidad },
+      { context },
+    );
+  }
+
+  quitarRepuesto(orden: Orden, itemId: number): Observable<Orden> {
+    return this.http.delete<Orden>(`${API}/${orden.id}/repuestos/${itemId}`, {
+      params: new HttpParams().set('version', orden.version),
+    });
+  }
+
+  presupuestos(ordenId: number, context?: HttpContext): Observable<Presupuesto[]> {
+    return this.http.get<Presupuesto[]>(`${API}/${ordenId}/presupuestos`, { context });
+  }
+
+  generarPresupuesto(
+    orden: Orden,
+    descuento: number,
+    observaciones: string | null,
+    context?: HttpContext,
+  ): Observable<Presupuesto> {
+    return this.http.post<Presupuesto>(
+      `${API}/${orden.id}/presupuestos`,
+      { version: orden.version, descuento, observaciones },
+      { context },
+    );
+  }
+
+  decidirPresupuesto(
+    id: number,
+    decision: 'APROBADO' | 'RECHAZADO',
+    observaciones: string | null,
+  ): Observable<Presupuesto> {
+    return this.http.post<Presupuesto>(`/api/v1/presupuestos/${id}/decision`, {
+      decision,
+      observaciones,
+    });
+  }
+
+  retirarPresupuesto(id: number): Observable<Presupuesto> {
+    return this.http.post<Presupuesto>(`/api/v1/presupuestos/${id}/retiro`, {});
+  }
+
+  documentoPresupuesto(id: number, context?: HttpContext): Observable<DocumentoPresupuesto> {
+    return this.http.get<DocumentoPresupuesto>(`/api/v1/presupuestos/${id}`, { context });
   }
 
   /** Mecánicos activos para asignar y filtrar (`GET /usuarios/mecanicos`). */

@@ -32,9 +32,12 @@ import { HkTabs, Pestana } from '../../shared/ui/tabs/tabs';
 import { ToastService } from '../../shared/ui/toast/toast';
 import { HkTooltipDirective } from '../../shared/ui/tooltip/tooltip';
 import { HkDiagnosticoForm } from './diagnostico-form';
+import { EnviarPresupuestoModal } from './enviar-presupuesto-modal';
+import { HkItemsOrden } from './items-orden';
+import { HkPresupuestosOrden } from './presupuestos-orden';
 import { MecanicosModal } from './mecanicos-modal';
 import { accionTransicion } from './orden-ui';
-import { Orden, OrdenesApiService, TransicionPermitida } from './ordenes-api.service';
+import { Orden, OrdenesApiService, Presupuesto, TransicionPermitida } from './ordenes-api.service';
 import { RecepcionFormDrawer } from './recepcion-form-drawer';
 
 /** El camino normal de una orden (la línea de tiempo); CANCELADA se marca sobre el último paso. */
@@ -57,8 +60,8 @@ function ultimaLlegada(
 
 /**
  * Detalle de una orden (RF11–RF14): encabezado, línea de tiempo, acciones según
- * `accionesPermitidas` (lo decide el backend) y pestañas. Ítems, presupuestos y pago llegan en
- * F09B/F09C: sus pestañas se ven deshabilitadas.
+ * `accionesPermitidas` (lo decide el backend) y pestañas. El pago llega en F09C: su pestaña se ve
+ * deshabilitada.
  */
 @Component({
   selector: 'hk-orden-detalle-page',
@@ -73,6 +76,8 @@ function ultimaLlegada(
     HkButton,
     HkCard,
     HkDiagnosticoForm,
+    HkItemsOrden,
+    HkPresupuestosOrden,
     HkEmptyState,
     HkPageHeader,
     HkPlaca,
@@ -235,6 +240,16 @@ function ultimaLlegada(
                 </section>
               </div>
             }
+            @case ('items') {
+              <hk-items-orden
+                [orden]="o"
+                (cambio)="orden.set($event)"
+                (recargar)="orden.reload()"
+              />
+            }
+            @case ('presupuestos') {
+              <hk-presupuestos-orden [orden]="o" (cambio)="orden.reload()" />
+            }
             @case ('diagnostico') {
               <hk-diagnostico-form [orden]="o" (guardado)="alGuardarDiagnostico($event)" />
             }
@@ -313,6 +328,7 @@ export class OrdenDetallePage {
     this.traducciones();
     const t = (clave: string) => this.transloco.translate(clave);
     const pronto = t('taller.detalle.pronto');
+    const o = this.orden.value();
     return [
       { id: 'resumen', etiqueta: t('taller.detalle.pestanas.resumen'), icono: 'info' },
       {
@@ -322,15 +338,14 @@ export class OrdenDetallePage {
       },
       {
         id: 'items',
-        etiqueta: `${t('taller.detalle.pestanas.items')} · ${pronto}`,
+        etiqueta: t('taller.detalle.pestanas.items'),
         icono: 'package',
-        deshabilitada: true,
+        contador: o ? o.servicios.length + o.repuestos.length : undefined,
       },
       {
         id: 'presupuestos',
-        etiqueta: `${t('taller.detalle.pestanas.presupuestos')} · ${pronto}`,
+        etiqueta: t('taller.detalle.pestanas.presupuestos'),
         icono: 'hourglass',
-        deshabilitada: true,
       },
       {
         id: 'pago',
@@ -383,6 +398,10 @@ export class OrdenDetallePage {
 
   protected async transicionar(orden: Orden, transicion: TransicionPermitida): Promise<void> {
     if (transicion.bloqueo || this.transicionando()) return;
+    if (transicion.estado === 'PENDIENTE_APROBACION') {
+      this.enviarPresupuesto(orden);
+      return;
+    }
     const accion = accionTransicion(orden.estado, transicion.estado);
     const nombre = this.transloco.translate(`taller.acciones.${accion.clave}`);
     const resultado = await this.confirmacion.pedir({
@@ -407,7 +426,8 @@ export class OrdenDetallePage {
             estado: this.transloco.translate(`estados.orden.${actualizada.estado}`),
           }),
         );
-        if (actualizada.estado === 'EN_DIAGNOSTICO') this.pestana.set('diagnostico');
+        if (actualizada.estado === 'EN_DIAGNOSTICO')
+          this.pestana.set(actualizada.diagnostico ? 'items' : 'diagnostico');
       },
       // El interceptor ya avisó (p. ej. otro usuario la cambió): se recarga lo vigente
       error: () => {
@@ -415,6 +435,24 @@ export class OrdenDetallePage {
         this.orden.reload();
       },
     });
+  }
+
+  /** Pasar a pendiente de aprobación es enviar un presupuesto (con descuento y observaciones). */
+  private enviarPresupuesto(orden: Orden): void {
+    this.dialogos
+      .abrirModal<EnviarPresupuestoModal, Orden, Presupuesto>(EnviarPresupuestoModal, {
+        datos: orden,
+        tamano: 'lg',
+        hojaEnMovil: true,
+      })
+      .closed.subscribe((presupuesto) => {
+        if (!presupuesto) return;
+        this.toast.exito(
+          this.transloco.translate('taller.presupuestos.enviado', { numero: presupuesto.numero }),
+        );
+        this.pestana.set('presupuestos');
+        this.orden.reload();
+      });
   }
 
   protected editarRecepcion(orden: Orden): void {

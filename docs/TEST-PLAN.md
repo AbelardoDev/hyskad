@@ -59,19 +59,19 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 ### Autenticación y usuarios (F03–F04)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
-| CP-01 | RF2 | Login con credenciales válidas | I, E | 200, access token y cookie refresh `HttpOnly`; el front entra al dashboard | Pendiente |
-| CP-02 | RF2, RN-49 | Login con contraseña errónea o usuario inactivo | I | 401 con mensaje genérico idéntico en ambos casos | Pendiente |
-| CP-03 | IC6, RN-49 | Sexto intento de login en un minuto | I | 429 | Pendiente |
+| CP-01 | RF2 | Login con credenciales válidas | I, E | 200, access token y cookie refresh `HttpOnly`; el front entra al dashboard | Pendiente (I aprobada en F03; E en F04B) |
+| CP-02 | RF2, RN-49 | Login con contraseña errónea o usuario inactivo | I | 401 con mensaje genérico idéntico en ambos casos | Aprobado (F03) |
+| CP-03 | IC6, RN-49 | Sexto intento de login en un minuto | I | 429 | Aprobado (F03) |
 | CP-04 | IC3 | Petición con token expirado → refresh automático | U (interceptor), E | Se renueva el token y la petición original se completa | Pendiente |
-| CP-05 | IC3 | Reutilizar un refresh token ya rotado | I | 401 y se revoca toda la familia de tokens | Pendiente |
-| CP-06 | RF1, RNF Seg. | Crear usuario con contraseña débil | I | 400 `PASSWORD_DEBIL` | Pendiente |
-| CP-07 | RF1 | Crear usuario con email repetido | I | 409 `EMAIL_DUPLICADO` | Pendiente |
-| CP-08 | RF3, RN-47 | Desactivar el único admin activo | I | 409 `ULTIMO_ADMIN` | Pendiente |
-| CP-09 | RF4 | Retirar `VENTAS_CREAR` a un vendedor | I, E | El endpoint responde 403 y la opción desaparece del menú | Pendiente |
-| CP-10 | IS4 | Mecánico llama a `GET /usuarios` | I | 403 | Pendiente |
-| CP-11 | RF35, RN-50 | Recuperación con correo existente y no existente | I | Misma respuesta 202; solo el existente recibe correo (Mailpit/GreenMail) | Pendiente |
-| CP-12 | RF35 | Usar enlace de recuperación vencido o ya usado | I | 400 `TOKEN_INVALIDO` | Pendiente |
-| CP-13 | RNF Seg. | Contraseña guardada | I | Hash BCrypt, nunca texto plano; no aparece en logs ni respuestas | Pendiente |
+| CP-05 | IC3 | Reutilizar un refresh token ya rotado | I | 401 y se revoca toda la familia de tokens | Aprobado (F03) |
+| CP-06 | RF1, RNF Seg. | Crear usuario con contraseña débil | I | 400 `PASSWORD_DEBIL` | Aprobado (F03): `VALIDACION` con `errors[].code = PASSWORD_DEBIL` |
+| CP-07 | RF1 | Crear usuario con email repetido | I | 409 `EMAIL_DUPLICADO` | Aprobado (F03) |
+| CP-08 | RF3, RN-47 | Desactivar el único admin activo | I | 409 `ULTIMO_ADMIN` | Aprobado (F03) |
+| CP-09 | RF4 | Retirar `VENTAS_CREAR` a un vendedor | I, E | El endpoint responde 403 y la opción desaparece del menú | Pendiente (I aprobada en F03; E en F04B) |
+| CP-10 | IS4 | Mecánico llama a `GET /usuarios` | I | 403 | Aprobado (F03) |
+| CP-11 | RF35, RN-50 | Recuperación con correo existente y no existente | I | Misma respuesta 202; solo el existente recibe correo (Mailpit/GreenMail) | Aprobado (F03, GreenMail) |
+| CP-12 | RF35 | Usar enlace de recuperación vencido o ya usado | I | 400 `TOKEN_INVALIDO` | Aprobado (F03) |
+| CP-13 | RNF Seg. | Contraseña guardada | I | Hash BCrypt, nunca texto plano; no aparece en logs ni respuestas | Aprobado (F03) |
 
 ### Clientes y motocicletas (F05)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |

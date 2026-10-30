@@ -1,4 +1,5 @@
 import { Permiso } from '../auth/permisos';
+import { ClaveContador } from './contadores.service';
 
 export interface ItemMenuNavegacion {
   /** Clave i18n del texto (`menu.*`). */
@@ -11,6 +12,8 @@ export interface ItemMenuNavegacion {
   permisos: readonly Permiso[];
   /** Aparece en la barra inferior en móvil (máximo 4). */
   accesoRapido?: boolean;
+  /** Número junto al ítem (p. ej. productos con stock bajo), de `ContadoresService`. */
+  contador?: ClaveContador;
 }
 
 export interface GrupoMenu {
@@ -74,6 +77,7 @@ export const MENU: readonly GrupoMenu[] = [
         icono: 'package',
         ruta: '/inventario',
         permisos: ['PRODUCTOS_VER'],
+        contador: 'stockBajo',
       },
       { clave: 'menu.compras', icono: 'truck', ruta: '/compras', permisos: ['COMPRAS_GESTIONAR'] },
       {

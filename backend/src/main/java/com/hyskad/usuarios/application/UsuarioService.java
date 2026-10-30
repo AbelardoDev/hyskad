@@ -1,10 +1,12 @@
 package com.hyskad.usuarios.application;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -60,6 +62,12 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public Usuario obtener(Long id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException(ENTIDAD, id));
+    }
+
+    /** Nombre de cada usuario por id, para mostrar quién hizo algo (p. ej. un movimiento de inventario). */
+    @Transactional(readOnly = true)
+    public Map<Long, String> nombres(Collection<Long> ids) {
+        return repository.findAllById(ids).stream().collect(Collectors.toMap(Usuario::getId, Usuario::getNombre));
     }
 
     @Transactional

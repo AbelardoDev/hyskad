@@ -13,7 +13,7 @@
 | F04A | Sistema de diseño, tema, i18n y layout | ✅ Terminada | #9 | Galería en /dev/ui (solo dev) |
 | F04B | Sesión, guards y administración de usuarios (frontend) | ✅ Terminada | #10 | Job `e2e` en el CI; capturas en `docs/capturas/f04b` |
 | F05 | Clientes y motocicletas | ✅ Terminada | #11 | Plantilla CRUD en ARCHITECTURE §6.1; capturas en `docs/capturas/f05` |
-| F06 | Catálogo de productos e inventario | ⬜ Pendiente | | |
+| F06 | Catálogo de productos e inventario | ✅ Terminada | #12 | Contrato de `InventarioService` en su Javadoc; capturas en `docs/capturas/f06` |
 | F07 | Proveedores y compras | ⬜ Pendiente | | |
 | F08 | Ventas y comprobantes | ⬜ Pendiente | | |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ⬜ Pendiente | | |
@@ -28,11 +28,16 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
+- **Fase:** F06 ✅ (cerrada 2026-10-30, PR #12)
+- **Rama:** `feature/f06-inventario` → `main`
+- **Hecho:** módulos `catalogo` (categorías y productos) e `inventario`. Migración V4 (cantidades `DECIMAL(12,2)`, `CHECK` de stock, `version`), `InventarioService` como única puerta del stock (entrada por compra, salida por venta, reservar/liberar/consumir, devolución de venta, salida por anulación de compra y ajustes) con `PESSIMISTIC_WRITE`, RN-07 a RN-15 y `StockBajoDetectado`; movimientos inmutables con filtros y CSV; costo promedio oculto para quien no gestiona productos; datos dev (6 categorías, 40 productos). Frontend: productos con nivel de stock y badge, ficha con kárdex en línea de tiempo, formulario con `hk-money-input` y categoría rápida, modal de categorías, ajuste con vista previa del stock resultante, movimientos globales con CSV y contador de stock bajo en el menú. Pruebas: backend 148 unitarias y 164 IT (incluida la concurrencia de 20 reservas); frontend 218 unitarias; 49 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f06/`.
+- **Siguiente paso concreto:** iniciar F07 con `/fase F07` (proveedores y compras: usan `registrarEntradaCompra` y `registrarSalidaAnulacionCompra`).
+- **Bloqueos o dudas:** ninguno.
+
+### Sesión anterior (F05)
 - **Fase:** F05 ✅ (cerrada 2026-10-30, PR #11)
 - **Rama:** `feature/f05-clientes-motos` → `main`
 - **Hecho:** módulos `clientes` y `motocicletas` (backend y frontend). Migración V3, servicios con RN-38 a RN-45 (normalización de documento, teléfono, placa y VIN; NIT con DV; razón social con NIT; documento, placa y VIN únicos; cambio de propietario a un cliente activo; RN-44 vía `ConsultaOrdenesActivas`), búsqueda con `Specification`, auditoría sin datos personales y datos dev (10 clientes, 15 motos). Frontend: lista de clientes (tarjetas en móvil), drawer según el tipo de documento con DV en vivo y modal de la política de datos, ficha del cliente con sus motos y "Agregar moto", lista de motos con búsqueda por placa normalizada, ficha de la moto con cambio de propietario y pestaña Historial (vacía hasta F09C), `hk-placa` y validadores espejo en `core/utils/validadores.ts`. Pruebas: backend 135 unitarias y 133 IT; frontend 203 unitarias; 41 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f05/` (claro/oscuro, 1440/768/375 y en inglés).
-- **Siguiente paso concreto:** iniciar F06 con `/fase F06`. Decidir antes el presupuesto del bundle inicial (ver deuda técnica).
-- **Bloqueos o dudas:** ninguno.
 
 ### Sesión anterior
 - **Fase:** F04B ✅ (cerrada 2026-10-30, PR #10)
@@ -42,6 +47,16 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-10-30 · F06 · Cantidades de inventario `DECIMAL(12,2)`, aprobado por el usuario · hay unidades fraccionables (litro, galón, metro).
+- 2026-10-30 · F06 · El ajuste de entrada lleva un costo unitario opcional (sin él, el promedio vigente) y recalcula el promedio con RN-07, aprobado por el usuario · si entrara siempre al promedio, el stock inicial de un producto nuevo entraría a $0 y distorsionaría la primera compra.
+- 2026-10-30 · F06 · Presupuesto del bundle inicial: aviso en 900 kB (error 1,2 MB), aprobado por el usuario · `@lucide/angular` es un solo módulo y cada ícono suma ~4 kB al inicial; hoy 821 kB (156 kB comprimido).
+- 2026-10-30 · F06 · `inventario` depende de `catalogo` y no al revés: `InventarioService` obtiene el producto bloqueado con `ProductoService.bloquear` (`Propagation.MANDATORY`) y las reglas viven en la entidad `Producto` · evita el ciclo y que otro módulo use el repositorio de productos.
+- 2026-10-30 · F06 · Las reservas no generan movimiento (solo cambian `stock_reservado`) · RN-11 registra cambios de existencias y sus tipos no incluyen reservas; consumir una reserva sí genera `SALIDA_ORDEN`.
+- 2026-10-30 · F06 · Los movimientos (con costos) los ven `PRODUCTOS_GESTIONAR` o `INVENTARIO_AJUSTAR` (admin y almacén), aprobado por el usuario en el plan · la tabla de permisos no los menciona.
+- 2026-10-30 · F06 · Todos los métodos de `InventarioService` rechazan productos inactivos, también la devolución de una venta anulada · lo pide el prompt; si un producto se desactiva y luego se anula una venta suya, habrá que reactivarlo (ver deuda técnica).
+- 2026-10-30 · F06 · Una categoría inactiva no se elige para productos nuevos, pero los existentes la conservan; nombre de categoría único · no hay regla de negocio sobre categorías.
+- 2026-10-30 · F06 · CSV de movimientos generado en el backend (UTF-8 con BOM, `;`, máx. 10 000 filas) con celdas que empiezan por `= + - @` neutralizadas · se abre directo en Excel en español y evita inyección de fórmulas con el motivo.
+- 2026-10-30 · F06 · Contador de stock bajo del menú (`ContadoresService`) se carga al iniciar sesión y se recarga tras crear, editar o ajustar · hasta F10 no hay tiempo real.
 - 2026-10-30 · F05 · `ConsultaOrdenesActivas` vive en `clientes.application` (el prompt decía `motocicletas`), aprobado por el usuario · `motocicletas` depende de `clientes`; si `ClienteService` usara una interfaz de `motocicletas` habría un ciclo que ArchUnit prohíbe.
 - 2026-10-30 · F05 · Desactivar un cliente no desactiva sus motos; a un cliente inactivo no se le asignan motos (`CLIENTE_INACTIVO`, al crear o al cambiar de dueño), aprobado por el usuario · RN-44 solo habla de órdenes activas.
 - 2026-10-30 · F05 · Teléfono del cliente obligatorio y colombiano de 10 dígitos (`@TelefonoColombiano`: celular `3…` o fijo `60…`, se guarda sin `+57` ni separadores); email, dirección y ciudad opcionales · el prompt pide teléfono de 10 dígitos y el taller necesita un contacto.
@@ -115,4 +130,7 @@ pm-cache-hk`.
 - RN-44: `SinOrdenesActivas` (en `clientes.application`) siempre responde `false`. En F09A `taller` implementa `ConsultaOrdenesActivas`, se borra la implementación provisional y se repite CP-19 con órdenes reales.
 - `GET /motocicletas/{id}/historial` devuelve `[]` con la estructura final (`HistorialServicio`); se llena en F09C (CP-21).
 - El texto de autorización de datos (RN-45) está en las traducciones; hacerlo configurable en F11.
-- Presupuesto del bundle inicial: 799,3 kB de 800 kB (aviso). Cualquier ícono o API nueva de `@angular/forms`/CDK lo supera; decidir en F06 si se sube el aviso o se cambia cómo se registran los íconos.
+- Presupuesto del bundle inicial: aviso subido a 900 kB en F06 (hoy 821 kB). Si vuelve a acercarse, cambiar el registro de íconos (p. ej. SVG por URL) en vez de seguir subiéndolo.
+- RN-15 vs. RN-21: anular una venta de un producto que se desactivó después dará `PRODUCTO_INACTIVO` en la devolución. Revisar en F08 si la devolución debe permitirse con el producto inactivo.
+- `StockBajoDetectado` se publica pero nadie lo escucha hasta F10 (notificaciones); la configuración `stock.alerta.habilitada` se aplicará allí.
+- El filtro por usuario de `GET /inventario/movimientos` existe en la API pero no en la pantalla (almacén no puede listar usuarios).

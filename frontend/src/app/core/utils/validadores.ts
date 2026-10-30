@@ -171,3 +171,27 @@ export const vinValido: ValidatorFn = (control: AbstractControl): ValidationErro
   if (typeof valor !== 'string' || valor.trim() === '') return null;
   return /^[A-HJ-NPR-Z0-9]{17}$/i.test(valor.trim()) ? null : { vinInvalido: true };
 };
+
+// ── Cantidades de inventario (DECIMAL(12,2) en el backend) ─────────────────────────────────────
+
+const PATRON_CANTIDAD = /^\d{1,10}([.,]\d{1,2})?$/;
+
+/** Texto escrito por el usuario (`12,5` o `12.5`) a número; `null` si no es una cantidad válida. */
+export function aCantidad(texto: string): number | null {
+  const limpio = texto.trim();
+  return PATRON_CANTIDAD.test(limpio) ? Number(limpio.replace(',', '.')) : null;
+}
+
+/**
+ * Cantidad con máximo 2 decimales: `{ cantidadInvalida: true }` si no lo es, y
+ * `{ cantidadPositiva: true }` si con `positiva` vale 0. Vacía la deja a `required`.
+ */
+export function cantidad(opciones: { positiva: boolean }): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const valor: unknown = control.value;
+    if (typeof valor !== 'string' || valor.trim() === '') return null;
+    const numero = aCantidad(valor);
+    if (numero === null) return { cantidadInvalida: true };
+    return opciones.positiva && numero === 0 ? { cantidadPositiva: true } : null;
+  };
+}

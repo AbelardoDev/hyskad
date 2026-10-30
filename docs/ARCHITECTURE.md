@@ -234,7 +234,9 @@ Pruebas mínimas: IT del controller con permisos por rol (401 sin token, 403 por
 
 Textos en `es.json`/`en.json` bajo la clave del módulo; códigos de error nuevos en `errors.*` y errores de validación locales en `validacion.*`. E2E del flujo principal + axe de lista, formulario y detalle en claro y oscuro.
 
-> Íconos: `@lucide/angular` es un único módulo, así que cualquier ícono nuevo (aunque solo lo use una ruta diferida) suma ~4 kB al bundle inicial. Antes de registrar uno nuevo en `shared/ui/iconos.ts`, reutilizar uno existente.
+> Íconos: `@lucide/angular` es un único módulo, así que cualquier ícono nuevo (aunque solo lo use una ruta diferida) suma ~4 kB al bundle inicial (aviso en 900 kB desde F06). Antes de registrar uno nuevo en `shared/ui/iconos.ts`, reutilizar uno existente.
+
+**Módulos que mueven stock** (ventas, compras, taller) no tocan `Producto` ni sus existencias: llaman a `inventario.application.InventarioService` dentro de su propia transacción, con una `Referencia(tipo, id, numero)` del documento. El contrato de cada método (qué bloquea, qué valida, qué movimiento crea y qué devuelve) está en su Javadoc.
 
 ## 7. Tiempo real y notificaciones (RF30, IC5)
 

@@ -12,6 +12,7 @@ import { LucideDynamicIcon } from '@lucide/angular';
 
 import { HkLogo } from '../../shared/ui/logo/logo';
 import { HkTooltipDirective } from '../../shared/ui/tooltip/tooltip';
+import { ContadoresService } from './contadores.service';
 import { NavegacionService } from './navegacion.service';
 
 /**
@@ -91,6 +92,23 @@ import { NavegacionService } from './navegacion.service';
                   @if (!colapsado()) {
                     <span class="truncate">{{ item.clave | transloco }}</span>
                   }
+                  @if (item.contador && contadores.valor(item.contador); as n) {
+                    @if (colapsado()) {
+                      <span
+                        class="absolute top-1.5 right-2 size-2 rounded-full bg-warning ring-2 ring-sidebar-bg"
+                        aria-hidden="true"
+                      ></span>
+                    } @else {
+                      <span
+                        class="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-warning px-1.5 text-xs font-semibold text-navy-950 tabular"
+                        aria-hidden="true"
+                        >{{ n }}</span
+                      >
+                    }
+                    <span class="sr-only">{{
+                      'layout.contadores.' + item.contador | transloco: { n }
+                    }}</span>
+                  }
                 </a>
               </li>
             }
@@ -108,4 +126,5 @@ export class HkSidebarNav {
   readonly navegar = output<void>();
 
   protected readonly navegacion = inject(NavegacionService);
+  protected readonly contadores = inject(ContadoresService);
 }

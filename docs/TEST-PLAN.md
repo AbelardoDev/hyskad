@@ -112,11 +112,20 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 ### Inventario, proveedores y compras (F06–F07)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
-| CP-22 | RF17 | Crear producto con código duplicado | I | 409 | Pendiente |
-| CP-23 | RF21, RN-07 | Compra de 10 u a $12.000 sobre 10 u a $10.000 | U, I | Stock 20, costo promedio $11.000, movimiento `ENTRADA_COMPRA` | Pendiente |
-| CP-24 | RF18, RN-13 | Ajuste de salida que dejaría stock bajo lo reservado | I | 409 `STOCK_INSUFICIENTE` | Pendiente |
-| CP-25 | RN-11 | Cada movimiento queda registrado con stock resultante y usuario | I | Fila en `movimiento_inventario` coherente | Pendiente |
-| CP-26 | RN-14 | Stock cruza el mínimo | I | Se publica un único `StockBajoDetectado` | Pendiente |
+| CP-22 | RF17 | Crear producto con código duplicado | I | 409 | Aprobado (F06, `CODIGO_DUPLICADO` aunque cambien mayúsculas o espacios) |
+| CP-23 | RF21, RN-07 | Compra de 10 u a $12.000 sobre 10 u a $10.000 | U, I | Stock 20, costo promedio $11.000, movimiento `ENTRADA_COMPRA` | Aprobado (F06: U de la fórmula; I con `registrarEntradaCompra`. La compra en sí llega en F07) |
+| CP-24 | RF18, RN-13 | Ajuste de salida que dejaría stock bajo lo reservado | I | 409 `STOCK_INSUFICIENTE` | Aprobado (F06, servicio y `POST /inventario/ajustes`) |
+| CP-25 | RN-11 | Cada movimiento queda registrado con stock resultante y usuario | I | Fila en `movimiento_inventario` coherente | Aprobado (F06) |
+| CP-26 | RN-14 | Stock cruza el mínimo | I | Se publica un único `StockBajoDetectado` | Aprobado (F06; vuelve a publicarse solo si sube y baja de nuevo) |
+| CP-95 | RN-07 | Costo promedio con stock 0, cantidades con decimales y redondeo | U | Con stock 0 toma el costo de la entrada; 2 decimales `HALF_UP` | Aprobado (F06) |
+| CP-96 | RN-12, RN-10 | 20 hilos reservan 1 u del mismo producto con stock 10 | I | Exactamente 10 reservas; `stock_reservado = 10` | Aprobado (F06) |
+| CP-97 | RF19, RN-11 | Reservar y luego consumir la reserva | I | Baja existencias y reserva a 0 con un solo movimiento `SALIDA_ORDEN` | Aprobado (F06) |
+| CP-98 | RN-15 | Producto inactivo en cualquier movimiento; desactivar con reservas | U, I | 409 `PRODUCTO_INACTIVO` en los 9 tipos de operación; 409 `RESERVA_PENDIENTE` | Aprobado (F06) |
+| CP-99 | RF17, IS4 | Mecánico y vendedor consultan productos | I, E | Sin `costoPromedio` ni acciones de gestión; almacén y admin sí lo ven | Aprobado (F06) |
+| CP-100 | RN-09, RN-17 | Devolución de venta y salida por anulación de compra | I | La devolución entra al costo de la venta y recalcula; la anulación sale al promedio sin recalcularlo | Aprobado (F06) |
+| CP-101 | RF18, RN-13 | Ajuste de entrada desde la UI y su movimiento | U, E | Vista previa del stock resultante; la salida que supera el disponible no se confirma; el movimiento aparece en la ficha y en el listado global | Aprobado (F06) |
+| CP-102 | RF18 | Exportar movimientos a CSV | I | UTF-8 con BOM, `;`, y celdas que empiezan por `= + - @` neutralizadas | Aprobado (F06) |
+| CP-103 | RNF Acc. | axe en productos, drawers de producto y ajuste, ficha con movimientos y listado global, claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F06) |
 | CP-27 | RN-17 | Anular compra sin stock disponible suficiente | I | 409 | Pendiente |
 | CP-28 | RF20 | CRUD de proveedor con NIT válido | I | Operaciones correctas | Pendiente |
 

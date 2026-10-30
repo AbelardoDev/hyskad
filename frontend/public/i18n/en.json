@@ -82,7 +82,10 @@
     "perfil": "My profile",
     "cambiar_password": "Change password",
     "cerrar_sesion": "Sign out",
-    "ir_inicio": "Go to home"
+    "ir_inicio": "Go to home",
+    "contadores": {
+      "stockBajo": "{{n}} products with low stock"
+    }
   },
   "idiomas": {
     "es": "Español",
@@ -178,7 +181,9 @@
     "documentoInvalido": "The number doesn't match the document type",
     "placaInvalida": "Valid formats: ABC12D, ABC12 or 123ABC (motor tricycle)",
     "telefonoInvalido": "Enter a 10-digit mobile or landline number",
-    "vinInvalido": "The VIN has 17 letters and digits, without I, O or Q"
+    "vinInvalido": "The VIN has 17 letters and digits, without I, O or Q",
+    "cantidadInvalida": "Enter a quantity with at most 2 decimals",
+    "cantidadPositiva": "The quantity must be greater than zero"
   },
   "errors": {
     "DESCONOCIDO": "Something went wrong. Please try again.",
@@ -227,7 +232,18 @@
     "ORDENES_ACTIVAS": "There are active work orders; close them before deactivating",
     "MIN": "The value is below the minimum allowed",
     "MAX": "The value is above the maximum allowed",
-    "POSITIVE": "The value must be greater than zero"
+    "POSITIVE": "The value must be greater than zero",
+    "CODIGO_DUPLICADO": "A product with that code already exists",
+    "CODIGO_INVALIDO": "Use letters, digits and - _ . /",
+    "CATEGORIA_DUPLICADA": "A category with that name already exists",
+    "CATEGORIA_INACTIVA": "The category is inactive: choose another or activate it",
+    "PRODUCTO_INACTIVO": "The product is inactive",
+    "STOCK_INSUFICIENTE": "Not enough stock available",
+    "RESERVA_INSUFICIENTE": "There aren't that many reserved units",
+    "RESERVA_PENDIENTE": "The product has units reserved in work orders: it can't be deactivated",
+    "CANTIDAD_INVALIDA": "The quantity must be greater than zero with at most 2 decimals",
+    "DECIMAL_MIN": "The value is below the minimum allowed",
+    "DIGITS": "The number has too many digits or decimals"
   },
   "roles": {
     "ADMIN": "Administrator",
@@ -552,6 +568,151 @@
       "vacio_titulo": "No services recorded",
       "vacio_texto": "This motorcycle's work orders will show up here, with their services, parts and totals.",
       "error": "History couldn't be loaded"
+    }
+  },
+  "inventario": {
+    "titulo": "Inventory",
+    "subtitulo": "Products, parts and their stock",
+    "nuevo": "New product",
+    "buscar": "Search by code, name or brand…",
+    "vacio_titulo": "No products match",
+    "vacio_texto": "Try another search or clear the filters.",
+    "error_titulo": "Products couldn't be loaded",
+    "creado": "Product {{nombre}} created",
+    "actualizado": "Changes to {{nombre}} saved",
+    "activado": "{{nombre}} is active again",
+    "desactivado": "{{nombre}} was deactivated",
+    "nivel_accesible": "Stock level against the minimum of {{minimo}}",
+    "confirmar_activar": {
+      "titulo": "Activate product?",
+      "mensaje": "{{nombre}} can be sold, purchased and added to orders again."
+    },
+    "confirmar_desactivar": {
+      "titulo": "Deactivate product?",
+      "mensaje": "{{nombre}} can't be sold, purchased, adjusted or added to orders. Its history is kept."
+    },
+    "filtros": {
+      "todas_categorias": "All categories",
+      "stock_bajo": "Low stock",
+      "activos": "Active",
+      "inactivos": "Inactive"
+    },
+    "estado_stock": {
+      "OK": "In stock",
+      "BAJO": "Low stock",
+      "AGOTADO": "Out of stock"
+    },
+    "unidades": {
+      "UNIDAD": "Unit",
+      "LITRO": "Liter",
+      "GALON": "Gallon",
+      "KIT": "Kit",
+      "PAR": "Pair",
+      "METRO": "Meter"
+    },
+    "unidades_corto": {
+      "UNIDAD": "u",
+      "LITRO": "L",
+      "GALON": "gal",
+      "KIT": "kit",
+      "PAR": "pair",
+      "METRO": "m"
+    },
+    "campos": {
+      "producto": "Product",
+      "codigo": "Code",
+      "nombre": "Name",
+      "categoria": "Category",
+      "marca": "Brand",
+      "unidad": "Unit of measure",
+      "precio": "Sale price",
+      "costo": "Average cost",
+      "minimo": "Minimum stock",
+      "disponible": "Available",
+      "estado_stock": "Status",
+      "stock_actual": "On hand",
+      "reservado": "Reserved",
+      "descripcion": "Description"
+    },
+    "form": {
+      "titulo_nuevo": "New product",
+      "titulo_editar": "Edit product",
+      "codigo_ayuda": "Part reference; saved in uppercase.",
+      "elige_categoria": "Choose a category",
+      "precio_ayuda": "Before VAT, in pesos.",
+      "minimo_ayuda": "When availability reaches this, a low-stock alert is raised.",
+      "stock_inicial": "The product starts with no stock. Load it with a purchase or an inbound adjustment."
+    },
+    "categorias": {
+      "titulo": "Categories",
+      "descripcion": "Inactive ones can't be chosen for new products; existing products keep theirs.",
+      "nueva": "New category",
+      "renombrar": "Rename category",
+      "crear": "Create",
+      "creada": "Category {{nombre}} created",
+      "actualizada": "Category {{nombre}} updated",
+      "vacio": "No categories yet",
+      "editar_de": "Edit {{nombre}}",
+      "activar_de": "Activate {{nombre}}",
+      "desactivar_de": "Deactivate {{nombre}}"
+    },
+    "ajuste": {
+      "titulo": "Adjust inventory",
+      "tipo": "Adjustment type",
+      "tipos": {
+        "ENTRADA": "In (adds stock)",
+        "SALIDA": "Out (removes stock)"
+      },
+      "cantidad": "Quantity",
+      "costo": "Unit cost",
+      "costo_ayuda": "Leave it empty to use the current average cost.",
+      "motivo": "Reason",
+      "motivo_ayuda": "At least 10 characters: it stays in the product history.",
+      "producto_ayuda": "Active products only.",
+      "buscar_producto": "Search product…",
+      "disponible_opcion": "available",
+      "resultante": "Will remain",
+      "excede": "The removal exceeds the available stock ({{disponible}}).",
+      "confirmar": "Save adjustment",
+      "registrado": "Adjustment of {{nombre}} saved"
+    },
+    "tipos": {
+      "ENTRADA_COMPRA": "Purchase receipt",
+      "SALIDA_VENTA": "Sale",
+      "SALIDA_ORDEN": "Work order usage",
+      "ENTRADA_AJUSTE": "Adjustment in",
+      "SALIDA_AJUSTE": "Adjustment out",
+      "DEVOLUCION_ANULACION_VENTA": "Return from voided sale",
+      "SALIDA_ANULACION_COMPRA": "Voided purchase"
+    },
+    "movimientos": {
+      "titulo": "Movements",
+      "subtitulo": "Stock in and out for every product",
+      "exportar": "Export CSV",
+      "todos_productos": "All products",
+      "todos_tipos": "All types",
+      "desde": "From",
+      "hasta": "To",
+      "fecha": "Date",
+      "tipo": "Type",
+      "cantidad": "Quantity",
+      "costo": "Unit cost",
+      "stock_resultante": "Resulting stock",
+      "motivo": "Reason or reference",
+      "detalle": "{{stock}} left · cost {{costo}}",
+      "vacio_titulo": "No movements",
+      "vacio_texto": "There are no movements with those filters.",
+      "vacio_producto": "This product has no stock in or out yet.",
+      "error": "Movements couldn't be loaded"
+    },
+    "detalle": {
+      "miga": "Product",
+      "resumen": "Summary",
+      "existencias": "Stock",
+      "datos": "Product details",
+      "no_encontrado": "Product not found",
+      "no_encontrado_texto": "The link may be wrong or you may not have access.",
+      "volver": "Back to inventory"
     }
   }
 }

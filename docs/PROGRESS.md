@@ -10,7 +10,7 @@
 | F01 | Monorepo, infraestructura local y CI | ✅ Terminada | #1 | Repo público AbelardoDev/hyskad; `main` protegida por el CI |
 | F02 | Base del backend | ✅ Terminada | #7 | Swagger en /api/docs (dev) |
 | F03 | Autenticación, usuarios y permisos (backend) | ✅ Terminada | #8 | Usuarios dev en el README |
-| F04A | Sistema de diseño, tema, i18n y layout | ✅ Terminada | #PR | Galería en /dev/ui (solo dev) |
+| F04A | Sistema de diseño, tema, i18n y layout | ✅ Terminada | #9 | Galería en /dev/ui (solo dev) |
 | F04B | Sesión, guards y administración de usuarios (frontend) | ⬜ Pendiente | | |
 | F05 | Clientes y motocicletas | ⬜ Pendiente | | |
 | F06 | Catálogo de productos e inventario | ⬜ Pendiente | | |
@@ -28,7 +28,7 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F04A ✅ (cerrada 2026-10-29)
+- **Fase:** F04A ✅ (cerrada 2026-10-29, PR #9)
 - **Rama:** `feature/f04a-design-system` → `main`
 - **Hecho:** tokens completos en `styles.css` (escalas, semánticos claro/oscuro, `-soft`, `-ink`, `border-strong`) con `npm run contrast:check`; fuentes Inter y Plus Jakarta Sans auto-alojadas; íconos `@lucide/angular` registrados en `shared/ui/iconos.ts`; `ThemeService` + script anti-parpadeo + `theme-color`; `LanguageService` (Transloco con scopes, `<html lang>`, `es-CO`/`en-US`), pipes `cop`, `fecha`, `tiempoRelativo` y `npm run i18n:check` (en el CI). Kit `shared/ui` completo salvo `hk-chart` y `hk-command-palette` (ver DESIGN-SYSTEM §6), campos con `ControlValueAccessor` y `hk-form-field` que traduce `validacion.*` y `errors.<CODE>`. Layout: `HkShell` (sidebar 260/76 px recordado, colapsado en tablet, drawer + barra inferior en móvil), topbar (migas, buscador placeholder con Ctrl+K, idioma, tema, notificaciones, usuario), `TituloStrategy`, 13 rutas lazy con página "Próximamente" y 404 de marca. Galería `/dev/ui` excluida del build de producción. Pruebas: 92 unitarias (Vitest), 13 E2E + axe en claro/oscuro (Chromium, Firefox y WebKit). Revisado en 375/768/1024/1440 px, claro y oscuro, es y en, sin scroll horizontal.
 - **Siguiente paso concreto:** iniciar F04B con `/fase F04B` (sesión, guards, filtrado del menú por permiso, login). Revisar los PRs de dependabot abiertos.

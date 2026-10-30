@@ -9,7 +9,7 @@
 | F00 | Preparación del entorno | ✅ Terminada | — | Entorno verificado 2026-10-29 |
 | F01 | Monorepo, infraestructura local y CI | ✅ Terminada | #1 | Repo público AbelardoDev/hyskad; `main` protegida por el CI |
 | F02 | Base del backend | ✅ Terminada | #7 | Swagger en /api/docs (dev) |
-| F03 | Autenticación, usuarios y permisos (backend) | ✅ Terminada | PR_F03 | Usuarios dev en el README |
+| F03 | Autenticación, usuarios y permisos (backend) | ✅ Terminada | #8 | Usuarios dev en el README |
 | F04A | Sistema de diseño, tema, i18n y layout | ⬜ Pendiente | | |
 | F04B | Sesión, guards y administración de usuarios (frontend) | ⬜ Pendiente | | |
 | F05 | Clientes y motocicletas | ⬜ Pendiente | | |
@@ -28,7 +28,7 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F03 ✅ (cerrada 2026-10-29, PR PR_F03)
+- **Fase:** F03 ✅ (cerrada 2026-10-29, PR #8)
 - **Rama:** `feature/f03-auth-usuarios` → `main`
 - **Hecho:** módulo `usuarios` (`Usuario`, `UsuarioPermiso`, `Rol`, `Permiso` con marca solo admin, `PermisosPorRol` = tabla de ARCHITECTURE §5, `PermisoService`, `UsuarioService` con RN-46/47/48, `CuentaService` para auth, `AdminInicialRunner`) y módulo `auth` (JWT HS256 con Nimbus, refresh opaco hasheado con rotación y revocación de la familia ante reúso, cookie `hk_refresh`, recuperación de contraseña de 30 min y un solo uso con correo Thymeleaf es/en, rate limiting con Bucket4j). En `shared`: `UsuarioActual`, `JwtConfig` (BCrypt 12, converter `permisos` → authorities sin prefijo), `AuditorAware` real, `@PasswordSegura`, `CorreoService`, 429 con `Retry-After`, 400 para `sort` inválido. Migraciones `V2` (`debe_cambiar_password`) y `db/dev-data/R__usuarios_dev.sql` (solo dev). Pruebas: 113 unitarias + 74 de integración (GreenMail para correos); cobertura de `auth.application` 92,9 % y de `usuarios.application` 98,5 %. Verificado a mano en dev: admin → `/usuarios` 200, mecánico 403, correo de recuperación en Mailpit con el enlace correcto, logs sin secretos.
 - **Siguiente paso concreto:** iniciar F04A con `/fase F04A`. Revisar los PRs de dependabot abiertos.

@@ -1,0 +1,146 @@
+{
+  "titulo": "UI kit",
+  "subtitulo": "Showcase of the design system components and tokens. Development only.",
+  "controles": {
+    "tema": "Theme",
+    "idioma": "Language"
+  },
+  "secciones": {
+    "colores": "Colors",
+    "tipografia": "Typography",
+    "botones": "Buttons",
+    "formularios": "Forms",
+    "badges": "Badges and order statuses",
+    "tarjetas": "Cards and KPIs",
+    "tabla": "Table",
+    "navegacion": "Tabs and timeline",
+    "overlays": "Dialogs, menus and toasts",
+    "feedback": "Empty, loading and avatars",
+    "formato": "Currency and date formatting",
+    "marca": "Logo"
+  },
+  "colores": {
+    "escala": "Brand scale",
+    "semanticos": "Semantic tokens",
+    "estados": "Statuses"
+  },
+  "tipografia": {
+    "titulo_pagina": "Page title",
+    "titulo_seccion": "Section or card title",
+    "cuerpo": "Body text designed to be read for hours without strain.",
+    "ayuda": "Label or helper text",
+    "kpi": "KPI number"
+  },
+  "botones": {
+    "primario": "Save order",
+    "secundario": "Cancel",
+    "fantasma": "View details",
+    "peligro": "Void sale",
+    "enlace": "View history",
+    "cargando": "Saving…",
+    "deshabilitado": "Unavailable",
+    "pequeno": "Small",
+    "grande": "Large",
+    "nuevo": "New order",
+    "editar": "Edit",
+    "eliminar": "Delete"
+  },
+  "form": {
+    "nombre": "Customer name",
+    "nombre_ayuda": "As shown on the ID document",
+    "email": "Email",
+    "password": "Password",
+    "documento": "Document type",
+    "documento_placeholder": "Choose a type",
+    "moto": "Motorcycle",
+    "moto_placeholder": "Search by plate or model",
+    "fecha": "Check-in date",
+    "monto": "Deposit amount",
+    "observaciones": "Notes",
+    "acepta": "The customer authorizes data processing",
+    "notificar": "Notify by email",
+    "enviar": "Validate form",
+    "valido": "Form is valid",
+    "error_servidor": "Simulate server error",
+    "tipos": {
+      "CC": "Citizen ID",
+      "CE": "Foreigner ID",
+      "NIT": "Tax ID (NIT)",
+      "PA": "Passport"
+    }
+  },
+  "tarjetas": {
+    "titulo": "Today's summary",
+    "subtitulo": "Updated a moment ago",
+    "texto": "Cards group related content with p-5 padding (p-4 on mobile).",
+    "ventas_hoy": "Today's sales",
+    "ordenes_activas": "Active orders",
+    "pendientes": "Awaiting approval",
+    "stock_bajo": "Low-stock products"
+  },
+  "tabla": {
+    "etiqueta": "Sample orders",
+    "numero": "Number",
+    "placa": "Plate",
+    "cliente": "Customer",
+    "estado": "Status",
+    "total": "Total",
+    "ingreso": "Check-in",
+    "cargando": "Simulate loading",
+    "vacia": "Simulate empty",
+    "seleccionadas": "{{n}} selected",
+    "vacio_titulo": "No orders match these filters",
+    "vacio_texto": "Try another search or clear the filters.",
+    "filtro_estado": "Status: In repair",
+    "abierta": "You opened order {{numero}}"
+  },
+  "navegacion": {
+    "resumen": "Summary",
+    "diagnostico": "Diagnosis",
+    "items": "Services and parts",
+    "historial": "History",
+    "contenido": "Content of the “{{pestana}}” tab.",
+    "cancelada": "Show as cancelled"
+  },
+  "overlays": {
+    "abrir_modal": "Open modal",
+    "abrir_drawer": "Open drawer",
+    "confirmar": "Confirm action",
+    "confirmar_peligro": "Dangerous action with reason",
+    "modal_titulo": "Record diagnosis",
+    "modal_texto": "Modals trap focus, close with Esc and return focus to the button that opened them.",
+    "drawer_titulo": "Advanced filters",
+    "drawer_texto": "The drawer slides in from the right and is meant for secondary forms or filters.",
+    "confirmar_titulo": "Send quote?",
+    "confirmar_mensaje": "The quote will be emailed to the customer.",
+    "peligro_titulo": "Void sale V-000123",
+    "peligro_mensaje": "Voiding returns the stock and cannot be undone.",
+    "peligro_boton": "Void sale",
+    "confirmado": "Action confirmed",
+    "confirmado_motivo": "Reason: {{motivo}}",
+    "cancelado": "Action cancelled",
+    "toast_exito": "Success toast",
+    "toast_error": "Error toast",
+    "toast_aviso": "Warning toast",
+    "toast_info": "Info toast",
+    "toast_titulo_exito": "Order saved",
+    "toast_titulo_error": "Could not save",
+    "toast_titulo_aviso": "Low stock",
+    "toast_titulo_info": "New order assigned",
+    "toast_mensaje": "This toast closes by itself after 4 seconds.",
+    "menu": "Actions",
+    "menu_elegido": "You chose “{{opcion}}”",
+    "tooltip": "Hover or focus me",
+    "tooltip_texto": "I am an accessible tooltip"
+  },
+  "feedback": {
+    "vacio_titulo": "No customers yet",
+    "vacio_texto": "Add the first customer to start creating work orders.",
+    "vacio_accion": "New customer"
+  },
+  "formato": {
+    "moneda": "Currency (COP)",
+    "fecha": "Date",
+    "relativa": "Relative date"
+  }
+}

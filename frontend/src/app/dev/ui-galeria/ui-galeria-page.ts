@@ -9,6 +9,7 @@ import {
 } from '@jsverse/transloco';
 import { LucideDynamicIcon } from '@lucide/angular';
 
+import { AuthService } from '../../core/auth/auth.service';
 import { IDIOMAS, LanguageService } from '../../core/i18n/language.service';
 import { PreferenciaTema, ThemeService } from '../../core/theme/theme.service';
 import { CopPipe, FechaPipe, TiempoRelativoPipe } from '../../core/utils/formato.pipes';
@@ -122,6 +123,7 @@ const TAMANO_PAGINA = 5;
 export class UiGaleriaPage {
   protected readonly tema = inject(ThemeService);
   protected readonly idioma = inject(LanguageService);
+  protected readonly auth = inject(AuthService);
   private readonly transloco = inject(TranslocoService);
   private readonly dialogos = inject(DialogosService);
   private readonly confirmacion = inject(ConfirmacionService);

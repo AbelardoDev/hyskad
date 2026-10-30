@@ -15,40 +15,6 @@ import { DEV_ROUTES } from './dev/dev.routes';
 export const routes: Routes = [
   {
     path: '',
-    component: AuthLayout,
-    children: [
-      {
-        path: 'login',
-        canActivate: [invitadoGuard],
-        data: { miga: 'auth.login.miga' },
-        loadComponent: () => import('./features/auth/login-page').then((m) => m.LoginPage),
-      },
-      {
-        path: 'olvide-password',
-        canActivate: [invitadoGuard],
-        data: { miga: 'auth.olvide.miga' },
-        loadComponent: () =>
-          import('./features/auth/olvide-password-page').then((m) => m.OlvidePasswordPage),
-      },
-      {
-        path: 'restablecer-password',
-        data: { miga: 'auth.restablecer.miga' },
-        loadComponent: () =>
-          import('./features/auth/restablecer-password-page').then(
-            (m) => m.RestablecerPasswordPage,
-          ),
-      },
-      {
-        path: 'cambiar-password',
-        canActivate: [sesionGuard],
-        data: { miga: 'auth.cambiar.miga' },
-        loadComponent: () =>
-          import('./features/auth/cambiar-password-page').then((m) => m.CambiarPasswordPage),
-      },
-    ],
-  },
-  {
-    path: '',
     component: HkShell,
     canActivate: [authGuard],
     canActivateChild: [authGuard],
@@ -150,6 +116,41 @@ export const routes: Routes = [
           import('./core/layout/paginas/acceso-denegado-page').then((m) => m.AccesoDenegadoPage),
       },
       ...DEV_ROUTES,
+    ],
+  },
+  // Después del shell: con `''` y sin hijo que coincida, capturaría la raíz.
+  {
+    path: '',
+    component: AuthLayout,
+    children: [
+      {
+        path: 'login',
+        canActivate: [invitadoGuard],
+        data: { miga: 'auth.login.miga' },
+        loadComponent: () => import('./features/auth/login-page').then((m) => m.LoginPage),
+      },
+      {
+        path: 'olvide-password',
+        canActivate: [invitadoGuard],
+        data: { miga: 'auth.olvide.miga' },
+        loadComponent: () =>
+          import('./features/auth/olvide-password-page').then((m) => m.OlvidePasswordPage),
+      },
+      {
+        path: 'restablecer-password',
+        data: { miga: 'auth.restablecer.miga' },
+        loadComponent: () =>
+          import('./features/auth/restablecer-password-page').then(
+            (m) => m.RestablecerPasswordPage,
+          ),
+      },
+      {
+        path: 'cambiar-password',
+        canActivate: [sesionGuard],
+        data: { miga: 'auth.cambiar.miga' },
+        loadComponent: () =>
+          import('./features/auth/cambiar-password-page').then((m) => m.CambiarPasswordPage),
+      },
     ],
   },
   {

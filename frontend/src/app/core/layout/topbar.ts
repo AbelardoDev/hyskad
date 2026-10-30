@@ -188,12 +188,12 @@ const POSICION_PANEL: ConnectedPosition[] = [
         (seleccion)="alElegirUsuario($event)"
       >
         <hk-avatar [nombre]="usuario()?.nombre ?? ''" tamano="sm" aria-hidden="true" />
-        @if (usuario(); as u) {
-          <div hkMenuEncabezado class="mb-1.5 border-b border-border px-2.5 pt-1 pb-2.5">
+        <div hkMenuEncabezado class="mb-1.5 border-b border-border px-2.5 pt-1 pb-2.5">
+          @if (usuario(); as u) {
             <p class="truncate text-sm font-semibold text-fg">{{ u.nombre }}</p>
             <p class="truncate text-xs text-muted">{{ 'roles.' + u.rol | transloco }}</p>
-          </div>
-        }
+          }
+        </div>
       </hk-dropdown-menu>
     </div>
   `,

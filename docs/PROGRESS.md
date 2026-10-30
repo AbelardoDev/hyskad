@@ -28,11 +28,14 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F04A ✅ (cerrada 2026-10-29, PR #9)
-- **Rama:** `feature/f04a-design-system` → `main`
-- **Hecho:** tokens completos en `styles.css` (escalas, semánticos claro/oscuro, `-soft`, `-ink`, `border-strong`) con `npm run contrast:check`; fuentes Inter y Plus Jakarta Sans auto-alojadas; íconos `@lucide/angular` registrados en `shared/ui/iconos.ts`; `ThemeService` + script anti-parpadeo + `theme-color`; `LanguageService` (Transloco con scopes, `<html lang>`, `es-CO`/`en-US`), pipes `cop`, `fecha`, `tiempoRelativo` y `npm run i18n:check` (en el CI). Kit `shared/ui` completo salvo `hk-chart` y `hk-command-palette` (ver DESIGN-SYSTEM §6), campos con `ControlValueAccessor` y `hk-form-field` que traduce `validacion.*` y `errors.<CODE>`. Layout: `HkShell` (sidebar 260/76 px recordado, colapsado en tablet, drawer + barra inferior en móvil), topbar (migas, buscador placeholder con Ctrl+K, idioma, tema, notificaciones, usuario), `TituloStrategy`, 13 rutas lazy con página "Próximamente" y 404 de marca. Galería `/dev/ui` excluida del build de producción. Pruebas: 92 unitarias (Vitest), 13 E2E + axe en claro/oscuro (Chromium, Firefox y WebKit). Revisado en 375/768/1024/1440 px, claro y oscuro, es y en, sin scroll horizontal.
-- **Siguiente paso concreto:** iniciar F04B con `/fase F04B` (sesión, guards, filtrado del menú por permiso, login). Revisar los PRs de dependabot abiertos.
-- **Bloqueos o dudas:** ninguno.
+- **Fase:** F04B 🟦 en curso (interrumpida 2026-10-30 por límite de uso).
+- **Rama:** `feature/f04b-sesion-usuarios` (sin push).
+- **Hecho:** perfil `e2e` en el backend con `POST /api/v1/test/reset`, rate limit desactivable solo en e2e, IT. `infra/docker-compose.e2e.yml` (MySQL 3307, Mailpit 8026, Nginx 4300 con `BACKEND_PORT`). Frontend completo: AuthService, interceptores, guards, directiva, menú filtrado, login, olvidé/restablecer, cambio obligatorio, perfil, usuarios y permisos. 148 pruebas unitarias en verde, lint OK. E2E escritas (`auth.spec.ts`, `usuarios.spec.ts`, `a11y/auth.a11y.spec.ts`).
+- **Pendiente:**
+  1. E2E en rojo: (a) `getByLabel` no encuentra los campos de contraseña; usar `getByRole('textbox', { name, exact: true })`. (b) axe `label-content-name-mismatch` en el botón del menú de usuario: las iniciales del avatar son texto visible que no forma parte de `aria-label`. (c) Revisar la prueba de Mailpit (no se encontró el correo en 15 s) y la del clic en el menú "Permisos" (elemento no estable).
+  2. Job `e2e` en `.github/workflows/ci.yml`.
+  3. Capturas claro/oscuro/móvil, actualizar TEST-PLAN (CP-01, CP-04, CP-09), `/verificar`, PR y merge.
+- **Entorno local:** backend e2e en :8081 (en :8080 corre un backend dev del usuario), `BACKEND_PORT=8081 docker compose -f infra/docker-compose.e2e.yml up -d`, `E2E_BASE_URL=http://localhost:4300 npx playwright test --project=chromium`.
 
 ## Decisiones tomadas durante el desarrollo
 

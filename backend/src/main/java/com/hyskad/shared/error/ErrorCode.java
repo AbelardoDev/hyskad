@@ -37,6 +37,15 @@ public enum ErrorCode {
     VIN_DUPLICADO(HttpStatus.CONFLICT),
     CLIENTE_INACTIVO(HttpStatus.CONFLICT),
     ORDENES_ACTIVAS(HttpStatus.CONFLICT),
+    // catálogo e inventario
+    CODIGO_DUPLICADO(HttpStatus.CONFLICT),
+    CATEGORIA_DUPLICADA(HttpStatus.CONFLICT),
+    CATEGORIA_INACTIVA(HttpStatus.CONFLICT),
+    PRODUCTO_INACTIVO(HttpStatus.CONFLICT),
+    STOCK_INSUFICIENTE(HttpStatus.CONFLICT),
+    RESERVA_INSUFICIENTE(HttpStatus.CONFLICT),
+    RESERVA_PENDIENTE(HttpStatus.CONFLICT),
+    CANTIDAD_INVALIDA(HttpStatus.BAD_REQUEST),
     ERROR_INTERNO(HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus status;

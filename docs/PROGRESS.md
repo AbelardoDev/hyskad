@@ -13,7 +13,7 @@
 | F04A | Sistema de diseño, tema, i18n y layout | ✅ Terminada | #9 | Galería en /dev/ui (solo dev) |
 | F04B | Sesión, guards y administración de usuarios (frontend) | ✅ Terminada | #10 | Job `e2e` en el CI; capturas en `docs/capturas/f04b` |
 | F05 | Clientes y motocicletas | ✅ Terminada | #11 | Plantilla CRUD en ARCHITECTURE §6.1; capturas en `docs/capturas/f05` |
-| F06 | Catálogo de productos e inventario | ⬜ Pendiente | | |
+| F06 | Catálogo de productos e inventario | 🟦 En curso | | |
 | F07 | Proveedores y compras | ⬜ Pendiente | | |
 | F08 | Ventas y comprobantes | ⬜ Pendiente | | |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ⬜ Pendiente | | |

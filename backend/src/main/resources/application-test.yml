@@ -12,6 +12,11 @@ management:
 hyskad:
   base-url: http://localhost:4200
   mail-from: no-reply@hyskad.test
+  jwt:
+    secret: vhNkuVC8Qw7Ze7sG/0YYA5tJv7pJqOeopvIa5pzI3ZDt33fbdjrUx0VoOGbVz/5o
+  admin:
+    email: admin@hyskad.test
+    password: AdminInicial2026
 
 springdoc:
   api-docs:

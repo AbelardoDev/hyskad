@@ -10,7 +10,7 @@
 | F01 | Monorepo, infraestructura local y CI | ✅ Terminada | #1 | Repo público AbelardoDev/hyskad; `main` protegida por el CI |
 | F02 | Base del backend | ✅ Terminada | #7 | Swagger en /api/docs (dev) |
 | F03 | Autenticación, usuarios y permisos (backend) | ✅ Terminada | #8 | Usuarios dev en el README |
-| F04A | Sistema de diseño, tema, i18n y layout | ⬜ Pendiente | | |
+| F04A | Sistema de diseño, tema, i18n y layout | 🟦 En curso | | |
 | F04B | Sesión, guards y administración de usuarios (frontend) | ⬜ Pendiente | | |
 | F05 | Clientes y motocicletas | ⬜ Pendiente | | |
 | F06 | Catálogo de productos e inventario | ⬜ Pendiente | | |

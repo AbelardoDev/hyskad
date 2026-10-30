@@ -18,6 +18,23 @@ public final class Normalizador {
         return numero == null ? null : numero.replaceAll("[\\s.-]", "").toUpperCase(Locale.ROOT);
     }
 
+    /**
+     * Teléfono colombiano solo con dígitos: quita espacios, guiones, puntos, paréntesis y el
+     * indicativo {@code +57}: {@code "+57 300 123-4567"} → {@code "3001234567"}.
+     */
+    public static String telefono(String telefono) {
+        if (telefono == null) {
+            return null;
+        }
+        String digitos = telefono.replaceAll("[\\s().-]", "");
+        return digitos.startsWith("+57") ? digitos.substring(3) : digitos;
+    }
+
+    /** VIN en mayúsculas y sin espacios alrededor; vacío se trata como ausente. */
+    public static String vin(String vin) {
+        return vin == null || vin.isBlank() ? null : vin.trim().toUpperCase(Locale.ROOT);
+    }
+
     /** Email sin espacios alrededor y en minúsculas, para que la unicidad no dependa de mayúsculas. */
     public static String email(String email) {
         return email == null ? null : email.trim().toLowerCase(Locale.ROOT);

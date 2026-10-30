@@ -31,6 +31,12 @@ public enum ErrorCode {
     ULTIMO_ADMIN(HttpStatus.CONFLICT),
     AUTO_MODIFICACION(HttpStatus.CONFLICT),
     PERMISO_SOLO_ADMIN(HttpStatus.BAD_REQUEST),
+    // clientes y motocicletas
+    DOCUMENTO_DUPLICADO(HttpStatus.CONFLICT),
+    PLACA_DUPLICADA(HttpStatus.CONFLICT),
+    VIN_DUPLICADO(HttpStatus.CONFLICT),
+    CLIENTE_INACTIVO(HttpStatus.CONFLICT),
+    ORDENES_ACTIVAS(HttpStatus.CONFLICT),
     ERROR_INTERNO(HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus status;

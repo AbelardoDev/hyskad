@@ -2,6 +2,7 @@ package com.hyskad.usuarios.persistence;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.hyskad.shared.persistence.Patrones;
 import com.hyskad.usuarios.domain.Rol;
 import com.hyskad.usuarios.domain.Usuario;
 
@@ -20,10 +21,10 @@ public final class UsuarioSpecifications {
         if (texto == null || texto.isBlank()) {
             return Specification.unrestricted();
         }
-        String patron = "%" + escapar(texto.trim()) + "%";
+        String patron = Patrones.contiene(texto.trim());
         return (raiz, consulta, cb) -> cb.or(
-                cb.like(raiz.get("nombre"), patron, '\\'),
-                cb.like(raiz.get("email"), patron, '\\'));
+                cb.like(raiz.get("nombre"), patron, Patrones.ESCAPE),
+                cb.like(raiz.get("email"), patron, Patrones.ESCAPE));
     }
 
     static Specification<Usuario> conRol(Rol rol) {
@@ -32,9 +33,5 @@ public final class UsuarioSpecifications {
 
     static Specification<Usuario> conEstado(Boolean activo) {
         return activo == null ? Specification.unrestricted() : (raiz, consulta, cb) -> cb.equal(raiz.get("activo"), activo);
-    }
-
-    private static String escapar(String texto) {
-        return texto.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 }

@@ -11,7 +11,7 @@
 | F02 | Base del backend | ✅ Terminada | #7 | Swagger en /api/docs (dev) |
 | F03 | Autenticación, usuarios y permisos (backend) | ✅ Terminada | #8 | Usuarios dev en el README |
 | F04A | Sistema de diseño, tema, i18n y layout | ✅ Terminada | #9 | Galería en /dev/ui (solo dev) |
-| F04B | Sesión, guards y administración de usuarios (frontend) | ⬜ Pendiente | | |
+| F04B | Sesión, guards y administración de usuarios (frontend) | 🟦 En curso | | |
 | F05 | Clientes y motocicletas | ⬜ Pendiente | | |
 | F06 | Catálogo de productos e inventario | ⬜ Pendiente | | |
 | F07 | Proveedores y compras | ⬜ Pendiente | | |

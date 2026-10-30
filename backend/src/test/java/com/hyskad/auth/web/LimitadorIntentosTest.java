@@ -1,6 +1,7 @@
 package com.hyskad.auth.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.junit.jupiter.api.Test;
@@ -33,5 +34,16 @@ class LimitadorIntentosTest {
         limitador.consumir(Regla.LOGIN, "1.1.1.1|a@b.co");
         assertThatThrownBy(() -> limitador.consumir(Regla.OLVIDE_PASSWORD, "1.1.1.1|a@b.co"))
                 .isInstanceOf(DemasiadasSolicitudesException.class);
+    }
+
+    @Test
+    void deshabilitadoNuncaLimita() {
+        LimitadorIntentos sinLimite = new LimitadorIntentos(false);
+
+        assertThatCode(() -> {
+            for (int i = 0; i < 20; i++) {
+                sinLimite.consumir(Regla.LOGIN, "1.1.1.1|a@b.co");
+            }
+        }).doesNotThrowAnyException();
     }
 }

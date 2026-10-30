@@ -1,5 +1,6 @@
 package com.hyskad.shared.error;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -20,6 +21,15 @@ public class BusinessException extends RuntimeException {
         super(mensaje);
         this.code = code;
         this.parametros = Map.copyOf(parametros);
+    }
+
+    /**
+     * Error de validación detectado en el servicio (no por Bean Validation), con el mismo formato:
+     * 400 {@code VALIDACION} y {@code errors[]} por campo, p. ej. {@code items[1].productoId}.
+     */
+    public static BusinessException validacion(List<ErrorCampo> errores) {
+        return new BusinessException(ErrorCode.VALIDACION, "La solicitud tiene datos inválidos",
+                Map.of("errors", List.copyOf(errores)));
     }
 
     public ErrorCode getCode() {

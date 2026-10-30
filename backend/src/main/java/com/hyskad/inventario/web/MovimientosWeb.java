@@ -2,7 +2,6 @@ package com.hyskad.inventario.web;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Component;
 import com.hyskad.catalogo.domain.Producto;
 import com.hyskad.inventario.domain.MovimientoInventario;
 import com.hyskad.inventario.web.dto.MovimientoResponse;
+import com.hyskad.shared.config.TiempoConfig;
 import com.hyskad.usuarios.application.UsuarioService;
 
 /**
@@ -24,8 +24,8 @@ import com.hyskad.usuarios.application.UsuarioService;
 @Component
 class MovimientosWeb {
 
-    static final ZoneId ZONA = ZoneId.of("America/Bogota");
-    private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm").withZone(ZONA);
+    private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+            .withZone(TiempoConfig.ZONA_NEGOCIO);
     private static final String SEPARADOR = ";";
     private static final String BOM = "﻿";
     private static final List<String> ENCABEZADOS = List.of("fecha", "tipo", "codigo", "producto", "cantidad",

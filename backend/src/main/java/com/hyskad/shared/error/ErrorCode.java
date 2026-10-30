@@ -46,6 +46,10 @@ public enum ErrorCode {
     RESERVA_INSUFICIENTE(HttpStatus.CONFLICT),
     RESERVA_PENDIENTE(HttpStatus.CONFLICT),
     CANTIDAD_INVALIDA(HttpStatus.BAD_REQUEST),
+    // proveedores y compras
+    PROVEEDOR_INACTIVO(HttpStatus.CONFLICT),
+    FACTURA_DUPLICADA(HttpStatus.CONFLICT),
+    COMPRA_ANULADA(HttpStatus.CONFLICT),
     ERROR_INTERNO(HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus status;

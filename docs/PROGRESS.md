@@ -14,7 +14,7 @@
 | F04B | Sesión, guards y administración de usuarios (frontend) | ✅ Terminada | #10 | Job `e2e` en el CI; capturas en `docs/capturas/f04b` |
 | F05 | Clientes y motocicletas | ✅ Terminada | #11 | Plantilla CRUD en ARCHITECTURE §6.1; capturas en `docs/capturas/f05` |
 | F06 | Catálogo de productos e inventario | ✅ Terminada | #12 | Contrato de `InventarioService` en su Javadoc; capturas en `docs/capturas/f06` |
-| F07 | Proveedores y compras | ⬜ Pendiente | | |
+| F07 | Proveedores y compras | 🟦 En curso | | |
 | F08 | Ventas y comprobantes | ⬜ Pendiente | | |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ⬜ Pendiente | | |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ⬜ Pendiente | | |

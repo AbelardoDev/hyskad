@@ -10,55 +10,34 @@ import {
   signal,
 } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import {
-  AbstractControl,
-  NonNullableFormBuilder,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators,
-} from '@angular/forms';
-import { translateSignal, TranslocoPipe } from '@jsverse/transloco';
+import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { finalize, Observable } from 'rxjs';
 
 import { conFormulario, marcarErroresServidor } from '../../core/http/contexto-http';
 import { codigoDeError } from '../../core/http/error.interceptor';
 import { FechaPipe } from '../../core/utils/formato.pipes';
 import {
-  digitoVerificacionNit,
-  documentoValido,
-  normalizarDocumento,
+  documentoSegunTipo,
   normalizarTelefono,
+  numeroConDv,
   telefonoColombiano,
   TipoDocumento,
-  TIPOS_DOCUMENTO,
 } from '../../core/utils/validadores';
 import { HkButton } from '../../shared/ui/button/button';
 import { DialogosService } from '../../shared/ui/dialog/dialogos.service';
 import { HkDrawer } from '../../shared/ui/dialog/drawer';
+import { HkCamposDocumento } from '../../shared/ui/forms/campos-documento';
 import { HkCheckbox } from '../../shared/ui/forms/checkbox';
 import { enfocarPrimerError } from '../../shared/ui/forms/enfocar-error';
 import { HkFormField } from '../../shared/ui/forms/form-field';
 import { HkInput } from '../../shared/ui/forms/input';
-import { HkSelect, OpcionSelect } from '../../shared/ui/forms/select';
 import { Cliente, ClientesApiService, DatosCliente } from './clientes-api.service';
 import { PoliticaDatosModal } from './politica-datos-modal';
 
 export interface DatosFormCliente {
   /** Si viene, se edita; si no, se crea. */
   cliente?: Cliente;
-}
-
-/** Dígitos del NIT sin DV (RN-39). */
-const DIGITOS_NIT = 9;
-
-/**
- * Número completo para enviar: con NIT de 9 dígitos se le agrega el DV calculado; si ya trae los
- * 10 se deja tal cual para que la validación compruebe el DV escrito.
- */
-export function numeroConDv(tipo: TipoDocumento | '', numero: string): string {
-  const normalizado = normalizarDocumento(numero);
-  if (tipo !== 'NIT' || normalizado.length !== DIGITOS_NIT) return normalizado;
-  return `${normalizado}${digitoVerificacionNit(normalizado) ?? ''}`;
 }
 
 /** Crear o editar un cliente (RF5, RF6) en un drawer. Cierra devolviendo el cliente guardado. */
@@ -69,11 +48,11 @@ export function numeroConDv(tipo: TipoDocumento | '', numero: string): string {
     TranslocoPipe,
     FechaPipe,
     HkButton,
+    HkCamposDocumento,
     HkCheckbox,
     HkDrawer,
     HkFormField,
     HkInput,
-    HkSelect,
   ],
   template: `
     <hk-drawer
@@ -88,39 +67,10 @@ export function numeroConDv(tipo: TipoDocumento | '', numero: string): string {
         (ngSubmit)="guardar()"
         novalidate
       >
-        <div class="grid gap-5 sm:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-          <hk-form-field [etiqueta]="'clientes.campos.tipo_documento' | transloco">
-            <hk-select formControlName="tipoDocumento" [opciones]="opcionesTipo()" />
-          </hk-form-field>
-          <hk-form-field
-            [etiqueta]="
-              (esNit() ? 'clientes.campos.nit' : 'clientes.campos.numero_documento') | transloco
-            "
-            [ayuda]="
-              (esNit() ? 'clientes.form.nit_ayuda' : 'clientes.form.documento_ayuda') | transloco
-            "
-          >
-            <div class="flex items-stretch gap-2">
-              <hk-input
-                class="min-w-0 flex-1"
-                formControlName="numeroDocumento"
-                autocompletar="off"
-                [modoTeclado]="soloDigitos() ? 'numeric' : 'text'"
-                [maxCaracteres]="20"
-              />
-              @if (esNit()) {
-                <output
-                  class="inline-flex min-w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-2 px-2 text-sm text-muted tabular"
-                  [attr.aria-label]="'clientes.form.dv_accesible' | transloco: { dv: dv() ?? '—' }"
-                  aria-live="polite"
-                >
-                  {{ 'clientes.form.dv' | transloco }}
-                  <span class="ml-1 font-semibold text-fg">{{ dv() ?? '—' }}</span>
-                </output>
-              }
-            </div>
-          </hk-form-field>
-        </div>
+        <hk-campos-documento
+          [tipoDocumento]="form.controls.tipoDocumento"
+          [numeroDocumento]="form.controls.numeroDocumento"
+        />
 
         @if (esNit()) {
           <hk-form-field [etiqueta]="'clientes.campos.razon_social' | transloco">
@@ -225,10 +175,7 @@ export class ClienteFormDrawer {
       (this.cliente?.tipoDocumento ?? 'CC') as TipoDocumento | '',
       Validators.required,
     ],
-    numeroDocumento: [
-      this.cliente?.numeroDocumento ?? '',
-      [Validators.required, (c: AbstractControl) => this.validarDocumento(c)],
-    ],
+    numeroDocumento: [this.cliente?.numeroDocumento ?? '', Validators.required],
     nombres: [this.cliente?.nombres ?? '', Validators.maxLength(80)],
     apellidos: [this.cliente?.apellidos ?? '', Validators.maxLength(80)],
     razonSocial: [this.cliente?.razonSocial ?? '', Validators.maxLength(150)],
@@ -242,32 +189,15 @@ export class ClienteFormDrawer {
   private readonly tipo = toSignal(this.form.controls.tipoDocumento.valueChanges, {
     initialValue: this.form.controls.tipoDocumento.value,
   });
-  private readonly numero = toSignal(this.form.controls.numeroDocumento.valueChanges, {
-    initialValue: this.form.controls.numeroDocumento.value,
-  });
 
   protected readonly esNit = computed(() => this.tipo() === 'NIT');
-  protected readonly soloDigitos = computed(() => !['CE', 'PA'].includes(this.tipo()));
-  /** DV calculado en vivo con los primeros 9 dígitos del NIT. */
-  protected readonly dv = computed(() => {
-    const digitos = normalizarDocumento(this.numero());
-    return digitos.length >= DIGITOS_NIT
-      ? digitoVerificacionNit(digitos.slice(0, DIGITOS_NIT))
-      : null;
-  });
-
-  private readonly textosTipo = translateSignal(TIPOS_DOCUMENTO.map((t) => `clientes.tipos.${t}`));
-  protected readonly opcionesTipo = computed<OpcionSelect[]>(() =>
-    TIPOS_DOCUMENTO.map((valor, i) => ({ valor, etiqueta: this.textosTipo()[i] })),
-  );
 
   constructor() {
+    const { numeroDocumento, tipoDocumento } = this.form.controls;
+    numeroDocumento.addValidators(documentoSegunTipo(() => tipoDocumento.value));
+    numeroDocumento.updateValueAndValidity();
     this.aplicarNombreSegunTipo();
-    this.form.controls.tipoDocumento.valueChanges.subscribe(() => {
-      this.aplicarNombreSegunTipo();
-      const numero = this.form.controls.numeroDocumento;
-      numero.updateValueAndValidity();
-    });
+    this.form.controls.tipoDocumento.valueChanges.subscribe(() => this.aplicarNombreSegunTipo());
   }
 
   protected verPolitica(): void {
@@ -313,15 +243,6 @@ export class ClienteFormDrawer {
         enfocarPrimerError(this.host.nativeElement, this.injector);
       },
     });
-  }
-
-  /** RN-38/39 con el tipo elegido; el NIT de 9 dígitos es válido porque el DV se calcula. */
-  private validarDocumento(control: AbstractControl): ValidationErrors | null {
-    const valor: unknown = control.value;
-    const tipo = this.form?.controls.tipoDocumento.value;
-    if (typeof valor !== 'string' || valor.trim() === '' || !tipo) return null;
-    if (documentoValido(tipo, numeroConDv(tipo, valor))) return null;
-    return tipo === 'NIT' ? { nitInvalido: true } : { documentoInvalido: true };
   }
 
   /** RN-39: con NIT se pide razón social; con los demás, nombres y apellidos. */

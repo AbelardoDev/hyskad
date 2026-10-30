@@ -61,6 +61,11 @@ describe('formatoFecha', () => {
     expect(formatoFecha(fecha, 'en-US', 'corta')).toBe('10/29/26');
     expect(formatoFecha('x', 'es-CO')).toBe('');
   });
+
+  it('una fecha sin hora (factura) es ese día en cualquier zona horaria, no el anterior', () => {
+    expect(formatoFecha('2026-10-30', 'es-CO', 'corta')).toBe('30/10/26');
+    expect(formatoFecha('2026-01-01', 'en-US', 'corta')).toBe('1/1/26');
+  });
 });
 
 describe('pipes de formato', () => {

@@ -35,9 +35,12 @@ export function problemaDe(error: unknown): ProblemaApi | null {
   return error !== null && typeof error === 'object' ? (error as ProblemaApi) : null;
 }
 
-/** El control por su ruta (`telefono`, `clave.nueva`) o, si no está, por su nombre en un subgrupo. */
+/**
+ * El control por su ruta (`telefono`, `clave.nueva`, `items[1].productoId` → `items.1.productoId`)
+ * o, si no está, por su nombre en un subgrupo.
+ */
 function buscarControl(grupo: FormGroup, campo: string): AbstractControl | null {
-  const directo = grupo.get(campo);
+  const directo = grupo.get(campo.replace(/\[(\d+)\]/g, '.$1'));
   if (directo) return directo;
   for (const hijo of Object.values(grupo.controls)) {
     const encontrado = hijo instanceof FormGroup ? buscarControl(hijo, campo) : null;

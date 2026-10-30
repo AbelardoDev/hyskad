@@ -56,3 +56,28 @@ export async function crearClienteConMoto(
   await api.dispose();
   return { clienteId, motoId, nombreCompleto: `${nombres} E2E` };
 }
+
+/** Crea por la API un producto activo sin stock en la primera categoría activa. */
+export async function crearProducto(nombre: string): Promise<{ id: number; codigo: string; nombre: string }> {
+  const { api, token } = await apiComoAdmin();
+  const headers = { Authorization: `Bearer ${token}` };
+  const categorias = (await (await api.get('/api/v1/categorias?activo=true', { headers })).json()) as {
+    id: number;
+  }[];
+  const codigo = `E2E-${letras(3)}${digitos(5)}`;
+  const respuesta = await api.post('/api/v1/productos', {
+    headers,
+    data: {
+      codigo,
+      nombre,
+      categoriaId: categorias[0].id,
+      unidad: 'UNIDAD',
+      precioVenta: 50000,
+      stockMinimo: 1,
+    },
+  });
+  expect(respuesta.status()).toBe(201);
+  const { id } = (await respuesta.json()) as { id: number };
+  await api.dispose();
+  return { id, codigo, nombre };
+}

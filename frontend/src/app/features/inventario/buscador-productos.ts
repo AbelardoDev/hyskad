@@ -4,7 +4,7 @@ import { translateSignal } from '@jsverse/transloco';
 import { map, switchMap, timer } from 'rxjs';
 
 import { erroresManejados } from '../../core/http/contexto-http';
-import { formatoCantidad } from '../../core/utils/formato';
+import { formatoCantidad, formatoCop } from '../../core/utils/formato';
 import { LanguageService } from '../../core/i18n/language.service';
 import { OpcionCombobox } from '../../shared/ui/forms/combobox';
 import { InventarioApiService, Producto } from './inventario-api.service';
@@ -17,7 +17,7 @@ const RESULTADOS = 10;
  * marca), con el disponible visible. Recuerda los productos vistos para que `producto(id)` siga
  * respondiendo aunque cambie la búsqueda. Llamar en un contexto de inyección.
  */
-export function buscadorProductos(opciones: { soloActivos: boolean }) {
+export function buscadorProductos(opciones: { soloActivos: boolean; conCosto?: boolean }) {
   const api = inject(InventarioApiService);
   const idioma = inject(LanguageService);
   const texto = signal('');
@@ -47,13 +47,19 @@ export function buscadorProductos(opciones: { soloActivos: boolean }) {
       ),
   });
   const textoDisponible = translateSignal('inventario.ajuste.disponible_opcion');
+  const textoCosto = translateSignal('inventario.ajuste.costo_opcion');
+  /** Con `conCosto` (compras) se ve también el costo promedio, si el usuario puede verlo. */
+  const costo = (p: Producto) =>
+    opciones.conCosto && p.costoPromedio !== undefined
+      ? ` · ${textoCosto()} ${formatoCop(p.costoPromedio, idioma.locale())}`
+      : '';
 
   return {
     opciones: computed<OpcionCombobox[]>(() =>
       (resultados.value() ?? []).map((p) => ({
         valor: String(p.id),
         etiqueta: p.nombre,
-        descripcion: `${p.codigo} · ${textoDisponible()} ${formatoCantidad(p.stockDisponible, idioma.locale())}`,
+        descripcion: `${p.codigo} · ${textoDisponible()} ${formatoCantidad(p.stockDisponible, idioma.locale())}${costo(p)}`,
       })),
     ),
     cargando: resultados.isLoading,

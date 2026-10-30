@@ -1,7 +1,15 @@
 import { Routes } from '@angular/router';
 
-import { ProximamentePage } from '../../core/layout/paginas/proximamente-page';
-
 export const COMPRAS_ROUTES: Routes = [
-  { path: '', component: ProximamentePage, data: { icono: 'truck' } },
+  { path: '', loadComponent: () => import('./compras-page').then((m) => m.ComprasPage) },
+  {
+    path: 'nueva',
+    data: { miga: 'compras.nueva' },
+    loadComponent: () => import('./nueva-compra-page').then((m) => m.NuevaCompraPage),
+  },
+  {
+    path: ':id',
+    data: { miga: 'compras.detalle.miga' },
+    loadComponent: () => import('./compra-detalle-page').then((m) => m.CompraDetallePage),
+  },
 ];

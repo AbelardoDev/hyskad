@@ -4,7 +4,8 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { TestBed } from '@angular/core/testing';
 
 import { errorInterceptor } from '../../core/http/error.interceptor';
-import { ClienteFormDrawer, DatosFormCliente, numeroConDv } from './cliente-form-drawer';
+import { numeroConDv } from '../../core/utils/validadores';
+import { ClienteFormDrawer, DatosFormCliente } from './cliente-form-drawer';
 import { Cliente } from './clientes-api.service';
 
 const CLIENTE: Cliente = {
@@ -153,7 +154,7 @@ describe('ClienteFormDrawer', () => {
     req.flush({ code: 'DOCUMENTO_DUPLICADO' }, { status: 409, statusText: 'Conflict' });
     fixture.detectChanges();
 
-    expect(errores()).toEqual(['Ya existe un cliente con ese documento']);
+    expect(errores()).toEqual(['Ya existe un registro con ese documento']);
     expect(cerrar).not.toHaveBeenCalled();
   });
 });

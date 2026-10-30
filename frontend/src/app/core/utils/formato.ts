@@ -39,6 +39,20 @@ export function formatoMiles(valor: number, locale: string): string {
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(valor);
 }
 
+const formatosCantidad = new Map<string, Intl.NumberFormat>();
+
+/** Cantidad de inventario: miles con separador y hasta 2 decimales ("1.250", "12,5"). */
+export function formatoCantidad(valor: Monto, locale: string): string {
+  const numero = aNumero(valor);
+  if (numero === null) return '';
+  let formato = formatosCantidad.get(locale);
+  if (!formato) {
+    formato = new Intl.NumberFormat(locale, { maximumFractionDigits: 2 });
+    formatosCantidad.set(locale, formato);
+  }
+  return formato.format(numero);
+}
+
 const UNIDADES: readonly [Intl.RelativeTimeFormatUnit, number][] = [
   ['year', 365 * 24 * 3600],
   ['month', 30 * 24 * 3600],

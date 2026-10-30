@@ -82,7 +82,10 @@
     "perfil": "Mi perfil",
     "cambiar_password": "Cambiar contraseña",
     "cerrar_sesion": "Cerrar sesión",
-    "ir_inicio": "Ir al inicio"
+    "ir_inicio": "Ir al inicio",
+    "contadores": {
+      "stockBajo": "{{n}} productos con stock bajo"
+    }
   },
   "idiomas": {
     "es": "Español",
@@ -178,7 +181,9 @@
     "documentoInvalido": "El número no corresponde al tipo de documento",
     "placaInvalida": "Formatos válidos: ABC12D, ABC12 o 123ABC (motocarro)",
     "telefonoInvalido": "Escribe un celular o un fijo de 10 dígitos",
-    "vinInvalido": "El VIN tiene 17 letras y números, sin I, O ni Q"
+    "vinInvalido": "El VIN tiene 17 letras y números, sin I, O ni Q",
+    "cantidadInvalida": "Escribe una cantidad con máximo 2 decimales",
+    "cantidadPositiva": "La cantidad debe ser mayor que cero"
   },
   "errors": {
     "DESCONOCIDO": "Ocurrió un error inesperado. Intenta de nuevo.",
@@ -227,7 +232,18 @@
     "ORDENES_ACTIVAS": "Tiene órdenes de trabajo activas; ciérralas antes de desactivarlo",
     "MIN": "El valor es menor que el permitido",
     "MAX": "El valor es mayor que el permitido",
-    "POSITIVE": "El valor debe ser mayor que cero"
+    "POSITIVE": "El valor debe ser mayor que cero",
+    "CODIGO_DUPLICADO": "Ya existe un producto con ese código",
+    "CODIGO_INVALIDO": "Usa letras, números y - _ . /",
+    "CATEGORIA_DUPLICADA": "Ya existe una categoría con ese nombre",
+    "CATEGORIA_INACTIVA": "La categoría está inactiva: elige otra o actívala",
+    "PRODUCTO_INACTIVO": "El producto está inactivo",
+    "STOCK_INSUFICIENTE": "No hay stock disponible suficiente",
+    "RESERVA_INSUFICIENTE": "No hay tantas unidades reservadas",
+    "RESERVA_PENDIENTE": "El producto tiene unidades reservadas en órdenes: no se puede desactivar",
+    "CANTIDAD_INVALIDA": "La cantidad debe ser mayor que cero y tener máximo 2 decimales",
+    "DECIMAL_MIN": "El valor es menor que el permitido",
+    "DIGITS": "El número tiene demasiados dígitos o decimales"
   },
   "roles": {
     "ADMIN": "Administrador",
@@ -552,6 +568,151 @@
       "vacio_titulo": "Sin servicios registrados",
       "vacio_texto": "Aquí aparecerán las órdenes de trabajo de esta moto, con sus servicios, repuestos y totales.",
       "error": "No se pudo cargar el historial"
+    }
+  },
+  "inventario": {
+    "titulo": "Inventario",
+    "subtitulo": "Productos, repuestos y sus existencias",
+    "nuevo": "Nuevo producto",
+    "buscar": "Buscar por código, nombre o marca…",
+    "vacio_titulo": "No hay productos que coincidan",
+    "vacio_texto": "Prueba con otra búsqueda o quita los filtros.",
+    "error_titulo": "No se pudieron cargar los productos",
+    "creado": "Producto {{nombre}} creado",
+    "actualizado": "Cambios de {{nombre}} guardados",
+    "activado": "{{nombre}} está activo de nuevo",
+    "desactivado": "{{nombre}} fue desactivado",
+    "nivel_accesible": "Nivel de stock frente al mínimo de {{minimo}}",
+    "confirmar_activar": {
+      "titulo": "¿Activar producto?",
+      "mensaje": "{{nombre}} se podrá vender, comprar y agregar a órdenes otra vez."
+    },
+    "confirmar_desactivar": {
+      "titulo": "¿Desactivar producto?",
+      "mensaje": "{{nombre}} no se podrá vender, comprar, ajustar ni agregar a órdenes. Su historial se conserva."
+    },
+    "filtros": {
+      "todas_categorias": "Todas las categorías",
+      "stock_bajo": "Stock bajo",
+      "activos": "Activos",
+      "inactivos": "Inactivos"
+    },
+    "estado_stock": {
+      "OK": "Disponible",
+      "BAJO": "Stock bajo",
+      "AGOTADO": "Agotado"
+    },
+    "unidades": {
+      "UNIDAD": "Unidad",
+      "LITRO": "Litro",
+      "GALON": "Galón",
+      "KIT": "Kit",
+      "PAR": "Par",
+      "METRO": "Metro"
+    },
+    "unidades_corto": {
+      "UNIDAD": "u",
+      "LITRO": "L",
+      "GALON": "gal",
+      "KIT": "kit",
+      "PAR": "par",
+      "METRO": "m"
+    },
+    "campos": {
+      "producto": "Producto",
+      "codigo": "Código",
+      "nombre": "Nombre",
+      "categoria": "Categoría",
+      "marca": "Marca",
+      "unidad": "Unidad de medida",
+      "precio": "Precio de venta",
+      "costo": "Costo promedio",
+      "minimo": "Stock mínimo",
+      "disponible": "Disponible",
+      "estado_stock": "Estado",
+      "stock_actual": "Existencias",
+      "reservado": "Reservado",
+      "descripcion": "Descripción"
+    },
+    "form": {
+      "titulo_nuevo": "Nuevo producto",
+      "titulo_editar": "Editar producto",
+      "codigo_ayuda": "Referencia del repuesto; se guarda en mayúsculas.",
+      "elige_categoria": "Elige una categoría",
+      "precio_ayuda": "Sin IVA, en pesos.",
+      "minimo_ayuda": "Al llegar a este disponible se avisa de stock bajo.",
+      "stock_inicial": "El producto empieza sin existencias. Cárgalas con una compra o con un ajuste de entrada."
+    },
+    "categorias": {
+      "titulo": "Categorías",
+      "descripcion": "Las inactivas no se eligen para productos nuevos; los que ya la tienen la conservan.",
+      "nueva": "Nueva categoría",
+      "renombrar": "Renombrar categoría",
+      "crear": "Crear",
+      "creada": "Categoría {{nombre}} creada",
+      "actualizada": "Categoría {{nombre}} actualizada",
+      "vacio": "Todavía no hay categorías",
+      "editar_de": "Editar {{nombre}}",
+      "activar_de": "Activar {{nombre}}",
+      "desactivar_de": "Desactivar {{nombre}}"
+    },
+    "ajuste": {
+      "titulo": "Ajustar inventario",
+      "tipo": "Tipo de ajuste",
+      "tipos": {
+        "ENTRADA": "Entrada (suma existencias)",
+        "SALIDA": "Salida (resta existencias)"
+      },
+      "cantidad": "Cantidad",
+      "costo": "Costo unitario",
+      "costo_ayuda": "Si lo dejas vacío, entra al costo promedio actual.",
+      "motivo": "Motivo",
+      "motivo_ayuda": "Mínimo 10 caracteres: queda en el historial del producto.",
+      "producto_ayuda": "Solo productos activos.",
+      "buscar_producto": "Buscar producto…",
+      "disponible_opcion": "disponible",
+      "resultante": "Quedarán",
+      "excede": "La salida supera el disponible ({{disponible}}).",
+      "confirmar": "Registrar ajuste",
+      "registrado": "Ajuste de {{nombre}} registrado"
+    },
+    "tipos": {
+      "ENTRADA_COMPRA": "Entrada por compra",
+      "SALIDA_VENTA": "Salida por venta",
+      "SALIDA_ORDEN": "Salida por orden de trabajo",
+      "ENTRADA_AJUSTE": "Ajuste de entrada",
+      "SALIDA_AJUSTE": "Ajuste de salida",
+      "DEVOLUCION_ANULACION_VENTA": "Devolución por venta anulada",
+      "SALIDA_ANULACION_COMPRA": "Salida por compra anulada"
+    },
+    "movimientos": {
+      "titulo": "Movimientos",
+      "subtitulo": "Entradas y salidas de todos los productos",
+      "exportar": "Exportar CSV",
+      "todos_productos": "Todos los productos",
+      "todos_tipos": "Todos los tipos",
+      "desde": "Desde",
+      "hasta": "Hasta",
+      "fecha": "Fecha",
+      "tipo": "Tipo",
+      "cantidad": "Cantidad",
+      "costo": "Costo unitario",
+      "stock_resultante": "Stock resultante",
+      "motivo": "Motivo o referencia",
+      "detalle": "Quedaron {{stock}} · costo {{costo}}",
+      "vacio_titulo": "Sin movimientos",
+      "vacio_texto": "No hay movimientos con esos filtros.",
+      "vacio_producto": "Este producto todavía no tiene entradas ni salidas.",
+      "error": "No se pudieron cargar los movimientos"
+    },
+    "detalle": {
+      "miga": "Producto",
+      "resumen": "Resumen",
+      "existencias": "Existencias",
+      "datos": "Datos del producto",
+      "no_encontrado": "Producto no encontrado",
+      "no_encontrado_texto": "Puede que el enlace esté mal o que no tengas acceso.",
+      "volver": "Volver a inventario"
     }
   }
 }

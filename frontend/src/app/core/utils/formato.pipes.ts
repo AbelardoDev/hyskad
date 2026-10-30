@@ -1,9 +1,16 @@
 import { inject, Pipe, PipeTransform } from '@angular/core';
 
 import { LanguageService } from '../i18n/language.service';
-import { EstiloFecha, formatoCop, formatoFecha, Monto, tiempoRelativo } from './formato';
+import {
+  EstiloFecha,
+  formatoCantidad,
+  formatoCop,
+  formatoFecha,
+  Monto,
+  tiempoRelativo,
+} from './formato';
 
-// Las tres pipes son impuras para reaccionar al cambio de idioma; el costo es bajo
+// Las pipes son impuras para reaccionar al cambio de idioma; el costo es bajo
 // porque los formateadores de Intl se reutilizan por locale.
 
 /** `{{ total | cop }}` → "$ 1.250.000" */
@@ -13,6 +20,16 @@ export class CopPipe implements PipeTransform {
 
   transform(valor: Monto): string {
     return formatoCop(valor, this.idioma.locale());
+  }
+}
+
+/** `{{ stock | cantidad }}` → "1.250" o "12,5" */
+@Pipe({ name: 'cantidad', pure: false })
+export class CantidadPipe implements PipeTransform {
+  private readonly idioma = inject(LanguageService);
+
+  transform(valor: Monto): string {
+    return formatoCantidad(valor, this.idioma.locale());
   }
 }
 

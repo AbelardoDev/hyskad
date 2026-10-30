@@ -153,7 +153,7 @@ describe('ClienteFormDrawer', () => {
     req.flush({ code: 'DOCUMENTO_DUPLICADO' }, { status: 409, statusText: 'Conflict' });
     fixture.detectChanges();
 
-    expect(errores()).toContain('Ya existe un cliente con ese documento');
+    expect(errores()).toEqual(['Ya existe un cliente con ese documento']);
     expect(cerrar).not.toHaveBeenCalled();
   });
 });

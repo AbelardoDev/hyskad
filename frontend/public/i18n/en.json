@@ -266,7 +266,10 @@
     "KILOMETRAJE_MENOR": "The mileage cannot be lower than the last reading",
     "MECANICO_INVALIDO": "Only active mechanics can be assigned",
     "MECANICO_REPETIDO": "That mechanic is already on the list",
-    "NOTA_REQUERIDA": "Write the reason"
+    "NOTA_REQUERIDA": "Write the reason",
+    "PRESUPUESTO_NO_PENDIENTE": "The quote is no longer pending",
+    "SERVICIO_INACTIVO": "The service is inactive",
+    "DECISION_INVALIDA": "The decision must be approved or rejected"
   },
   "roles": {
     "ADMIN": "Administrator",
@@ -1078,7 +1081,7 @@
     "bloqueos": {
       "SIN_MECANICOS": "Assign at least one mechanic",
       "SIN_DIAGNOSTICO": "Record the diagnosis first",
-      "SIN_ITEMS": "Add services or parts (coming soon)",
+      "SIN_ITEMS": "Add at least one service or part",
       "SIN_PAGO": "Record the payment first (coming soon)"
     },
     "confirmar_transicion": {
@@ -1103,6 +1106,86 @@
     "historial": {
       "creada": "Order checked in",
       "a": "to"
+    },
+    "items": {
+      "servicios": "Services",
+      "repuestos": "Parts",
+      "agregar": "Add",
+      "agregar_servicio": "Add service",
+      "agregar_repuesto": "Add part",
+      "sin_servicios": "No services on this order yet",
+      "sin_repuestos": "No parts on this order yet",
+      "producto": "Product",
+      "buscar_producto": "Search by code or name…",
+      "opcion_producto": "{{disponible}} available · {{precio}}",
+      "disponible": "Available",
+      "precio": "Price",
+      "cantidad": "Quantity",
+      "bajo_minimo": "With this reservation the available stock reaches the minimum ({{minimo}}) or below.",
+      "origen": "Service source",
+      "origenes": {
+        "catalogo": "From catalog",
+        "libre": "Custom labor"
+      },
+      "servicio": "Service",
+      "buscar_servicio": "Search the catalog…",
+      "descripcion": "Description",
+      "precio_ayuda": "Suggested by the catalog; you can adjust it for this order.",
+      "sin_mecanico": "No mechanic",
+      "de_catalogo": "From catalog",
+      "mano_obra": "Custom labor",
+      "precio_de": "Price of {{item}}",
+      "cantidad_de": "Quantity of {{item}}",
+      "quitar": "Remove {{item}}",
+      "quitar_corto": "Remove",
+      "totales": "Order totals",
+      "solo_lectura_estado": "Services and parts can only be changed while the order is in diagnosis.",
+      "solo_lectura_permiso": "You are not allowed to change the services and parts of this order.",
+      "confirmar_quitar": {
+        "titulo": "Remove from the order?",
+        "mensaje": "{{item}} leaves the order. If it is a part, its reservation goes back to inventory."
+      }
+    },
+    "presupuestos": {
+      "titulo_documento": "Quote",
+      "documento_de": "Quote {{numero}}",
+      "enviar_titulo": "Send quote · {{numero}}",
+      "enviar_texto": "The current items and totals are frozen and the order awaits approval.",
+      "observaciones": "Notes for the customer",
+      "vista_previa": "Preview",
+      "error": "Quotes could not be loaded",
+      "vacio": "No quotes yet",
+      "vacio_texto": "They are sent from diagnosis, with the diagnosis recorded and at least one item.",
+      "version": "version {{version}}",
+      "estados": {
+        "PENDIENTE": "Pending",
+        "APROBADO": "Approved",
+        "RECHAZADO": "Rejected",
+        "REEMPLAZADO": "Superseded"
+      },
+      "ver_items": "View items ({{n}})",
+      "imprimir": "Print",
+      "aprobar": "Approve",
+      "rechazar": "Reject",
+      "enviado": "Quote {{numero}} sent",
+      "confirmar_aprobar": {
+        "titulo": "Approve {{numero}}?",
+        "mensaje": "The customer approved the quote: the order moves to repair."
+      },
+      "confirmar_rechazar": {
+        "titulo": "Reject {{numero}}?",
+        "mensaje": "The order is cancelled and all its reserved parts are released. Write the customer’s reason."
+      },
+      "confirmar_retirar": {
+        "titulo": "Withdraw {{numero}}?"
+      },
+      "hecho": {
+        "APROBADO": "Quote {{numero}} approved",
+        "RECHAZADO": "Quote {{numero}} rejected",
+        "RETIRO": "Quote {{numero}} withdrawn"
+      },
+      "volver": "Back to the order",
+      "no_encontrado": "Quote not found"
     }
   }
 }

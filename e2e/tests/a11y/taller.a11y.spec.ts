@@ -59,6 +59,14 @@ for (const tema of ['light', 'dark'] as const) {
       await page.getByRole('tab', { name: /Historial/ }).click();
       await sinViolacionesGraves(page);
 
+      await page.getByRole('tab', { name: /Servicios y repuestos/ }).click();
+      await expect(page.getByRole('complementary', { name: 'Totales de la orden' })).toBeVisible();
+      await sinViolacionesGraves(page);
+
+      await page.getByRole('tab', { name: 'Presupuestos' }).click();
+      await expect(page.getByText('Todavía no hay presupuestos')).toBeVisible();
+      await sinViolacionesGraves(page);
+
       await page.getByRole('button', { name: 'Cancelar orden' }).click();
       await expect(page.getByRole('dialog')).toBeVisible();
       await sinViolacionesGraves(page);

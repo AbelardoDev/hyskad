@@ -333,6 +333,20 @@
   animation: hk-desde-derecha 250ms var(--ease-hk) both;
 }
 
+/* Modal abierto como hoja inferior en el teléfono (`hojaEnMovil`). */
+.hk-hoja-panel .cdk-dialog-container > * {
+  max-height: 90dvh;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  animation: hk-desde-abajo 250ms var(--ease-hk) both;
+}
+
+@keyframes hk-desde-abajo {
+  from {
+    transform: translateY(100%);
+  }
+}
+
 @keyframes hk-desde-izquierda {
   from {
     transform: translateX(-100%);

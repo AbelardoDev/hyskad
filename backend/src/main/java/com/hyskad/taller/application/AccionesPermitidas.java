@@ -10,6 +10,7 @@ import com.hyskad.taller.domain.EstadoOrden;
  * usuario pero aún no se cumple su condición (p. ej. {@code SIN_MECANICOS}).
  */
 public record AccionesPermitidas(boolean editar, boolean asignarMecanicos, boolean registrarDiagnostico,
+        boolean editarItems, boolean gestionarPresupuestos,
         List<Transicion> transiciones) {
 
     public record Transicion(EstadoOrden estado, boolean requiereNota, String bloqueo) {

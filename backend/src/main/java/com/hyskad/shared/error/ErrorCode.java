@@ -59,6 +59,8 @@ public enum ErrorCode {
     MOTO_CON_ORDEN_ACTIVA(HttpStatus.CONFLICT),
     TRANSICION_INVALIDA(HttpStatus.CONFLICT),
     ORDEN_ESTADO_INVALIDO(HttpStatus.CONFLICT),
+    PRESUPUESTO_NO_PENDIENTE(HttpStatus.CONFLICT),
+    SERVICIO_INACTIVO(HttpStatus.CONFLICT),
     ERROR_INTERNO(HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus status;

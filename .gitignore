@@ -1,0 +1,49 @@
+# --- Sistema operativo ---
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- IDEs ---
+.idea/
+*.iml
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.project
+.classpath
+.settings/
+.factorypath
+*.swp
+
+# --- Variables de entorno ---
+.env
+.env.*
+!.env.example
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Java / Maven ---
+target/
+!.mvn/wrapper/maven-wrapper.jar
+*.class
+hs_err_pid*
+
+# --- Node / Angular ---
+node_modules/
+dist/
+.angular/
+out-tsc/
+.npm/
+npm-debug.log*
+
+# --- Pruebas ---
+coverage/
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/
+
+# --- Claude Code (configuración local) ---
+.claude/settings.local.json

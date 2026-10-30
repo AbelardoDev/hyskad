@@ -16,7 +16,7 @@
 | F06 | Catálogo de productos e inventario | ✅ Terminada | #12 | Contrato de `InventarioService` en su Javadoc; capturas en `docs/capturas/f06` |
 | F07 | Proveedores y compras | ✅ Terminada | #13 | `CalculadoraTotales` (RN-04) lista para ventas y órdenes; capturas en `docs/capturas/f07` |
 | F08 | Ventas y comprobantes | ✅ Terminada | #14 | POS con teclado (F2/Enter/F9); comprobante carta/tirilla fuera del shell; capturas en `docs/capturas/f08` |
-| F09A | Órdenes: creación, asignación, estados y diagnóstico | ⬜ Pendiente | | |
+| F09A | Órdenes: creación, asignación, estados y diagnóstico | 🟦 En curso | | |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ⬜ Pendiente | | |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ⬜ Pendiente | | |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ⬜ Pendiente | | |

@@ -52,6 +52,13 @@ public enum ErrorCode {
     COMPRA_ANULADA(HttpStatus.CONFLICT),
     // ventas
     VENTA_ANULADA(HttpStatus.CONFLICT),
+    // servicios y taller
+    SERVICIO_DUPLICADO(HttpStatus.CONFLICT),
+    MOTO_NO_PERTENECE_CLIENTE(HttpStatus.BAD_REQUEST),
+    MOTO_INACTIVA(HttpStatus.CONFLICT),
+    MOTO_CON_ORDEN_ACTIVA(HttpStatus.CONFLICT),
+    TRANSICION_INVALIDA(HttpStatus.CONFLICT),
+    ORDEN_ESTADO_INVALIDO(HttpStatus.CONFLICT),
     ERROR_INTERNO(HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus status;

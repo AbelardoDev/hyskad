@@ -28,6 +28,7 @@ import com.hyskad.usuarios.application.PermisoDeUsuario;
 import com.hyskad.usuarios.application.UsuarioService;
 import com.hyskad.usuarios.domain.Rol;
 import com.hyskad.usuarios.web.dto.UsuarioResponse;
+import com.hyskad.usuarios.web.dto.UsuarioResumenResponse;
 
 import jakarta.validation.Valid;
 
@@ -50,6 +51,17 @@ public class UsuarioController {
             @RequestParam(required = false) Rol rol, @RequestParam(required = false) Boolean activo,
             @PageableDefault(sort = "nombre", direction = Sort.Direction.ASC) Pageable pagina) {
         return PageResponse.of(service.listar(q, rol, activo, pagina), mapper::toResponse);
+    }
+
+    /**
+     * Mecánicos activos (solo id y nombre) para asignar órdenes y filtrar el tablero: lo usan
+     * quienes no administran usuarios, como el vendedor.
+     */
+    @GetMapping("/mecanicos")
+    @PreAuthorize("hasAnyAuthority('ORDENES_ASIGNAR', 'ORDENES_VER_TODAS')")
+    public List<UsuarioResumenResponse> mecanicos() {
+        return service.mecanicosActivos().stream().map(u -> new UsuarioResumenResponse(u.getId(), u.getNombre()))
+                .toList();
     }
 
     @GetMapping("/{id}")

@@ -42,7 +42,6 @@ import { HkSidebarNav } from './sidebar-nav';
             "
             [attr.aria-pressed]="idioma.idioma() === opcion"
             [attr.lang]="opcion"
-            [attr.aria-label]="'idiomas.' + opcion | transloco"
             (click)="idioma.cambiar(opcion)"
           >
             {{ opcion }}

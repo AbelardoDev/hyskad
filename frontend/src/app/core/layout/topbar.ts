@@ -98,7 +98,6 @@ const POSICION_PANEL: ConnectedPosition[] = [
       <button
         type="button"
         class="group hidden h-10 w-64 items-center gap-2 rounded-xl border border-border bg-surface-2/70 px-3 text-sm text-muted hk-foco transition-colors hover:border-border-strong hover:text-fg lg:inline-flex xl:w-80"
-        [attr.aria-label]="'layout.buscar_etiqueta' | transloco"
         aria-keyshortcuts="Control+K Meta+K"
         (click)="abrirBusqueda()"
       >
@@ -123,10 +122,12 @@ const POSICION_PANEL: ConnectedPosition[] = [
       <hk-dropdown-menu
         class="max-sm:hidden"
         [etiqueta]="'layout.idioma' | transloco"
+        [nombreEnContenido]="true"
         [items]="itemsIdioma()"
         [seleccionado]="idioma.idioma()"
         (seleccion)="cambiarIdioma($event)"
       >
+        <span class="sr-only">{{ 'layout.idioma' | transloco }}</span>
         <svg lucideIcon="languages" class="size-5" aria-hidden="true" />
         <span class="text-xs font-semibold uppercase max-md:hidden">{{ idioma.idioma() }}</span>
       </hk-dropdown-menu>

@@ -47,7 +47,6 @@
             "
             [attr.aria-pressed]="idioma.idioma() === opcion"
             [attr.lang]="opcion"
-            [attr.aria-label]="'idiomas.' + opcion | transloco"
             [attr.data-testid]="'idioma-' + opcion"
             (click)="idioma.cambiar(opcion)"
           >

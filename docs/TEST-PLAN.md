@@ -56,6 +56,17 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | CP-73 | RNF Mant. | Reglas de arquitectura (capas, persistencia por módulo, controllers sin repositorios ni entidades, sin ciclos) | U (ArchUnit) | Sin violaciones | Aprobado |
 | CP-74 | RNF Observ. | `X-Request-Id` recibido se reutiliza; uno inseguro se reemplaza | I | La respuesta y el MDC llevan el id | Aprobado |
 
+### Sistema de diseño, tema, i18n y layout (F04A)
+| ID | Req. | Caso | Tipo | Resultado esperado | Estado |
+|---|---|---|---|---|---|
+| CP-75 | IU1, RNF Acc. | Pares texto/fondo de los tokens en claro y oscuro (`npm run contrast:check`) | U | Todos ≥ 4,5:1 (texto) y ≥ 3:1 (bordes de controles y foco) | Aprobado |
+| CP-76 | IU2 | Cambiar tema (Sistema/Claro/Oscuro), seguir a `prefers-color-scheme` y recargar | U, E | Clase `.dark`, `theme-color` y preferencia persisten sin parpadeo | Aprobado |
+| CP-77 | IU4 | Cambiar idioma es ↔ en y recargar; claves iguales en ambos (`npm run i18n:check`) | U, E | Textos, `<html lang>`, título y formato (`es-CO`/`en-US`) cambian y persisten | Aprobado |
+| CP-78 | RNF Usab. | Formato COP con redondeo HALF_UP y fechas relativas | U | `$ 1.250.000`, 99.999,5 → `$ 100.000`, "hace 5 min" | Aprobado |
+| CP-79 | IU1, IU6 | Componentes del kit: render, variantes, teclado y eventos | U | 92 pruebas del kit y el layout en verde | Aprobado |
+| CP-80 | IU6, RNF Compat. | Navegación por sidebar (escritorio) y drawer + barra inferior (375 px) en Chromium, Firefox y WebKit | E | Llega al módulo, marca `aria-current`, sin scroll horizontal | Aprobado |
+| CP-81 | RNF Acc. | axe sobre `/dev/ui` y el shell, en claro y oscuro | A | 0 violaciones serias o críticas (WCAG 2.1 AA) | Aprobado |
+
 ### Autenticación y usuarios (F03–F04)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|

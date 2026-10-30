@@ -54,7 +54,7 @@ const CLASE_ITEM =
       type="button"
       [cdkMenuTriggerFor]="menu"
       [cdkMenuPosition]="posiciones()"
-      [attr.aria-label]="etiqueta()"
+      [attr.aria-label]="nombreEnContenido() ? null : etiqueta()"
       [class]="claseDisparador()"
     >
       <ng-content />
@@ -125,6 +125,8 @@ export class HkDropdownMenu {
   readonly etiqueta = input.required<string>();
   readonly seleccionado = input<string>();
   readonly alineacion = input<'inicio' | 'fin'>('fin');
+  /** El botón toma su nombre accesible del contenido proyectado (que incluye texto visible). */
+  readonly nombreEnContenido = input(false);
   readonly claseDisparador = input(
     'inline-flex h-10 items-center gap-2 rounded-xl px-2.5 text-sm font-medium text-muted transition-colors hover:bg-surface-2 hover:text-fg aria-expanded:bg-surface-2 aria-expanded:text-fg hk-foco max-md:min-h-11 max-md:min-w-11 max-md:justify-center',
   );

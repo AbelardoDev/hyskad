@@ -8,7 +8,7 @@
 |---|---|---|---|---|
 | F00 | Preparación del entorno | ✅ Terminada | — | Entorno verificado 2026-10-29 |
 | F01 | Monorepo, infraestructura local y CI | ✅ Terminada | #1 | Repo público AbelardoDev/hyskad; `main` protegida por el CI |
-| F02 | Base del backend | 🟦 En curso | | |
+| F02 | Base del backend | ✅ Terminada | #7 | Swagger en /api/docs (dev) |
 | F03 | Autenticación, usuarios y permisos (backend) | ⬜ Pendiente | | |
 | F04A | Sistema de diseño, tema, i18n y layout | ⬜ Pendiente | | |
 | F04B | Sesión, guards y administración de usuarios (frontend) | ⬜ Pendiente | | |
@@ -28,10 +28,10 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F02 🟦 (implementación y verificación local terminadas; falta PR, CI y merge)
-- **Rama:** `feature/f02-backend-base`
+- **Fase:** F02 ✅ (cerrada 2026-10-29, PR #7)
+- **Rama:** `main`
 - **Hecho:** `shared` completo: `BaseEntity` + JPA Auditing con `Clock`, `PageResponse` (máx. 100), errores con `ProblemDetail` (`type` URN, `code`, `requestId`, `errors[]`), `ConsecutivoService` (PESSIMISTIC_WRITE, propagación MANDATORY), `@PlacaColombiana` y `@DocumentoValido` (DV NIT), `Normalizador`, Jackson estricto, OpenAPI en `/api/docs` (dev/test), async acotado con MDC, CORS dev, filtro `X-Request-Id`, logs ECS en prod, seguridad base (todo autenticado salvo health y docs; 401/403 como ProblemDetail). Módulo `configuracion` (caché invalidada al confirmar) y `AuditoriaService`. Migración `V1__sistema.sql`. `ArquitecturaTest` genérico. Se eliminó el ping (backend, frontend y E2E). Pruebas: 76 unitarias + 27 de integración (failsafe) + Vitest + E2E.
-- **Siguiente paso concreto:** abrir el PR de F02, esperar el CI y hacer merge; luego `/fase F03`.
+- **Siguiente paso concreto:** iniciar F03 con `/fase F03`. Revisar los PRs de dependabot abiertos.
 - **Bloqueos o dudas:** ninguno. MySQL80 local quedó detenido y en arranque manual a pedido del usuario.
 
 ## Decisiones tomadas durante el desarrollo

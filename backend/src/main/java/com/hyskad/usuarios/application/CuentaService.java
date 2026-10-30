@@ -61,6 +61,9 @@ public class CuentaService {
             return new Fallida(usuario.getId(), MotivoFallo.USUARIO_INACTIVO);
         }
         usuario.registrarAcceso(Instant.now(clock));
+        // UPDATE inmediato: toma el bloqueo exclusivo de la fila antes de que la auditoría y el refresh
+        // token (FK a usuario) tomen el compartido; si no, dos logins simultáneos se bloquean mutuamente.
+        repository.flush();
         return new Exitosa(sesion(usuario));
     }
 

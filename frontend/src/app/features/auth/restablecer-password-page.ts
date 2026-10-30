@@ -76,7 +76,7 @@ import { HkAvisoFormulario } from '../../shared/ui/forms/aviso-formulario';
         routerLink="/login"
         class="mt-6 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-primary hk-foco hover:underline"
       >
-        <svg lucideIcon="arrow-left" class="size-4" aria-hidden="true" />
+        <svg lucideIcon="chevron-left" class="size-4" aria-hidden="true" />
         {{ 'auth.volver_login' | transloco }}
       </a>
     </section>

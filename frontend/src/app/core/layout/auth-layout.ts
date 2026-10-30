@@ -59,7 +59,9 @@ import { HkPreferenciasInvitado } from './preferencias-invitado';
       </div>
       <div class="flex flex-1 items-center justify-center px-4 pt-4 pb-12">
         <div class="w-full max-w-md animate-entrada">
-          <hk-logo variante="completo" class="mx-auto mb-8 block h-9 w-fit lg:hidden" />
+          <div class="mb-8 flex justify-center lg:hidden">
+            <hk-logo variante="completo" class="h-9" />
+          </div>
           <router-outlet />
         </div>
       </div>

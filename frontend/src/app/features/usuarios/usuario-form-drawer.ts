@@ -111,7 +111,7 @@ export interface DatosFormUsuario {
         <button hk-button variante="secondary" (click)="ref.close()">
           {{ 'comun.cancelar' | transloco }}
         </button>
-        <button hk-button tipo="submit" form="form-usuario" icono="save" [cargando]="guardando()">
+        <button hk-button tipo="submit" form="form-usuario" icono="check" [cargando]="guardando()">
           {{ 'comun.guardar' | transloco }}
         </button>
       </div>

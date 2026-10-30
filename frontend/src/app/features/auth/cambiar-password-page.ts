@@ -17,7 +17,7 @@ import { HkCambioPasswordForm } from '../perfil/cambio-password-form';
       <span
         class="mb-5 inline-flex size-12 items-center justify-center rounded-2xl bg-primary-soft text-primary-ink"
       >
-        <svg lucideIcon="lock-keyhole" class="size-6" aria-hidden="true" />
+        <svg lucideIcon="key-round" class="size-6" aria-hidden="true" />
       </span>
       <h1 class="font-display text-2xl font-bold tracking-tight text-fg">
         {{ 'auth.cambiar.titulo' | transloco }}

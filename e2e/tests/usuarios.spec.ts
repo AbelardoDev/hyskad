@@ -22,15 +22,16 @@ test.describe('administración de usuarios', () => {
     await drawer.getByLabel('Nombre').fill('Marta Mecánica E2E');
     await drawer.getByLabel('Correo electrónico').fill(email);
     await drawer.getByLabel('Rol').selectOption('MECANICO');
-    await drawer.getByLabel('Contraseña inicial').fill('corta');
+    await drawer.getByRole('textbox', { name: 'Contraseña inicial' }).fill('corta');
     await expect(drawer.getByText('Débil')).toBeVisible();
-    await drawer.getByLabel('Contraseña inicial').fill('Mecanica2026');
+    await drawer.getByRole('textbox', { name: 'Contraseña inicial' }).fill('Mecanica2026');
     await drawer.getByRole('button', { name: 'Guardar' }).click();
 
     await expect(drawer).toBeHidden();
     await expect(page.getByText('Usuario Marta Mecánica E2E creado')).toBeVisible();
 
     await page.getByRole('searchbox', { name: 'Buscar por nombre o correo…' }).fill(email);
+    await expect(page.getByRole('table').getByRole('row')).toHaveCount(2);
     const fila = page.getByRole('row', { name: /Marta Mecánica E2E/ });
     await expect(fila).toContainText('Mecánico');
     await expect(fila).toContainText('Activo');
@@ -53,6 +54,8 @@ test.describe('administración de usuarios', () => {
 
     await page.getByRole('combobox', { name: 'Rol' }).selectOption('ADMIN');
     await page.getByRole('searchbox').fill(yo.email);
+    // Espera a que la búsqueda (con 300 ms de espera) recargue la tabla antes de abrir el menú.
+    await expect(page.getByRole('table').getByRole('row')).toHaveCount(2);
     const propia = page.getByRole('row', { name: /\(tú\)/ });
     await propia.getByRole('button', { name: /^Acciones para/ }).click();
     await expect(page.getByRole('menuitem', { name: 'Desactivar' })).toHaveCount(0);
@@ -60,5 +63,22 @@ test.describe('administración de usuarios', () => {
 
     await expect(page.getByText('No puedes cambiar tus propios permisos.')).toBeVisible();
     await expect(page.getByRole('switch', { name: 'Gestionar usuarios y permisos' })).toBeDisabled();
+  });
+
+  test.describe('en móvil (375 px)', () => {
+    test.use({ viewport: { width: 375, height: 812 }, hasTouch: true });
+
+    test('la acción principal flota sobre la barra inferior y la tabla pasa a tarjetas', async ({ page }) => {
+      await page.goto('/usuarios');
+      const nuevo = page.getByRole('button', { name: 'Nuevo usuario' });
+      await expect(page.getByText('admin@hyskad.local').filter({ visible: true })).toBeVisible();
+
+      const caja = await nuevo.boundingBox();
+      expect(caja!.y).toBeGreaterThan(812 / 2);
+      await nuevo.click();
+      await expect(page.getByRole('dialog', { name: 'Nuevo usuario' })).toBeVisible();
+      const desborde = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(desborde).toBe(0);
+    });
   });
 });

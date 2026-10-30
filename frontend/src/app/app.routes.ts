@@ -2,7 +2,6 @@ import { inject } from '@angular/core';
 import { Routes } from '@angular/router';
 
 import { authGuard, invitadoGuard, permisoGuard, sesionGuard } from './core/auth/guards';
-import { AuthLayout } from './core/layout/auth-layout';
 import { NavegacionService } from './core/layout/navegacion.service';
 import { HkShell } from './core/layout/shell';
 import { DEV_ROUTES } from './dev/dev.routes';
@@ -121,7 +120,7 @@ export const routes: Routes = [
   // Después del shell: con `''` y sin hijo que coincida, capturaría la raíz.
   {
     path: '',
-    component: AuthLayout,
+    loadComponent: () => import('./core/layout/auth-layout').then((m) => m.AuthLayout),
     children: [
       {
         path: 'login',
@@ -137,7 +136,8 @@ export const routes: Routes = [
           import('./features/auth/olvide-password-page').then((m) => m.OlvidePasswordPage),
       },
       {
-        path: 'restablecer-password',
+        // Ruta del enlace que arma el backend en el correo (RecuperacionPasswordService).
+        path: 'restablecer',
         data: { miga: 'auth.restablecer.miga' },
         loadComponent: () =>
           import('./features/auth/restablecer-password-page').then(

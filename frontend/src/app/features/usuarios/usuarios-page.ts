@@ -54,7 +54,7 @@ type Estado = (typeof ESTADOS)[number];
       [titulo]="'usuarios.titulo' | transloco"
       [subtitulo]="'usuarios.subtitulo' | transloco"
     >
-      <button hk-button icono="user-plus" hkAccionPrincipal (click)="abrirFormulario()">
+      <button hk-button icono="plus" hkAccionPrincipal (click)="abrirFormulario()">
         {{ 'usuarios.nuevo' | transloco }}
       </button>
     </hk-page-header>
@@ -93,7 +93,7 @@ type Estado = (typeof ESTADOS)[number];
             [titulo]="'usuarios.error_titulo' | transloco"
             [texto]="'usuarios.error_texto' | transloco"
           >
-            <button hk-button variante="secondary" icono="refresh-cw" (click)="usuarios.reload()">
+            <button hk-button variante="secondary" icono="rotate-ccw" (click)="usuarios.reload()">
               {{ 'comun.reintentar' | transloco }}
             </button>
           </hk-empty-state>

@@ -62,7 +62,7 @@ export function ajustesDesde(
       [titulo]="'usuarios.permisos.titulo' | transloco"
       [subtitulo]="'usuarios.permisos.subtitulo' | transloco"
     >
-      <a hk-button variante="secondary" icono="arrow-left" routerLink="/usuarios">
+      <a hk-button variante="secondary" icono="chevron-left" routerLink="/usuarios">
         {{ 'usuarios.permisos.volver' | transloco }}
       </a>
     </hk-page-header>
@@ -74,7 +74,7 @@ export function ajustesDesde(
           [titulo]="'usuarios.permisos.error_titulo' | transloco"
           [texto]="'usuarios.error_texto' | transloco"
         >
-          <button hk-button variante="secondary" icono="refresh-cw" (click)="datos.reload()">
+          <button hk-button variante="secondary" icono="rotate-ccw" (click)="datos.reload()">
             {{ 'comun.reintentar' | transloco }}
           </button>
         </hk-empty-state>
@@ -115,7 +115,7 @@ export function ajustesDesde(
                     </hk-switch>
                     <span class="flex flex-wrap gap-1.5">
                       @if (p.soloAdmin) {
-                        <hk-badge tono="warning" icono="lock-keyhole">
+                        <hk-badge tono="warning" icono="key-round">
                           {{ 'usuarios.permisos.solo_admin' | transloco }}
                         </hk-badge>
                       }
@@ -161,7 +161,7 @@ export function ajustesDesde(
           </button>
           <button
             hk-button
-            icono="save"
+            icono="check"
             [cargando]="guardando()"
             [deshabilitado]="!hayCambios()"
             (click)="guardar()"

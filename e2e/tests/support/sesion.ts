@@ -33,7 +33,7 @@ export async function apiComoAdmin(): Promise<{ api: APIRequestContext; token: s
 /** Crea un usuario nuevo por la API (cada prueba con el suyo: así pueden correr en paralelo). */
 export async function crearUsuario(rol: Rol, idioma: 'es' | 'en' = 'es'): Promise<UsuarioE2e> {
   const { api, token } = await apiComoAdmin();
-  const nombre = `E2E ${rol} ${++contador}`;
+  const nombre = `E2E ${rol} ${String(Date.now()).slice(-5)}${++contador}`;
   const email = emailUnico(rol);
   const respuesta = await api.post('/api/v1/usuarios', {
     headers: { Authorization: `Bearer ${token}` },
@@ -69,6 +69,6 @@ export async function entrarPorFormulario(
   usuario: { email: string; password: string },
 ): Promise<void> {
   await page.getByLabel('Correo electrónico').fill(usuario.email);
-  await page.getByLabel(/^Contraseña/).fill(usuario.password);
+  await page.getByRole('textbox', { name: 'Contraseña', exact: true }).fill(usuario.password);
   await page.getByRole('button', { name: 'Entrar' }).click();
 }

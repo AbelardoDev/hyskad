@@ -183,10 +183,13 @@ const POSICION_PANEL: ConnectedPosition[] = [
       <!-- Usuario -->
       <hk-dropdown-menu
         [etiqueta]="'layout.menu_usuario' | transloco"
+        [nombreEnContenido]="true"
         [items]="itemsUsuario()"
         claseDisparador="ml-1 inline-flex rounded-full hk-foco max-md:size-11 max-md:items-center max-md:justify-center"
         (seleccion)="alElegirUsuario($event)"
       >
+        <!-- Nombre accesible desde el texto oculto: las iniciales visibles no forman parte de él (axe). -->
+        <span class="sr-only">{{ 'layout.menu_usuario' | transloco }}</span>
         <hk-avatar [nombre]="usuario()?.nombre ?? ''" tamano="sm" aria-hidden="true" />
         <div hkMenuEncabezado class="mb-1.5 border-b border-border px-2.5 pt-1 pb-2.5">
           @if (usuario(); as u) {

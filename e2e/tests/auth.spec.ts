@@ -13,9 +13,14 @@ test.describe('sesión', () => {
     await page.goto('/login');
     await expect(page).toHaveTitle('Iniciar sesión · HYSKAD');
 
-    const login = page.waitForResponse('**/api/v1/auth/login');
+    // Se captura el token de la respuesta del login (luego la app navega y el cuerpo ya no está).
+    let accessToken = '';
+    await page.route('**/api/v1/auth/login', async (ruta) => {
+      const respuesta = await ruta.fetch();
+      accessToken = ((await respuesta.json()) as { accessToken: string }).accessToken;
+      await ruta.fulfill({ response: respuesta });
+    });
     await entrarPorFormulario(page, usuario);
-    const { accessToken } = (await (await login).json()) as { accessToken: string };
 
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole('heading', { level: 1, name: 'Inicio' })).toBeVisible();
@@ -31,6 +36,7 @@ test.describe('sesión', () => {
     const almacenado = await page.evaluate(() =>
       JSON.stringify({ ...localStorage }) + JSON.stringify({ ...sessionStorage }),
     );
+    expect(accessToken).not.toBe('');
     expect(almacenado).not.toContain(accessToken);
     expect(almacenado).not.toContain(accessToken.split('.')[2]);
   });
@@ -43,7 +49,7 @@ test.describe('sesión', () => {
 
     await expect(page.getByRole('alert')).toContainText('Correo o contraseña incorrectos');
     await expect(page).toHaveURL(/\/login$/);
-    await expect(page.getByLabel(/^Contraseña/)).toHaveValue('');
+    await expect(page.getByRole('textbox', { name: 'Contraseña', exact: true })).toHaveValue('');
   });
 
   test('ante el 429 muestra cuánto esperar y bloquea el botón', async ({ page }) => {
@@ -145,7 +151,7 @@ test.describe('sesión', () => {
           if (!messages?.length) return '';
           const mensaje = await request.get(`${MAILPIT}/api/v1/message/${messages[0].ID}`);
           const { Text } = (await mensaje.json()) as { Text: string };
-          enlace = /https?:\/\/\S*restablecer-password\?token=[\w-]+/.exec(Text)?.[0] ?? '';
+          enlace = /https?:\/\/\S*\/restablecer\?token=[\w-]+/.exec(Text)?.[0] ?? '';
           return enlace;
         },
         { timeout: 15_000 },
@@ -155,9 +161,9 @@ test.describe('sesión', () => {
     // El enlace apunta a APP_BASE_URL; se abre la misma ruta en la app bajo prueba.
     const { pathname, search } = new URL(enlace);
     await page.goto(pathname + search);
-    await page.getByLabel('Contraseña nueva').fill('NuevaClave2026');
+    await page.getByRole('textbox', { name: 'Contraseña nueva' }).fill('NuevaClave2026');
     await expect(page.getByText('Fuerte')).toBeVisible();
-    await page.getByLabel('Confirma la contraseña').fill('NuevaClave2026');
+    await page.getByRole('textbox', { name: 'Confirma la contraseña' }).fill('NuevaClave2026');
     await page.getByRole('button', { name: 'Guardar contraseña' }).click();
 
     await expect(page).toHaveURL(/\/login$/);
@@ -167,8 +173,8 @@ test.describe('sesión', () => {
 
     // El enlace es de un solo uso.
     await page.goto(pathname + search);
-    await page.getByLabel('Contraseña nueva').fill('OtraClave2026');
-    await page.getByLabel('Confirma la contraseña').fill('OtraClave2026');
+    await page.getByRole('textbox', { name: 'Contraseña nueva' }).fill('OtraClave2026');
+    await page.getByRole('textbox', { name: 'Confirma la contraseña' }).fill('OtraClave2026');
     await page.getByRole('button', { name: 'Guardar contraseña' }).click();
     await expect(page.getByRole('heading', { name: 'El enlace no es válido' })).toBeVisible();
   });
@@ -213,7 +219,7 @@ test.describe('permisos', () => {
     await paginaVendedor.reload();
     await expect(paginaVendedor).toHaveURL(/\/login/);
     await entrarPorFormulario(paginaVendedor, vendedor);
-    await paginaVendedor.goto('/ventas');
+    await expect(paginaVendedor).toHaveURL(/\/ventas$/);
     await expect(paginaVendedor.getByRole('heading', { level: 1, name: 'Ventas' })).toBeVisible();
     await expect(paginaVendedor.getByRole('link', { name: 'Nueva venta' })).toHaveCount(0);
     await paginaVendedor.goto('/ventas/nueva');

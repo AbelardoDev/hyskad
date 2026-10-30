@@ -217,7 +217,9 @@ describe('HkShell', () => {
 
   it('el menú de usuario muestra nombre y rol, y cierra la sesión', async () => {
     const { fixture, el } = await montar(1440);
-    el.querySelector<HTMLButtonElement>('hk-topbar button[aria-label="Menú de usuario"]')!.click();
+    Array.from(el.querySelectorAll<HTMLButtonElement>('hk-topbar button'))
+      .find((b) => b.querySelector('hk-avatar') && b.textContent?.includes('Menú de usuario'))!
+      .click();
     await fixture.whenStable();
 
     expect(document.querySelector('[role="menu"]')?.textContent).toContain('Ana Admin');

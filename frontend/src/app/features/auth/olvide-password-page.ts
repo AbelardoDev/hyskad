@@ -42,7 +42,7 @@ import { cuentaRegresiva, segundosDeEspera } from './espera';
         <span
           class="mb-5 inline-flex size-12 items-center justify-center rounded-2xl bg-success-soft text-success-ink"
         >
-          <svg lucideIcon="mail-check" class="size-6" aria-hidden="true" />
+          <svg lucideIcon="circle-check" class="size-6" aria-hidden="true" />
         </span>
         <h1 class="font-display text-2xl font-bold tracking-tight text-fg">
           {{ 'auth.olvide.enviado_titulo' | transloco }}
@@ -94,7 +94,7 @@ import { cuentaRegresiva, segundosDeEspera } from './espera';
         routerLink="/login"
         class="mt-6 inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-primary hk-foco hover:underline"
       >
-        <svg lucideIcon="arrow-left" class="size-4" aria-hidden="true" />
+        <svg lucideIcon="chevron-left" class="size-4" aria-hidden="true" />
         {{ 'auth.volver_login' | transloco }}
       </a>
     </section>

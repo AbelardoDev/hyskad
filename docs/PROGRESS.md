@@ -28,18 +28,24 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F04B 🟦 en curso (interrumpida 2026-10-30 por límite de uso).
-- **Rama:** `feature/f04b-sesion-usuarios` (sin push).
-- **Hecho:** perfil `e2e` en el backend con `POST /api/v1/test/reset`, rate limit desactivable solo en e2e, IT. `infra/docker-compose.e2e.yml` (MySQL 3307, Mailpit 8026, Nginx 4300 con `BACKEND_PORT`). Frontend completo: AuthService, interceptores, guards, directiva, menú filtrado, login, olvidé/restablecer, cambio obligatorio, perfil, usuarios y permisos. 148 pruebas unitarias en verde, lint OK. E2E escritas (`auth.spec.ts`, `usuarios.spec.ts`, `a11y/auth.a11y.spec.ts`).
-- **Pendiente:**
-  1. E2E en rojo: (a) `getByLabel` no encuentra los campos de contraseña; usar `getByRole('textbox', { name, exact: true })`. (b) axe `label-content-name-mismatch` en el botón del menú de usuario: las iniciales del avatar son texto visible que no forma parte de `aria-label`. (c) Revisar la prueba de Mailpit (no se encontró el correo en 15 s) y la del clic en el menú "Permisos" (elemento no estable).
-  2. Job `e2e` en `.github/workflows/ci.yml`.
-  3. Capturas claro/oscuro/móvil, actualizar TEST-PLAN (CP-01, CP-04, CP-09), `/verificar`, PR y merge.
-- **Entorno local:** backend e2e en :8081 (en :8080 corre un backend dev del usuario), `BACKEND_PORT=8081 docker compose -f infra/docker-compose.e2e.yml up -d`, `E2E_BASE_URL=http://localhost:4300 npx playwright test --project=chromium`.
+- **Fase:** F04B (cierre 2026-10-30)
+- **Rama:** `feature/f04b-sesion-usuarios` → `main`
+- **Hecho:** sesión en el frontend (`AuthService` con access token solo en memoria, restauración con `/auth/refresh` al arrancar tras un splash, renovación 60 s antes de vencer, interceptor con un único refresh compartido y reintento, interceptor de errores → toast por `code` y `errors[]` marcados en el formulario). Guards `authGuard` (incluye cambio obligatorio de contraseña), `invitadoGuard`, `sesionGuard`, `permisoGuard` (`canMatch`) y página 403; directiva `*hkTienePermiso`; menú, drawer y barra inferior filtrados por permiso. Pantallas: login dividido (429 con cuenta regresiva), olvidé/restablecer contraseña con medidor de fortaleza, cambio obligatorio, Mi perfil (idioma guardado en la cuenta) y Usuarios (tabla con búsqueda y filtros, drawer crear/editar, activar/desactivar, permisos por módulo). Backend: perfil `e2e` con `POST /api/v1/test/reset` y arreglo del deadlock en logins simultáneos. CI: job `e2e` (MySQL + Mailpit + Nginx en `docker-compose.e2e.yml`, backend con perfil e2e, Playwright en Chromium, reporte como artefacto si falla). Pruebas: 148 unitarias, 32 E2E + axe (estables en 3 repeticiones). Capturas en `docs/capturas/f04b/` (claro/oscuro, escritorio/móvil); revisado también 768 px y en inglés.
+- **Siguiente paso concreto:** iniciar F05 con `/fase F05`. Revisar los PRs de dependabot abiertos.
+- **Bloqueos o dudas:** ninguno.
 
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-10-30 · F04B · El enlace de recuperación usa la ruta `/restablecer?token=` (la que ya arma el backend desde F03) · no cambiar el contrato del correo.
+- 2026-10-30 · F04B · Con sesión iniciada, el idioma elegido se guarda en la cuenta (`PUT /auth/me/preferencias`) y al recuperar la sesión manda el de la cuenta · el idioma es una preferencia del usuario (RF de perfil), no del navegador.
+- 2026-10-30 · F04B · CP-09 se cubre con la acción "Nueva venta" (`*hkTienePermiso="'VENTAS_CREAR'"`) y la ruta `/ventas/nueva` con `permisoGuard`, aprobado por el usuario · el módulo de ventas llega en F08.
+- 2026-10-30 · F04B · Rate limit desactivable solo en el perfil e2e (`hyskad.auth.rate-limit=false`); el 429 de la UI se prueba con una respuesta simulada · las E2E inician sesión muchas veces desde la misma IP; CP-03 sigue en la integración.
+- 2026-10-30 · F04B · `POST /api/v1/test/reset` hace `flyway.clean()` + `migrate()` con `db/dev-data`; se llama una vez en el `globalSetup` y cada E2E crea sus propios usuarios por la API · las pruebas corren en paralelo sin pisarse.
+- 2026-10-30 · F04B · Build `e2e` (optimizado, sin reemplazar `dev.routes`) para que la galería `/dev/ui` siga probándose en el CI; Nginx de e2e con `BACKEND_PORT` configurable · en local el 8080 suele estar ocupado por el backend de dev.
+- 2026-10-30 · F04B · `--animate-entrada` con `fill-mode: backwards` (antes `both`) · un `transform` animado que persiste convierte al elemento en contenedor de los `position: fixed` y la acción flotante de `hk-page-header` quedaba detrás de la topbar en móvil.
+- 2026-10-30 · F04B · Seis íconos nuevos reemplazados por equivalentes ya registrados y `AuthLayout` cargado en diferido · el bundle inicial pasaba el presupuesto de aviso (819 kB → 796 kB).
+- 2026-10-30 · F04B · `CuentaService.autenticar` hace `flush()` tras registrar el último acceso · dos logins simultáneos del mismo usuario provocaban un deadlock en MySQL (bloqueo compartido por las FK de auditoría/refresh token y luego exclusivo por el UPDATE).
 - 2026-10-29 · F04A · Íconos con `@lucide/angular` (paquete oficial sucesor) en vez de `lucide-angular` · `lucide-angular` 1.0 solo admite Angular ≤ 21.
 - 2026-10-29 · F04A · Presupuesto del bundle inicial subido a 800 kB (aviso) / 1,2 MB (error), aprobado por el usuario · cada ícono de `@lucide/angular` trae su plantilla compilada (~4 kB, ~250 kB en total); transferido comprimido ≈ 132 kB.
 - 2026-10-29 · F04A · `ring` claro `#2F74F5` (no `#5698FF`), tokens `-ink` para texto sobre `-soft` y `border-strong` para bordes de controles · el contraste AA no se cumplía con los valores originales; documentado en DESIGN-SYSTEM §1.2.
@@ -84,7 +90,8 @@ pm-cache-hk`.
 
 <!-- Qué quedó pendiente a propósito y por qué -->
 - Los refresh tokens y enlaces de recuperación vencidos no se purgan de la BD (crecen despacio; se puede agregar una tarea programada más adelante).
-- `debeCambiarPassword` no bloquea otros endpoints en el backend: lo hace cumplir el frontend (F04B).
+- `debeCambiarPassword` no bloquea otros endpoints en el backend: solo lo hace cumplir el frontend (`authGuard`).
 - Aviso de Mockito por auto-attach del agente en las pruebas del backend (JDK 25); sin impacto por ahora.
-- Las E2E no corren en el CI todavía (necesitan backend y frontend levantados); se ejecutan localmente. Bajo carga paralela del servidor de desarrollo, Firefox puede exceder el timeout de 30 s (en serie pasan).
-- El menú de usuario y la campana muestran datos de ejemplo hasta F04B/F10; "Cerrar sesión" está deshabilitado.
+- Las E2E corren en el CI solo en Chromium (los tres navegadores en F12). Bajo carga paralela del servidor de desarrollo, Firefox puede exceder el timeout de 30 s (en serie pasan).
+- La campana de notificaciones muestra un estado vacío hasta F10.
+- Detrás de Nginx (F13) el rate limit verá la IP del proxy: configurar `server.forward-headers-strategy` y confiar solo en el proxy propio.

@@ -4,9 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import com.hyskad.shared.dinero.CalculadoraTotales.Totales;
 
@@ -15,6 +18,31 @@ class CalculadoraTotalesTest {
 
     private static BigDecimal d(String valor) {
         return new BigDecimal(valor);
+    }
+
+    /**
+     * Casos fijos compartidos con {@code calcularTotales} del frontend (dinero.spec.ts): los dos
+     * deben dar exactamente lo mismo. Líneas como {@code cantidad×precio} separadas por {@code ;}.
+     */
+    @ParameterizedTest(name = "{0} − {1} con IVA {2} % → {3} + {4} = {5}")
+    @CsvSource(delimiter = '|', value = {
+            "1×10000           | 0     | 19 | 10000.00 | 1900.00 | 11900.00",
+            "2×12345;1×50000   | 74690 | 19 | 74690.00 | 0.00    | 0.00",
+            "3×1000            | 0     | 0  | 3000.00  | 0.00    | 3000.00",
+            "1×1250            | 0     | 19 | 1250.00  | 238.00  | 1488.00",
+            "1×3950            | 0     | 19 | 3950.00  | 751.00  | 4701.00",
+            "2.5×17500.33      | 0     | 19 | 43750.83 | 8313.00 | 52063.83",
+            "1×10000           | 2500  | 19 | 10000.00 | 1425.00 | 8925.00",
+            "3×333.33          | 0     | 19 | 999.99   | 190.00  | 1189.99" })
+    void casosFijosCompartidosConElFrontend(String lineas, String descuento, String iva, String subtotal,
+            String impuesto, String total) {
+        List<BigDecimal> subtotales = Arrays.stream(lineas.split(";")).map(l -> l.split("×"))
+                .map(l -> CalculadoraTotales.subtotalLinea(d(l[0].trim()), d(l[1].trim()))).toList();
+        Totales t = CalculadoraTotales.calcular(subtotales, d(descuento), d(iva));
+
+        assertThat(t.subtotal()).isEqualTo(d(subtotal));
+        assertThat(t.impuesto()).isEqualTo(d(impuesto));
+        assertThat(t.total()).isEqualTo(d(total));
     }
 
     @Test

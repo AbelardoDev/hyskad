@@ -12,6 +12,15 @@ import { DEV_ROUTES } from './dev/dev.routes';
  * y declara `data.miga` (clave i18n) para las migas de pan y el título de la pestaña.
  */
 export const routes: Routes = [
+  // Comprobante imprimible: con sesión pero fuera del shell (sin menú ni barras).
+  {
+    path: 'ventas/:id/comprobante',
+    canMatch: [permisoGuard('VENTAS_VER')],
+    canActivate: [authGuard],
+    data: { miga: 'ventas.comprobante' },
+    loadComponent: () =>
+      import('./features/ventas/comprobante-page').then((m) => m.ComprobantePage),
+  },
   {
     path: '',
     component: HkShell,

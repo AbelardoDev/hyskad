@@ -34,8 +34,8 @@ import com.hyskad.shared.security.UsuarioActual;
  *
  * <p>Contrato común de los métodos que mueven stock: se ejecutan en la transacción del llamador
  * (o abren una), bloquean el producto con {@code PESSIMISTIC_WRITE} (RN-12), rechazan productos
- * inactivos con {@code PRODUCTO_INACTIVO} (RN-15), cantidades no positivas o con más de 2 decimales
- * con {@code CANTIDAD_INVALIDA}, y lo que dejaría stock negativo o más reservado que existente con
+ * inactivos con {@code PRODUCTO_INACTIVO} (RN-15; salvo la devolución de una venta anulada),
+ * cantidades no positivas o con más de 2 decimales con {@code CANTIDAD_INVALIDA}, y lo que dejaría stock negativo o más reservado que existente con
  * {@code STOCK_INSUFICIENTE} / {@code RESERVA_INSUFICIENTE} (RN-10). Los que cambian existencias
  * guardan un movimiento inmutable (RN-11) y, si el disponible cruza el mínimo hacia abajo, publican
  * {@link StockBajoDetectado} una sola vez (RN-14). Las reservas no cambian existencias: no generan
@@ -125,12 +125,21 @@ public class InventarioService {
 
     /**
      * Devolución por anulación de venta ({@code DEVOLUCION_ANULACION_VENTA}): entra al costo
-     * registrado en esa venta y recalcula el promedio (RN-09).
+     * registrado en esa venta y recalcula el promedio (RN-09). Es la excepción a RN-15: se acepta
+     * aunque el producto esté inactivo, para que anular una venta siempre devuelva todo (RN-21).
      */
     @Transactional
     public MovimientoInventario registrarDevolucionVenta(Long productoId, BigDecimal cantidad, BigDecimal costoUnitario,
             Referencia referencia) {
-        return entrar(productoId, TipoMovimiento.DEVOLUCION_ANULACION_VENTA, cantidad, costoUnitario, referencia, null);
+        validarCantidad(cantidad);
+        Producto producto = productos.bloquear(productoId);
+        BigDecimal costo = validarCosto(costoUnitario);
+        boolean estabaBajo = producto.estaBajo();
+        producto.registrarDevolucion(cantidad, costo);
+        MovimientoInventario movimiento = guardar(producto, TipoMovimiento.DEVOLUCION_ANULACION_VENTA, cantidad, costo,
+                referencia, null);
+        avisarSiCruzaElMinimo(producto, estabaBajo);
+        return movimiento;
     }
 
     /**

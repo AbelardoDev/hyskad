@@ -118,3 +118,8 @@ export function formatoFecha(
   }
   return formato.format(valor);
 }
+
+/** Hoy en Colombia como `aaaa-mm-dd` (fechas de factura, filtros de "hoy"). */
+export function hoyEnBogota(ahora = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(ahora);
+}

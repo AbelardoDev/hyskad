@@ -30,7 +30,7 @@ import { finalize, map } from 'rxjs';
 
 import { conFormulario, erroresManejados } from '../../core/http/contexto-http';
 import { calcularTotales, subtotalLinea } from '../../core/utils/dinero';
-import { formatoCop } from '../../core/utils/formato';
+import { formatoCop, hoyEnBogota } from '../../core/utils/formato';
 import { CopPipe } from '../../core/utils/formato.pipes';
 import { LanguageService } from '../../core/i18n/language.service';
 import { aCantidad, cantidad } from '../../core/utils/validadores';
@@ -46,6 +46,7 @@ import { HkInput } from '../../shared/ui/forms/input';
 import { HkMoneyInput } from '../../shared/ui/forms/money-input';
 import { HkPageHeader } from '../../shared/ui/page-header/page-header';
 import { ToastService } from '../../shared/ui/toast/toast';
+import { ConfiguracionApiService } from '../configuracion/configuracion-api.service';
 import { buscadorProductos } from '../inventario/buscador-productos';
 import { buscadorProveedores } from '../proveedores/buscador-proveedores';
 import { ProveedoresApiService } from '../proveedores/proveedores-api.service';
@@ -53,11 +54,6 @@ import { ComprasApiService, NuevaCompra } from './compras-api.service';
 
 /** Si el costo ingresado se aleja más que esto del costo promedio actual, se advierte. */
 export const DIFERENCIA_COSTO_AVISO = 0.3;
-
-/** Hoy en Colombia como `aaaa-mm-dd` (la fecha de la factura no puede ser futura). */
-export function hoyEnBogota(ahora = new Date()): string {
-  return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(ahora);
-}
 
 /** Diferencia relativa entre el costo ingresado y el promedio; `null` si no hay promedio. */
 export function diferenciaCosto(costo: number | null, promedio: number | undefined): number | null {
@@ -249,6 +245,7 @@ interface Fila {
 })
 export class NuevaCompraPage {
   private readonly api = inject(ComprasApiService);
+  private readonly configuracion = inject(ConfiguracionApiService);
   private readonly proveedoresApi = inject(ProveedoresApiService);
   private readonly fb = inject(NonNullableFormBuilder);
   private readonly injector = inject(Injector);
@@ -278,7 +275,7 @@ export class NuevaCompraPage {
   protected readonly filas = signal<Fila[]>([]);
 
   private readonly ivaRecurso = rxResource({
-    stream: () => this.api.iva(erroresManejados()).pipe(map((r) => r.porcentaje)),
+    stream: () => this.configuracion.iva(erroresManejados()).pipe(map((r) => r.porcentaje)),
   });
   protected readonly iva = computed(() => this.ivaRecurso.value() ?? 0);
   private readonly valores = toSignal(this.form.controls.items.valueChanges, { initialValue: [] });

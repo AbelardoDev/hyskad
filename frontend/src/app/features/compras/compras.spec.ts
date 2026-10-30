@@ -7,7 +7,8 @@ import { provideRouter } from '@angular/router';
 import { conFormulario, marcarErroresServidor } from '../../core/http/contexto-http';
 import { errorInterceptor } from '../../core/http/error.interceptor';
 import { calcularTotales, subtotalLinea } from '../../core/utils/dinero';
-import { diferenciaCosto, hoyEnBogota, NuevaCompraPage } from './nueva-compra-page';
+import { hoyEnBogota } from '../../core/utils/formato';
+import { diferenciaCosto, NuevaCompraPage } from './nueva-compra-page';
 
 describe('calcularTotales (espejo de RN-04)', () => {
   it('suma líneas con centavos y redondea el IVA a pesos HALF_UP', () => {

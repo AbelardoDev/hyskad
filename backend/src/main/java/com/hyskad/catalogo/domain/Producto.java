@@ -27,7 +27,8 @@ import lombok.NoArgsConstructor;
  * Producto o repuesto (RF17) con sus existencias (RF18). El stock nace en 0 y solo cambia con los
  * métodos de movimiento, que llama {@code InventarioService} con la fila bloqueada (RN-12). Aquí
  * viven las reglas: RN-07/08 (costo promedio), RN-10 (nunca negativo ni más reservado que
- * existente) y RN-15 (inactivo no se mueve; no se desactiva con reservas).
+ * existente) y RN-15 (inactivo no se mueve, salvo la devolución de una venta anulada; no se
+ * desactiva con reservas).
  */
 @Entity
 @Table(name = "producto")
@@ -126,6 +127,16 @@ public class Producto extends BaseEntity {
     /** Entrada con costo (compra, devolución, ajuste): recalcula el costo promedio (RN-07, RN-09). */
     public void registrarEntrada(BigDecimal cantidad, BigDecimal costoUnitario) {
         verificarActivo();
+        this.costoPromedio = CostoPromedio.calcular(stockActual, costoPromedio, cantidad, costoUnitario);
+        this.stockActual = stockActual.add(cantidad);
+    }
+
+    /**
+     * Devolución por anulación de venta (RN-09, RN-21): entra al costo de la venta y recalcula el
+     * promedio. Es el único movimiento que se acepta con el producto inactivo: anular la venta debe
+     * devolver todo, aunque el producto se haya desactivado después (sigue sin poder venderse).
+     */
+    public void registrarDevolucion(BigDecimal cantidad, BigDecimal costoUnitario) {
         this.costoPromedio = CostoPromedio.calcular(stockActual, costoPromedio, cantidad, costoUnitario);
         this.stockActual = stockActual.add(cantidad);
     }

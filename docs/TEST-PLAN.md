@@ -120,7 +120,7 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | CP-95 | RN-07 | Costo promedio con stock 0, cantidades con decimales y redondeo | U | Con stock 0 toma el costo de la entrada; 2 decimales `HALF_UP` | Aprobado (F06) |
 | CP-96 | RN-12, RN-10 | 20 hilos reservan 1 u del mismo producto con stock 10 | I | Exactamente 10 reservas; `stock_reservado = 10` | Aprobado (F06) |
 | CP-97 | RF19, RN-11 | Reservar y luego consumir la reserva | I | Baja existencias y reserva a 0 con un solo movimiento `SALIDA_ORDEN` | Aprobado (F06) |
-| CP-98 | RN-15 | Producto inactivo en cualquier movimiento; desactivar con reservas | U, I | 409 `PRODUCTO_INACTIVO` en los 9 tipos de operación; 409 `RESERVA_PENDIENTE` | Aprobado (F06) |
+| CP-98 | RN-15 | Producto inactivo en cualquier movimiento; desactivar con reservas | U, I | 409 `PRODUCTO_INACTIVO` en los tipos de operación salvo la devolución por anulación de venta (excepción de F08); 409 `RESERVA_PENDIENTE` | Aprobado (F06; ajustado en F08) |
 | CP-99 | RF17, IS4 | Mecánico y vendedor consultan productos | I, E | Sin `costoPromedio` ni acciones de gestión; almacén y admin sí lo ven | Aprobado (F06) |
 | CP-100 | RN-09, RN-17 | Devolución de venta y salida por anulación de compra | I | La devolución entra al costo de la venta y recalcula; la anulación sale al promedio sin recalcularlo | Aprobado (F06) |
 | CP-101 | RF18, RN-13 | Ajuste de entrada desde la UI y su movimiento | U, E | Vista previa del stock resultante; la salida que supera el disponible no se confirma; el movimiento aparece en la ficha y en el listado global | Aprobado (F06) |
@@ -138,12 +138,17 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 ### Ventas (F08)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
-| CP-29 | RN-04 | Cálculo de totales con descuento e IVA 19 % | U | Valores exactos con redondeo HALF_UP | Aprobado (F07: `CalculadoraTotales` del backend y su espejo `calcularTotales` del frontend) |
-| CP-30 | RN-19 | Vender más que el disponible | I | 409 y no cambia el stock | Pendiente |
-| CP-31 | RN-12 | Dos ventas simultáneas de la última unidad | I (concurrencia) | Exactamente una confirma; stock final 0, nunca −1 | Pendiente |
-| CP-32 | RN-21 | Anular venta | I, E | Stock devuelto, movimientos `DEVOLUCION_ANULACION_VENTA`, estado `ANULADA` | Pendiente |
-| CP-33 | RN-21 | Vendedor sin `VENTAS_ANULAR` intenta anular | I | 403 | Pendiente |
-| CP-34 | RF27 | Comprobante de venta | E | Vista imprimible con leyenda de documento interno | Pendiente |
+| CP-29 | RN-04 | Cálculo de totales con descuento e IVA 19 % | U | Valores exactos con redondeo HALF_UP | Aprobado (F07; F08: la misma tabla de 9 casos fijos en `CalculadoraTotalesTest` y `dinero.spec.ts`) |
+| CP-30 | RN-19 | Vender más que el disponible | I | 409 y no cambia el stock | Aprobado (F08) |
+| CP-31 | RN-12 | Dos ventas simultáneas de la última unidad | I (concurrencia) | Exactamente una confirma; stock final 0, nunca −1 | Aprobado (F08) |
+| CP-32 | RN-21 | Anular venta | I, E | Stock devuelto, movimientos `DEVOLUCION_ANULACION_VENTA`, estado `ANULADA` | Aprobado (F08; también con el producto ya inactivo) |
+| CP-33 | RN-21 | Vendedor sin `VENTAS_ANULAR` intenta anular | I | 403 | Aprobado (F08) |
+| CP-34 | RF27 | Comprobante de venta | E | Vista imprimible con leyenda de documento interno | Aprobado (F08: carta y tirilla 80 mm, fuera del menú) |
+| CP-110 | RN-04, RN-19 | El cliente envía un precio o vende más de lo disponible desde la UI | U, I | 400 `PROPIEDAD_DESCONOCIDA` con `precioUnitario`; el carrito no deja pasar del disponible y el cuerpo enviado solo lleva producto y cantidad | Aprobado (F08) |
+| CP-111 | RF27 | Descuento, referencia de pago y monto recibido | U, I, E | 400 `DESCUENTO_INVALIDO` si supera el subtotal, `REFERENCIA_REQUERIDA` salvo efectivo, `MONTO_INSUFICIENTE`; cambio correcto en pantalla, confirmación y comprobante | Aprobado (F08) |
+| CP-112 | RF27, IU | Venta de 3 productos solo con el teclado | U, E | F2 enfoca el buscador, Enter agrega, F9 cobra y la confirmación se acepta con el teclado; el stock baja en los 3 | Aprobado (F08) |
+| CP-113 | RF29 | Lista de ventas con filtros y resumen | I, E | Filtros por número, fechas (día de Bogotá), método, estado y vendedor; `/ventas/resumen` cuenta y suma solo las pagadas | Aprobado (F08) |
+| CP-114 | RNF Acc. | axe en punto de venta (con atajos y carrito), lista, detalle y comprobante, claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F08) |
 
 ### Taller (F09)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |

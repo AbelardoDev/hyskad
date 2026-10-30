@@ -95,11 +95,6 @@ export class ComprasApiService {
     return this.http.post<Compra>(API, datos, { context });
   }
 
-  /** IVA vigente (RN-03) para mostrar los totales antes de registrar. */
-  iva(context?: HttpContext): Observable<{ porcentaje: number }> {
-    return this.http.get<{ porcentaje: number }>('/api/v1/configuracion/iva', { context });
-  }
-
   anular(id: number, motivo: string): Observable<Compra> {
     return this.http.post<Compra>(`${API}/${id}/anulacion`, { motivo });
   }

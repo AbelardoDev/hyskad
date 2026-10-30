@@ -70,6 +70,20 @@ public class UsuarioService {
         return repository.findAllById(ids).stream().collect(Collectors.toMap(Usuario::getId, Usuario::getNombre));
     }
 
+    /** Mecánicos activos por nombre, para asignarlos a órdenes (RN-26). */
+    @Transactional(readOnly = true)
+    public List<Usuario> mecanicosActivos() {
+        return repository.findByRolAndActivoTrueOrderByNombre(Rol.MECANICO);
+    }
+
+    /** De los ids dados, los que son mecánicos activos (RN-26); el resto no se puede asignar. */
+    @Transactional(readOnly = true)
+    public List<Usuario> mecanicosActivos(Collection<Long> ids) {
+        return repository.findAllById(ids).stream()
+                .filter(u -> u.isActivo() && u.getRol() == Rol.MECANICO)
+                .toList();
+    }
+
     @Transactional
     public Usuario crear(CrearUsuario datos) {
         String email = Normalizador.email(datos.email());

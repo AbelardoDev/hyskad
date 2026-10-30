@@ -185,7 +185,8 @@
     "cantidadInvalida": "Enter a quantity with at most 2 decimals",
     "cantidadPositiva": "The quantity must be greater than zero",
     "fechaFutura": "The date can't be later than today",
-    "maxDisponible": "Only {{max}} available"
+    "maxDisponible": "Only {{max}} available",
+    "kilometrajeMenor": "It cannot be lower than {{minimo}} km"
   },
   "errors": {
     "DESCONOCIDO": "Something went wrong. Please try again.",
@@ -255,7 +256,17 @@
     "VENTA_ANULADA": "The sale is already voided",
     "DESCUENTO_INVALIDO": "The discount can't be greater than the subtotal",
     "REFERENCIA_REQUERIDA": "Enter the payment reference",
-    "MONTO_INSUFICIENTE": "The amount received doesn't cover the total"
+    "MONTO_INSUFICIENTE": "The amount received doesn't cover the total",
+    "SERVICIO_DUPLICADO": "A service with that name already exists",
+    "MOTO_NO_PERTENECE_CLIENTE": "The motorcycle does not belong to that customer",
+    "MOTO_INACTIVA": "The motorcycle is inactive",
+    "MOTO_CON_ORDEN_ACTIVA": "The motorcycle already has an active order",
+    "TRANSICION_INVALIDA": "The order cannot move to that status right now",
+    "ORDEN_ESTADO_INVALIDO": "That cannot be done in the current status of the order",
+    "KILOMETRAJE_MENOR": "The mileage cannot be lower than the last reading",
+    "MECANICO_INVALIDO": "Only active mechanics can be assigned",
+    "MECANICO_REPETIDO": "That mechanic is already on the list",
+    "NOTA_REQUERIDA": "Write the reason"
   },
   "roles": {
     "ADMIN": "Administrator",
@@ -915,6 +926,183 @@
       "no_encontrada": "Purchase not found",
       "no_encontrada_texto": "The link may be wrong or you may not have access.",
       "volver": "Back to purchases"
+    }
+  },
+  "servicios": {
+    "titulo": "Workshop services",
+    "subtitulo": "Catalog of jobs with their base price and estimated time",
+    "nuevo": "New service",
+    "buscar": "Search by name or description…",
+    "error_titulo": "Services could not be loaded",
+    "vacio_titulo": "No services match",
+    "vacio_texto": "Try another search or add a service.",
+    "minutos": "{{minutos}} min",
+    "acciones": "Actions",
+    "creado": "Service {{nombre}} added",
+    "actualizado": "Changes to {{nombre}} saved",
+    "activado": "{{nombre}} is active again",
+    "desactivado": "{{nombre}} was deactivated",
+    "confirmar_activar": {
+      "titulo": "Activate service?",
+      "mensaje": "{{nombre}} can be added to work orders again."
+    },
+    "confirmar_desactivar": {
+      "titulo": "Deactivate service?",
+      "mensaje": "{{nombre}} can no longer be added to new orders. Orders that already have it do not change."
+    },
+    "campos": {
+      "nombre": "Name",
+      "precio_base": "Base price",
+      "tiempo": "Estimated time",
+      "descripcion": "Description"
+    },
+    "form": {
+      "titulo_nuevo": "New service",
+      "titulo_editar": "Edit service",
+      "tiempo_ayuda": "In minutes. The price can be adjusted on each order."
+    }
+  },
+  "taller": {
+    "tablero": {
+      "titulo": "Work orders",
+      "subtitulo": "Motorcycles in the workshop and their status",
+      "buscar": "Search by number, plate or customer…",
+      "todos_mecanicos": "All mechanics",
+      "desde": "From",
+      "hasta": "To",
+      "vista": "View",
+      "lista": "List",
+      "kanban": "Board",
+      "filtrar_estado": "Filter by status",
+      "error_titulo": "Work orders could not be loaded",
+      "vacio_titulo": "No work orders match",
+      "vacio_texto": "Try other filters or check in a motorcycle.",
+      "columna_vacia": "No orders",
+      "chip_desde": "From {{fecha}}",
+      "chip_hasta": "To {{fecha}}"
+    },
+    "campos": {
+      "numero": "Number",
+      "placa": "Plate",
+      "cliente": "Customer",
+      "moto": "Motorcycle",
+      "mecanicos": "Mechanics",
+      "mecanico": "Mechanic",
+      "fecha_ingreso": "Checked in",
+      "kilometraje": "Check-in mileage",
+      "motivo": "Reason for visit",
+      "descripcion_problema": "Problem description",
+      "observaciones": "Notes",
+      "diagnostico": "Diagnosis",
+      "observaciones_diagnostico": "Diagnosis notes",
+      "kilometraje_inspeccion": "Inspection mileage"
+    },
+    "mias": {
+      "titulo": "My orders",
+      "subtitulo": "Motorcycles assigned to you",
+      "vacio_titulo": "You have no assigned orders",
+      "vacio_texto": "When a motorcycle is assigned to you it will show up here."
+    },
+    "recepcion": {
+      "recibir": "Check in motorcycle",
+      "miga": "Check in",
+      "titulo": "Check in motorcycle",
+      "subtitulo": "Record a motorcycle arriving at the workshop",
+      "progreso": "Check-in steps",
+      "pasos": {
+        "cliente": "Customer",
+        "moto": "Motorcycle",
+        "ingreso": "Check-in details",
+        "mecanicos": "Mechanics",
+        "confirmar": "Confirm"
+      },
+      "buscar_cliente": "Search by name, ID or phone…",
+      "nuevo_cliente": "New customer",
+      "sin_motos": "This customer has no active motorcycles",
+      "nueva_moto": "Add motorcycle",
+      "orden_activa": "This motorcycle already has active order {{numero}}. Finish or cancel it before checking it in again.",
+      "ver_orden": "View order",
+      "ultimo_km": "Last recorded reading: {{km}} km",
+      "sin_km": "No previous mileage readings",
+      "elige_moto": "Choose a motorcycle to continue",
+      "observaciones_ayuda": "Condition on arrival, accessories left…",
+      "sin_permiso_asignar": "You are not allowed to assign mechanics. They can be assigned later.",
+      "mecanicos_ayuda": "Optional: choose who will work on the motorcycle and what each one will do.",
+      "anterior": "Back",
+      "siguiente": "Next",
+      "creada": "Order {{numero}} created"
+    },
+    "mecanicos": {
+      "titulo": "Mechanics for {{numero}}",
+      "ninguno_disponible": "There are no active mechanics.",
+      "actividad_placeholder": "Task (optional)",
+      "actividad_de": "Task for {{nombre}}",
+      "sin_asignar": "No mechanics assigned",
+      "sin_actividad": "No task described",
+      "guardados": "Mechanics updated"
+    },
+    "detalle": {
+      "miga": "Details",
+      "titulo": "Order {{numero}}",
+      "ingreso": "Checked in on {{fecha}}",
+      "no_encontrada": "Work order not found",
+      "no_encontrada_texto": "The link may be wrong or you may not have access to this order.",
+      "volver": "Back to work orders",
+      "mecanicos": "Mechanics",
+      "linea_tiempo": "Order status",
+      "secciones": "Order sections",
+      "pestanas": {
+        "resumen": "Summary",
+        "diagnostico": "Diagnosis",
+        "items": "Services and parts",
+        "presupuestos": "Quotes",
+        "pago": "Payment and delivery",
+        "historial": "History"
+      },
+      "pronto": "Coming soon",
+      "recibida_por": "Checked in by",
+      "editar_recepcion": "Edit check-in",
+      "recepcion_guardada": "Check-in details saved"
+    },
+    "acciones": {
+      "recibir": "Check in",
+      "iniciar_diagnostico": "Start diagnosis",
+      "requiere_ajuste": "Needs adjustment",
+      "retirar_presupuesto": "Withdraw quote",
+      "enviar_presupuesto": "Send quote",
+      "iniciar_reparacion": "Start repair",
+      "finalizar": "Finish",
+      "entregar": "Deliver",
+      "cancelar": "Cancel order"
+    },
+    "bloqueos": {
+      "SIN_MECANICOS": "Assign at least one mechanic",
+      "SIN_DIAGNOSTICO": "Record the diagnosis first",
+      "SIN_ITEMS": "Add services or parts (coming soon)",
+      "SIN_PAGO": "Record the payment first (coming soon)"
+    },
+    "confirmar_transicion": {
+      "titulo": "{{accion}} · {{numero}}",
+      "recibir": "The order will go back to checked in.",
+      "iniciar_diagnostico": "The order will move to diagnosis.",
+      "requiere_ajuste": "The order goes back to diagnosis to add the new jobs and send another quote. Explain what came up.",
+      "retirar_presupuesto": "The pending quote is withdrawn and the order goes back to diagnosis to adjust it.",
+      "enviar_presupuesto": "The quote will be sent to the customer for approval.",
+      "iniciar_reparacion": "The order will move to repair.",
+      "finalizar": "The order will be finished and ready for delivery.",
+      "entregar": "The motorcycle will be delivered to the customer.",
+      "cancelar": "The order is cancelled and cannot be reopened. Write the reason."
+    },
+    "transicion_hecha": "Order {{numero}}: {{estado}}",
+    "diagnostico": {
+      "km_ayuda": "Optional. It cannot be lower than the check-in mileage ({{km}} km).",
+      "guardar": "Save diagnosis",
+      "sin_registrar": "The diagnosis has not been recorded yet.",
+      "guardado": "Diagnosis saved"
+    },
+    "historial": {
+      "creada": "Order checked in",
+      "a": "to"
     }
   }
 }

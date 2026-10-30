@@ -185,7 +185,8 @@
     "cantidadInvalida": "Escribe una cantidad con máximo 2 decimales",
     "cantidadPositiva": "La cantidad debe ser mayor que cero",
     "fechaFutura": "La fecha no puede ser posterior a hoy",
-    "maxDisponible": "Solo hay {{max}} disponibles"
+    "maxDisponible": "Solo hay {{max}} disponibles",
+    "kilometrajeMenor": "No puede ser menor que {{minimo}} km"
   },
   "errors": {
     "DESCONOCIDO": "Ocurrió un error inesperado. Intenta de nuevo.",
@@ -255,7 +256,17 @@
     "VENTA_ANULADA": "La venta ya está anulada",
     "DESCUENTO_INVALIDO": "El descuento no puede ser mayor que el subtotal",
     "REFERENCIA_REQUERIDA": "Escribe la referencia del pago",
-    "MONTO_INSUFICIENTE": "Lo recibido no alcanza para el total"
+    "MONTO_INSUFICIENTE": "Lo recibido no alcanza para el total",
+    "SERVICIO_DUPLICADO": "Ya existe un servicio con ese nombre",
+    "MOTO_NO_PERTENECE_CLIENTE": "La motocicleta no pertenece a ese cliente",
+    "MOTO_INACTIVA": "La motocicleta está inactiva",
+    "MOTO_CON_ORDEN_ACTIVA": "La motocicleta ya tiene una orden activa",
+    "TRANSICION_INVALIDA": "La orden no puede cambiar a ese estado ahora",
+    "ORDEN_ESTADO_INVALIDO": "Esa operación no se puede hacer en el estado actual de la orden",
+    "KILOMETRAJE_MENOR": "El kilometraje no puede ser menor que la última lectura",
+    "MECANICO_INVALIDO": "Solo se pueden asignar mecánicos activos",
+    "MECANICO_REPETIDO": "Ese mecánico ya está en la lista",
+    "NOTA_REQUERIDA": "Escribe el motivo"
   },
   "roles": {
     "ADMIN": "Administrador",
@@ -915,6 +926,183 @@
       "no_encontrada": "Compra no encontrada",
       "no_encontrada_texto": "Puede que el enlace esté mal o que no tengas acceso.",
       "volver": "Volver a compras"
+    }
+  },
+  "servicios": {
+    "titulo": "Servicios del taller",
+    "subtitulo": "Catálogo de trabajos con su precio base y tiempo estimado",
+    "nuevo": "Nuevo servicio",
+    "buscar": "Buscar por nombre o descripción…",
+    "error_titulo": "No se pudieron cargar los servicios",
+    "vacio_titulo": "No hay servicios que coincidan",
+    "vacio_texto": "Prueba con otra búsqueda o registra un servicio.",
+    "minutos": "{{minutos}} min",
+    "acciones": "Acciones",
+    "creado": "Servicio {{nombre}} registrado",
+    "actualizado": "Cambios de {{nombre}} guardados",
+    "activado": "{{nombre}} está activo de nuevo",
+    "desactivado": "{{nombre}} fue desactivado",
+    "confirmar_activar": {
+      "titulo": "¿Activar servicio?",
+      "mensaje": "{{nombre}} se podrá agregar otra vez a las órdenes."
+    },
+    "confirmar_desactivar": {
+      "titulo": "¿Desactivar servicio?",
+      "mensaje": "{{nombre}} no se podrá agregar a órdenes nuevas. Las órdenes que ya lo tienen no cambian."
+    },
+    "campos": {
+      "nombre": "Nombre",
+      "precio_base": "Precio base",
+      "tiempo": "Tiempo estimado",
+      "descripcion": "Descripción"
+    },
+    "form": {
+      "titulo_nuevo": "Nuevo servicio",
+      "titulo_editar": "Editar servicio",
+      "tiempo_ayuda": "En minutos. El precio se puede ajustar en cada orden."
+    }
+  },
+  "taller": {
+    "tablero": {
+      "titulo": "Órdenes de trabajo",
+      "subtitulo": "Motos en el taller y su estado",
+      "buscar": "Buscar por número, placa o cliente…",
+      "todos_mecanicos": "Todos los mecánicos",
+      "desde": "Desde",
+      "hasta": "Hasta",
+      "vista": "Vista",
+      "lista": "Lista",
+      "kanban": "Tablero",
+      "filtrar_estado": "Filtrar por estado",
+      "error_titulo": "No se pudieron cargar las órdenes",
+      "vacio_titulo": "No hay órdenes que coincidan",
+      "vacio_texto": "Prueba con otros filtros o recibe una moto.",
+      "columna_vacia": "Sin órdenes",
+      "chip_desde": "Desde {{fecha}}",
+      "chip_hasta": "Hasta {{fecha}}"
+    },
+    "campos": {
+      "numero": "Número",
+      "placa": "Placa",
+      "cliente": "Cliente",
+      "moto": "Motocicleta",
+      "mecanicos": "Mecánicos",
+      "mecanico": "Mecánico",
+      "fecha_ingreso": "Ingreso",
+      "kilometraje": "Kilometraje de ingreso",
+      "motivo": "Motivo de ingreso",
+      "descripcion_problema": "Descripción del problema",
+      "observaciones": "Observaciones",
+      "diagnostico": "Diagnóstico",
+      "observaciones_diagnostico": "Observaciones del diagnóstico",
+      "kilometraje_inspeccion": "Kilometraje de inspección"
+    },
+    "mias": {
+      "titulo": "Mis órdenes",
+      "subtitulo": "Las motos que tienes asignadas",
+      "vacio_titulo": "No tienes órdenes asignadas",
+      "vacio_texto": "Cuando te asignen una moto aparecerá aquí."
+    },
+    "recepcion": {
+      "recibir": "Recibir moto",
+      "miga": "Recibir moto",
+      "titulo": "Recibir moto",
+      "subtitulo": "Registra el ingreso de una moto al taller",
+      "progreso": "Pasos de la recepción",
+      "pasos": {
+        "cliente": "Cliente",
+        "moto": "Motocicleta",
+        "ingreso": "Datos de ingreso",
+        "mecanicos": "Mecánicos",
+        "confirmar": "Confirmar"
+      },
+      "buscar_cliente": "Busca por nombre, documento o teléfono…",
+      "nuevo_cliente": "Nuevo cliente",
+      "sin_motos": "Este cliente no tiene motos activas",
+      "nueva_moto": "Registrar moto",
+      "orden_activa": "Esta moto ya tiene la orden {{numero}} activa. Termínala o cancélala antes de recibirla de nuevo.",
+      "ver_orden": "Ver orden",
+      "ultimo_km": "Última lectura registrada: {{km}} km",
+      "sin_km": "No hay lecturas de kilometraje anteriores",
+      "elige_moto": "Elige una motocicleta para continuar",
+      "observaciones_ayuda": "Estado de la moto al recibirla, accesorios que deja…",
+      "sin_permiso_asignar": "No tienes permiso para asignar mecánicos. Se podrán asignar después.",
+      "mecanicos_ayuda": "Opcional: elige quién va a trabajar la moto y qué hará cada uno.",
+      "anterior": "Anterior",
+      "siguiente": "Siguiente",
+      "creada": "Orden {{numero}} creada"
+    },
+    "mecanicos": {
+      "titulo": "Mecánicos de {{numero}}",
+      "ninguno_disponible": "No hay mecánicos activos.",
+      "actividad_placeholder": "Actividad (opcional)",
+      "actividad_de": "Actividad de {{nombre}}",
+      "sin_asignar": "Sin mecánicos asignados",
+      "sin_actividad": "Sin actividad descrita",
+      "guardados": "Mecánicos actualizados"
+    },
+    "detalle": {
+      "miga": "Detalle",
+      "titulo": "Orden {{numero}}",
+      "ingreso": "Ingresó el {{fecha}}",
+      "no_encontrada": "Orden no encontrada",
+      "no_encontrada_texto": "Puede que el enlace esté mal o que no tengas acceso a esta orden.",
+      "volver": "Volver a órdenes",
+      "mecanicos": "Mecánicos",
+      "linea_tiempo": "Estado de la orden",
+      "secciones": "Secciones de la orden",
+      "pestanas": {
+        "resumen": "Resumen",
+        "diagnostico": "Diagnóstico",
+        "items": "Servicios y repuestos",
+        "presupuestos": "Presupuestos",
+        "pago": "Pago y entrega",
+        "historial": "Historial"
+      },
+      "pronto": "Disponible pronto",
+      "recibida_por": "Recibida por",
+      "editar_recepcion": "Editar recepción",
+      "recepcion_guardada": "Datos de recepción guardados"
+    },
+    "acciones": {
+      "recibir": "Recibir",
+      "iniciar_diagnostico": "Iniciar diagnóstico",
+      "requiere_ajuste": "Requiere ajuste",
+      "retirar_presupuesto": "Retirar presupuesto",
+      "enviar_presupuesto": "Enviar presupuesto",
+      "iniciar_reparacion": "Iniciar reparación",
+      "finalizar": "Finalizar",
+      "entregar": "Entregar",
+      "cancelar": "Cancelar orden"
+    },
+    "bloqueos": {
+      "SIN_MECANICOS": "Asigna al menos un mecánico",
+      "SIN_DIAGNOSTICO": "Registra primero el diagnóstico",
+      "SIN_ITEMS": "Agrega servicios o repuestos (disponible pronto)",
+      "SIN_PAGO": "Registra primero el pago (disponible pronto)"
+    },
+    "confirmar_transicion": {
+      "titulo": "{{accion}} · {{numero}}",
+      "recibir": "La orden volverá a recibida.",
+      "iniciar_diagnostico": "La orden pasará a diagnóstico.",
+      "requiere_ajuste": "La orden vuelve a diagnóstico para agregar los nuevos trabajos y enviar otro presupuesto. Explica qué apareció.",
+      "retirar_presupuesto": "El presupuesto pendiente se retira y la orden vuelve a diagnóstico para ajustarlo.",
+      "enviar_presupuesto": "Se enviará el presupuesto al cliente para su aprobación.",
+      "iniciar_reparacion": "La orden pasará a reparación.",
+      "finalizar": "La orden quedará finalizada y lista para entregar.",
+      "entregar": "La moto se entregará al cliente.",
+      "cancelar": "La orden se cancela y no se podrá reabrir. Escribe el motivo."
+    },
+    "transicion_hecha": "Orden {{numero}}: {{estado}}",
+    "diagnostico": {
+      "km_ayuda": "Opcional. No puede ser menor que el de ingreso ({{km}} km).",
+      "guardar": "Guardar diagnóstico",
+      "sin_registrar": "Todavía no se ha registrado el diagnóstico.",
+      "guardado": "Diagnóstico guardado"
+    },
+    "historial": {
+      "creada": "Orden recibida",
+      "a": "a"
     }
   }
 }

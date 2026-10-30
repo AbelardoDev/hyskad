@@ -112,8 +112,8 @@ describe('migas y título', () => {
 });
 
 describe('HkShell', () => {
-  // Órdenes sigue siendo "Próximamente": no hace peticiones al backend.
-  async function montar(ancho: number, url = '/ordenes', sesion: Partial<UsuarioSesion> = {}) {
+  // Inicio (dashboard) sigue siendo "Próximamente" hasta F11: no hace peticiones al backend.
+  async function montar(ancho: number, url = '/dashboard', sesion: Partial<UsuarioSesion> = {}) {
     configurar(ancho, sesion);
     const fixture = TestBed.createComponent(Anfitrion);
     await TestBed.inject(Router).navigateByUrl(url);
@@ -126,16 +126,10 @@ describe('HkShell', () => {
 
     expect(el.querySelector('a[href="#contenido"]')?.textContent).toContain('Saltar al contenido');
     expect(el.querySelector('aside nav')?.getAttribute('aria-label')).toBe('Navegación principal');
-    expect(el.querySelector('aside [aria-current="page"]')?.textContent).toContain(
-      'Órdenes de trabajo',
-    );
-    expect(el.querySelector('hk-topbar [aria-current="page"]')?.textContent?.trim()).toBe(
-      'Órdenes de trabajo',
-    );
-    expect(el.querySelector('main#contenido h1')?.textContent?.trim()).toBe('Órdenes de trabajo');
-    expect(el.querySelector('main hk-empty-state')?.textContent).toContain(
-      'Órdenes de trabajo llega pronto',
-    );
+    expect(el.querySelector('aside [aria-current="page"]')?.textContent).toContain('Inicio');
+    expect(el.querySelector('hk-topbar [aria-current="page"]')?.textContent?.trim()).toBe('Inicio');
+    expect(el.querySelector('main#contenido h1')?.textContent?.trim()).toBe('Inicio');
+    expect(el.querySelector('main hk-empty-state')?.textContent).toContain('Inicio llega pronto');
   });
 
   it('el botón de menú colapsa el sidebar a solo íconos en escritorio', async () => {
@@ -175,7 +169,7 @@ describe('HkShell', () => {
       'Ventas',
     ]);
     expect(el.querySelector('hk-bottom-nav [aria-current="page"]')?.textContent).toContain(
-      'Órdenes',
+      'Inicio',
     );
   });
 
@@ -194,7 +188,7 @@ describe('HkShell', () => {
   });
 
   it('el menú, el drawer y la barra inferior muestran solo lo que permite el rol', async () => {
-    const { el } = await montar(375, '/ordenes', {
+    const { el } = await montar(375, '/dashboard', {
       rol: 'MECANICO',
       permisos: [
         'DASHBOARD_VER',

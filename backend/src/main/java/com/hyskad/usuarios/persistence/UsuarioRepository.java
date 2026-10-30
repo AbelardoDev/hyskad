@@ -23,6 +23,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>, JpaSpec
 
     boolean existsByRol(Rol rol);
 
+    List<Usuario> findByRolAndActivoTrueOrderByNombre(Rol rol);
+
     /** Administradores activos bloqueados para verificar RN-47 sin carreras entre dos admins. */
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select u from Usuario u where u.rol = com.hyskad.usuarios.domain.Rol.ADMIN and u.activo = true")

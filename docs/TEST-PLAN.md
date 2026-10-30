@@ -98,7 +98,7 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | CP-16 | RN-40 | Documento duplicado | I | 409 | Aprobado (F05, `DOCUMENTO_DUPLICADO`; el mismo número con otro tipo sí se admite) |
 | CP-17 | RF7, RN-41 | Placas `ABC12D`, `abc-12d`, `ABC12`, `123ABC` válidas; `AB123`, `ABCD12` inválidas | U (back y front) | Normaliza y acepta/rechaza según patrón | Aprobado (U backend F02, U front F05; también I) |
 | CP-18 | RF7 | Placa duplicada | I | 409 `PLACA_DUPLICADA` | Aprobado (F05, también escrita en minúsculas y al editar) |
-| CP-19 | RF6, RN-44 | Desactivar cliente con orden activa | I | 409 | Aprobado (F05, `ORDENES_ACTIVAS` con un doble de `ConsultaOrdenesActivas`; repetir con órdenes reales en F09A) |
+| CP-19 | RF6, RN-44 | Desactivar cliente con orden activa | I | 409 | Aprobado (F05 con un doble; F09A con órdenes reales: cliente y moto 409 `ORDENES_ACTIVAS` y, cancelada la orden, se desactivan) |
 | CP-20 | RF29 | Buscar clientes por nombre parcial, documento y teléfono | I | Resultados paginados correctos | Aprobado (F05) |
 | CP-21 | RF9 | Historial de una moto con 3 órdenes | I, E | Lista ordenada por fecha con servicios, repuestos y totales | Pendiente (F09C; en F05 el endpoint responde `[]` con la estructura final) |
 | CP-88 | RF4, IS4 | Permisos de cada endpoint de clientes y motos | I | Vendedor gestiona; mecánico solo consulta (403 al escribir); almacén 403 en todo; sin token 401 | Aprobado (F05) |
@@ -153,11 +153,18 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 ### Taller (F09)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
-| CP-35 | RF10, RN-25 | Crear orden con moto de otro cliente | I | 400 `MOTO_NO_PERTENECE_CLIENTE` | Pendiente |
-| CP-36 | RN-24 | Segunda orden activa para la misma moto | I | 409 | Pendiente |
-| CP-37 | RN-25 | Kilometraje menor al último registrado | I | 400 | Pendiente |
-| CP-38 | RF13, RN-22 | Todas las transiciones válidas e inválidas del diagrama | U (parametrizada) | Válidas pasan, inválidas `TRANSICION_INVALIDA` | Pendiente |
-| CP-39 | RF12, RN-27 | Mecánico consulta una orden no asignada | I | 404 (no revela existencia) | Pendiente |
+| CP-35 | RF10, RN-25 | Crear orden con moto de otro cliente | I | 400 `MOTO_NO_PERTENECE_CLIENTE` | Aprobado (F09A; moto inactiva → 409 `MOTO_INACTIVA`) |
+| CP-36 | RN-24 | Segunda orden activa para la misma moto | I | 409 | Aprobado (F09A: `MOTO_CON_ORDEN_ACTIVA` con el número de la activa; cancelada, se recibe otra vez; índice único en BD como respaldo) |
+| CP-37 | RN-25 | Kilometraje menor al último registrado | I | 400 | Aprobado (F09A: `KILOMETRAJE_MENOR` contra el mayor entre ingreso e inspección de órdenes anteriores; también en el diagnóstico) |
+| CP-38 | RF13, RN-22 | Todas las transiciones válidas e inválidas del diagrama | U (parametrizada) | Válidas pasan, inválidas `TRANSICION_INVALIDA` | Aprobado (F09A: las 49 combinaciones contra el diagrama de BUSINESS-RULES escrito aparte del enum) |
+| CP-39 | RF12, RN-27 | Mecánico consulta una orden no asignada | I | 404 (no revela existencia) | Aprobado (F09A: también al transicionar y diagnosticar; lista, "mis órdenes" y resumen solo cuentan las suyas) |
+| CP-115 | RN-23 | Historial en cada transición | U, I | Fila con estado anterior y nuevo, usuario y nota; la creación sin estado anterior; evento `EstadoOrdenCambiado` y auditoría `ORDEN_TRANSICION` | Aprobado (F09A) |
+| CP-116 | RF13, RN-27 | `accionesPermitidas` por rol, estado y asignación | I, U | Admin y vendedor: editar, asignar, iniciar diagnóstico y cancelar; mecánico asignado: solo sus transiciones y el diagnóstico; almacén: nada; no asignado: 404. Bloqueos `SIN_MECANICOS`, `SIN_DIAGNOSTICO`, `SIN_ITEMS` | Aprobado (F09A) |
+| CP-117 | RNF Integridad | Dos ediciones de la orden con la misma `version` | I | La segunda recibe 409 `CONFLICTO_CONCURRENCIA`, también al asignar mecánicos | Aprobado (F09A) |
+| CP-118 | RF10, RF12, RF14 | Recepción completa → asignar mecánico → el mecánico ve solo esa orden y registra el diagnóstico | E | Orden `OT-…`, aviso de orden activa al recibir la misma moto, "Mis órdenes" con una tarjeta, diagnóstico guardado | Aprobado (F09A) |
+| CP-119 | RF29 | Tablero en lista y kanban con filtros en la URL | U, E | Estados, mecánico, fechas y vista sobreviven a recargar; kanban por estado con contadores | Aprobado (F09A) |
+| CP-120 | RF16 | Catálogo de servicios | I, U | Nombre único sin importar mayúsculas (409 `SERVICIO_DUPLICADO`), precio y tiempo positivos, auditoría de campos, lo consulta quien trabaja órdenes | Aprobado (F09A) |
+| CP-121 | RNF Acc. | axe en tablero (lista y kanban), recepción, servicios y detalle con confirmación, claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F09A) |
 | CP-40 | RF19, RN-29 | Agregar repuesto reserva stock; quitarlo lo libera | I | `stock_reservado` correcto en ambos pasos | Pendiente |
 | CP-41 | RN-28 | Agregar ítem con orden `EN_REPARACION` | I | 409 | Pendiente |
 | CP-42 | RF22, RN-31 | Generar presupuesto y luego otro | I | El primero queda `REEMPLAZADO`, versión 2 `PENDIENTE` | Pendiente |

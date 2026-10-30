@@ -202,7 +202,7 @@ Solo estos, cada uno con un problema real que resolver. Cualquier otro requiere 
 | **Specification** (JPA `Specification`) | Búsquedas y filtros (RF29) | Combina filtros opcionales sin escribir una consulta por cada combinación. |
 | **DTO + Mapper** | Todos los módulos | Desacopla el contrato de la API del modelo de persistencia y evita exponer datos sensibles. |
 | **Repository** | Spring Data | Lo provee el framework. |
-| **Inversión de dependencias** (interfaz en el módulo que pregunta, implementación en el que sabe) | `clientes.application.ConsultaOrdenesActivas` implementada por `taller` (F09A); hasta entonces `SinOrdenesActivas` responde `false` | `taller` depende de `clientes`/`motocicletas`; para que estos consulten si hay órdenes activas (RN-44) sin crear un ciclo de dependencias. Vive en `clientes` (no en `motocicletas`) porque la usan los dos módulos y `motocicletas` ya depende de `clientes`. |
+| **Inversión de dependencias** (interfaz en el módulo que pregunta, implementación en el que sabe) | `clientes.application.ConsultaOrdenesActivas` implementada por `taller.application.OrdenesActivasDelTaller` | `taller` depende de `clientes`/`motocicletas`; para que estos consulten si hay órdenes activas (RN-44) sin crear un ciclo de dependencias. Vive en `clientes` (no en `motocicletas`) porque la usan los dos módulos y `motocicletas` ya depende de `clientes`. |
 | **Strategy** *(solo si llega a hacer falta)* | — | No se usa de entrada. Se evaluaría si aparece un segundo cálculo de impuestos o un segundo canal de notificación con lógica distinta. |
 
 Lo que **no** se hace: interfaces `XService` + `XServiceImpl` con una sola implementación, fábricas genéricas, capas "manager", herencia profunda de entidades.
@@ -237,6 +237,30 @@ Textos en `es.json`/`en.json` bajo la clave del módulo; códigos de error nuevo
 > Íconos: `@lucide/angular` es un único módulo, así que cualquier ícono nuevo (aunque solo lo use una ruta diferida) suma ~4 kB al bundle inicial (aviso en 900 kB desde F06). Antes de registrar uno nuevo en `shared/ui/iconos.ts`, reutilizar uno existente.
 
 **Módulos que mueven stock** (ventas, compras, taller) no tocan `Producto` ni sus existencias: llaman a `inventario.application.InventarioService` dentro de su propia transacción, con una `Referencia(tipo, id, numero)` del documento. El contrato de cada método (qué bloquea, qué valida, qué movimiento crea y qué devuelve) está en su Javadoc.
+
+## 6.2 Máquina de estados de la orden
+
+Generado a partir de `EstadoOrden` (`taller.domain`): cada flecha lleva el permiso que la pide o `automática` (la dispara el sistema, p. ej. al aprobar un presupuesto). `DiagramaEstadosTest` falla si el enum y este diagrama dejan de coincidir. Las condiciones de cada transición (mecánicos, diagnóstico, ítems, pago) y sus efectos los orquesta `OrdenTrabajoService`; el backend las expone por orden en `accionesPermitidas` (con `bloqueo` si la condición aún no se cumple) para que el frontend no repita esas reglas.
+
+<!-- diagrama-estados:inicio -->
+```mermaid
+stateDiagram-v2
+    [*] --> RECIBIDA
+    RECIBIDA --> EN_DIAGNOSTICO: ORDENES_TRABAJAR
+    RECIBIDA --> CANCELADA: ORDENES_CREAR + nota
+    EN_DIAGNOSTICO --> PENDIENTE_APROBACION: PRESUPUESTOS_GESTIONAR
+    EN_DIAGNOSTICO --> CANCELADA: ORDENES_CREAR + nota
+    PENDIENTE_APROBACION --> EN_DIAGNOSTICO: PRESUPUESTOS_GESTIONAR
+    PENDIENTE_APROBACION --> EN_REPARACION: automática
+    PENDIENTE_APROBACION --> CANCELADA: ORDENES_CREAR + nota
+    EN_REPARACION --> EN_DIAGNOSTICO: ORDENES_TRABAJAR + nota
+    EN_REPARACION --> FINALIZADA: ORDENES_TRABAJAR
+    EN_REPARACION --> CANCELADA: ORDENES_CREAR + nota
+    FINALIZADA --> ENTREGADA: ENTREGAS_REGISTRAR
+    ENTREGADA --> [*]
+    CANCELADA --> [*]
+```
+<!-- diagrama-estados:fin -->
 
 ## 7. Tiempo real y notificaciones (RF30, IC5)
 

@@ -26,6 +26,7 @@ export interface OpcionSelect {
         [attr.aria-invalid]="invalido() || null"
         [attr.aria-describedby]="descritoPor()"
         [attr.aria-required]="requerido() || null"
+        [attr.aria-label]="etiquetaAccesible() ?? null"
         (change)="actualizar(texto($event) || null)"
         (blur)="tocar()"
       >
@@ -57,4 +58,6 @@ export class HkSelect extends ControlBase<string | null> {
   readonly valor = model<string | null>(null);
   readonly opciones = input<readonly OpcionSelect[]>([]);
   readonly placeholder = input<string>();
+  /** Nombre accesible cuando no hay etiqueta visible (filtros). */
+  readonly etiquetaAccesible = input<string>();
 }

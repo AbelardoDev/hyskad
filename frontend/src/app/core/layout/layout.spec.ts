@@ -1,4 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { Title } from '@angular/platform-browser';
@@ -13,6 +15,9 @@ import { TranslocoService } from '@jsverse/transloco';
 import { of } from 'rxjs';
 
 import { routes } from '../../app.routes';
+import { authInterceptor } from '../auth/auth.interceptor';
+import { UsuarioSesion } from '../auth/auth.models';
+import { iniciarSesionDePrueba } from '../auth/sesion-de-prueba';
 import { ThemeService } from '../theme/theme.service';
 import { CLAVE_SIDEBAR, ESCRITORIO, LayoutService, MOVIL } from './layout.service';
 import { ACCESOS_RAPIDOS, MENU } from './menu.config';
@@ -32,7 +37,7 @@ function simularPantalla(ancho: number) {
   };
 }
 
-function configurar(ancho: number) {
+function configurar(ancho: number, sesion: Partial<UsuarioSesion> | null = {}) {
   window.matchMedia = vi
     .fn()
     .mockReturnValue({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() });
@@ -41,8 +46,11 @@ function configurar(ancho: number) {
       provideRouter(routes, withComponentInputBinding()),
       simularPantalla(ancho),
       { provide: TitleStrategy, useClass: TituloStrategy },
+      provideHttpClient(withInterceptors([authInterceptor])),
+      provideHttpClientTesting(),
     ],
   });
+  if (sesion) iniciarSesionDePrueba(sesion);
 }
 
 @Component({ imports: [RouterOutlet], template: '<router-outlet />' })
@@ -104,8 +112,8 @@ describe('migas y título', () => {
 });
 
 describe('HkShell', () => {
-  async function montar(ancho: number, url = '/clientes') {
-    configurar(ancho);
+  async function montar(ancho: number, url = '/clientes', sesion: Partial<UsuarioSesion> = {}) {
+    configurar(ancho, sesion);
     const fixture = TestBed.createComponent(Anfitrion);
     await TestBed.inject(Router).navigateByUrl(url);
     await fixture.whenStable();
@@ -178,6 +186,49 @@ describe('HkShell', () => {
     await fixture.whenStable();
 
     expect(TestBed.inject(ThemeService).preferencia()).toBe('dark');
+  });
+
+  it('el menú, el drawer y la barra inferior muestran solo lo que permite el rol', async () => {
+    const { el } = await montar(375, '/ordenes', {
+      rol: 'MECANICO',
+      permisos: [
+        'DASHBOARD_VER',
+        'CLIENTES_VER',
+        'MOTOS_VER',
+        'PRODUCTOS_VER',
+        'ORDENES_VER_ASIGNADAS',
+      ],
+    });
+
+    expect(
+      Array.from(el.querySelectorAll('hk-bottom-nav a')).map((a) => a.textContent?.trim()),
+    ).toEqual(['Inicio', 'Órdenes', 'Clientes', 'Motocicletas']);
+    const enSidebar = Array.from(el.querySelectorAll('aside nav a')).map((a) =>
+      a.getAttribute('href'),
+    );
+    expect(enSidebar).toEqual([
+      '/dashboard',
+      '/ordenes',
+      '/clientes',
+      '/motocicletas',
+      '/inventario',
+    ]);
+  });
+
+  it('el menú de usuario muestra nombre y rol, y cierra la sesión', async () => {
+    const { fixture, el } = await montar(1440);
+    el.querySelector<HTMLButtonElement>('hk-topbar button[aria-label="Menú de usuario"]')!.click();
+    await fixture.whenStable();
+
+    expect(document.querySelector('[role="menu"]')?.textContent).toContain('Ana Admin');
+    expect(document.querySelector('[role="menu"]')?.textContent).toContain('Administrador');
+    Array.from(document.querySelectorAll<HTMLButtonElement>('[role="menuitem"]'))
+      .find((b) => b.textContent?.includes('Cerrar sesión'))!
+      .click();
+    TestBed.inject(HttpTestingController).expectOne('/api/v1/auth/logout').flush(null);
+    await fixture.whenStable();
+
+    expect(TestBed.inject(Router).url).toBe('/login');
   });
 
   it('Ctrl+K abre el buscador global (placeholder)', async () => {

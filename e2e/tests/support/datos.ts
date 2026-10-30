@@ -81,3 +81,38 @@ export async function crearProducto(nombre: string): Promise<{ id: number; codig
   await api.dispose();
   return { id, codigo, nombre };
 }
+
+/** Carga stock por la API con un ajuste de entrada al costo indicado. */
+export async function cargarStock(productoId: number, cantidad: number, costo: number): Promise<void> {
+  const { api, token } = await apiComoAdmin();
+  const respuesta = await api.post('/api/v1/inventario/ajustes', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { productoId, tipo: 'ENTRADA', cantidad, costoUnitario: costo, motivo: 'Stock para pruebas E2E' },
+  });
+  expect(respuesta.status()).toBe(201);
+  await api.dispose();
+}
+
+/** Stock actual de un producto, leído por la API. */
+export async function stockDe(productoId: number): Promise<number> {
+  const { api, token } = await apiComoAdmin();
+  const respuesta = await api.get(`/api/v1/productos/${productoId}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const { stockActual } = (await respuesta.json()) as { stockActual: number };
+  await api.dispose();
+  return stockActual;
+}
+
+/** Registra por la API una venta en efectivo de 1 unidad y devuelve su id. */
+export async function venderPorApi(productoId: number): Promise<number> {
+  const { api, token } = await apiComoAdmin();
+  const respuesta = await api.post('/api/v1/ventas', {
+    headers: { Authorization: `Bearer ${token}` },
+    data: { items: [{ productoId, cantidad: 1 }], descuento: 0, metodoPago: 'EFECTIVO', montoRecibido: 100000 },
+  });
+  expect(respuesta.status()).toBe(201);
+  const { id } = (await respuesta.json()) as { id: number };
+  await api.dispose();
+  return id;
+}

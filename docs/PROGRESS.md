@@ -28,16 +28,26 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F00 ✅ (cerrada 2026-10-29)
-- **Rama:** — (el repositorio git se crea en F01)
-- **Hecho:** Entorno verificado: Java 25 Temurin (`JAVA_HOME` OK), Node 24.19 + npm, Git 2.55 con user.name/email, GitHub CLI 2.103.3 autenticado (AbelardoDev), Docker 28.3 con daemon activo y Compose v2.38; puertos 3306, 8080, 4200, 1025 y 8025 libres.
-- **Siguiente paso concreto:** Iniciar F01 con `/fase F01`.
-- **Bloqueos o dudas:** El token de `gh` no tiene el scope `workflow`; hará falta `gh auth refresh -s workflow` antes de hacer push de `.github/workflows` en F01. `gh` no está en el PATH de la sesión anterior de la terminal (se resuelve reabriéndola).
+- **Fase:** F01 🟦 (implementación y verificación local terminadas; falta publicar en GitHub, PR, CI y merge)
+- **Rama:** `feature/f01-monorepo-ci`
+- **Hecho:** repo git con `main` (commit inicial). Backend Spring Boot 4.1.2 (Java 25) con MapStruct 1.6.3, springdoc 3.2.0, Bucket4j 8.21.0, ArchUnit 1.5.1, Testcontainers MySQL 8.4 y JaCoCo 0.8.16 (regla 70 % en `application`/`domain`); perfiles dev/test/prod; `PingController` temporal. Frontend Angular 22.1 (zoneless y Vitest por defecto) con Tailwind v4 (PostCSS), Transloco es/en, ESLint + Prettier, proxy `/api`, marca en `public/brand`. E2E Playwright (3 navegadores). Compose dev (MySQL + Mailpit), `.env.example`, CI, dependabot y plantilla de PR. Verificación local: `mvnw verify` (3 pruebas), lint, test (2), build y E2E (3/3) en verde; ping de punta a punta probado.
+- **Siguiente paso concreto:** crear el repo en GitHub (`gh repo create hyskad --public --source=. --push`), push de la rama, PR, esperar el CI, proteger `main` y merge squash.
+- **Bloqueos o dudas:** la creación del repo público necesita aprobación explícita del usuario. El token de `gh` necesita el scope `workflow`. Hay un `mysqld` local ocupando el 3306 (la verificación se hizo con `DB_HOST_PORT=3307`).
 
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-10-29 · F01 · Transloco se instala ya en F01 · la página de ping no debe tener textos quemados; F04A completa la configuración de i18n.
+- 2026-10-29 · F01 · Seguridad temporal en `com.hyskad.ping.PingSecurityConfig` (solo `/api/v1/ping` y `/actuator/health` públicos, lo demás `denyAll`) · se reemplaza en F02/F03.
+- 2026-10-29 · F01 · La regla JaCoCo es por paquete (`com.hyskad.*.application*`, `*.domain*`); sin paquetes que coincidan no evalúa nada · cumple "excluir mientras no haya clases" sin flags extra.
+- 2026-10-29 · F01 · Puerto de MySQL del host configurable (`DB_HOST_PORT`, por defecto 3306) · en esta máquina hay otro MySQL en el 3306.
+- 2026-10-29 · F01 · springdoc desactivado en el perfil `prod`.
+- 2026-10-29 · F01 · En Windows/Git Bash, `./mvnw` falla por TLS (schannel) contra repo.maven.apache.org; usar `mvnw.cmd` desde PowerShell. La caché de npm por defecto daba ECONNRESET; se usó `npm_config_cache=%TEMP%
+pm-cache-hk`.
 
 ## Deuda técnica conocida
 
 <!-- Qué quedó pendiente a propósito y por qué -->
+- `PingController`, `PingSecurityConfig` y la página `features/ping` son temporales: se eliminan en F02.
+- La página de ping no usa tokens del sistema de diseño ni tiene modo oscuro (llegan en F04A).
+- Aviso de Mockito por auto-attach del agente en las pruebas del backend (JDK 25); sin impacto por ahora.

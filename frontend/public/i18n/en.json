@@ -184,7 +184,8 @@
     "vinInvalido": "The VIN has 17 letters and digits, without I, O or Q",
     "cantidadInvalida": "Enter a quantity with at most 2 decimals",
     "cantidadPositiva": "The quantity must be greater than zero",
-    "fechaFutura": "The date can't be later than today"
+    "fechaFutura": "The date can't be later than today",
+    "maxDisponible": "Only {{max}} available"
   },
   "errors": {
     "DESCONOCIDO": "Something went wrong. Please try again.",
@@ -250,7 +251,11 @@
     "COMPRA_ANULADA": "The purchase is already voided",
     "PRODUCTO_REPETIDO": "This product is already in another row",
     "FECHA_FUTURA": "The date can't be later than today",
-    "NOT_EMPTY": "Add at least one item"
+    "NOT_EMPTY": "Add at least one item",
+    "VENTA_ANULADA": "The sale is already voided",
+    "DESCUENTO_INVALIDO": "The discount can't be greater than the subtotal",
+    "REFERENCIA_REQUERIDA": "Enter the payment reference",
+    "MONTO_INSUFICIENTE": "The amount received doesn't cover the total"
   },
   "roles": {
     "ADMIN": "Administrator",
@@ -292,7 +297,88 @@
     "texto": "If you think you should have access, ask an administrator."
   },
   "ventas": {
-    "nueva": "New sale"
+    "nueva": "New sale",
+    "subtitulo": "Counter sales and their receipts",
+    "consumidor_final": "Walk-in customer",
+    "todos_metodos": "All methods",
+    "solo_mias": "Only my sales",
+    "vacio_titulo": "No sales with these filters",
+    "vacio_texto": "Change the dates or record a new sale.",
+    "error_titulo": "Sales couldn't be loaded",
+    "anular": "Void sale",
+    "anulada": "Sale {{numero}} voided",
+    "comprobante": "Receipt",
+    "comprobante_de": "Receipt for sale {{numero}}",
+    "comprobante_volver": "Back to the sale",
+    "imprimir": "Print / Save as PDF",
+    "imprimir_comprobante": "Print receipt",
+    "formato": "Print format",
+    "formatos": {
+      "carta": "Letter",
+      "tirilla": "80 mm roll"
+    },
+    "estados": {
+      "PAGADA": "Paid",
+      "ANULADA": "Voided"
+    },
+    "metodos": {
+      "EFECTIVO": "Cash",
+      "TRANSFERENCIA": "Transfer",
+      "TARJETA": "Card",
+      "OTRO": "Other"
+    },
+    "resumen": {
+      "cantidad": "Paid sales in the period",
+      "total": "Total sold in the period"
+    },
+    "campos": {
+      "numero": "Number",
+      "cliente": "Customer",
+      "vendedor": "Salesperson",
+      "metodo": "Payment method",
+      "referencia": "Payment reference",
+      "recibido": "Cash received",
+      "descuento": "Discount",
+      "precio": "Unit price"
+    },
+    "confirmar_anular": {
+      "titulo": "Void sale {{numero}}?",
+      "mensaje": "Everything sold goes back to inventory and the sale is voided. This can't be undone."
+    },
+    "detalle": {
+      "miga": "Details",
+      "titulo": "Sale {{numero}}",
+      "datos": "Sale details",
+      "no_encontrada": "Sale not found",
+      "volver": "Back to sales"
+    },
+    "pos": {
+      "subtitulo": "Search, add and charge; everything works with the keyboard",
+      "buscar": "Search product by code or name…",
+      "resultados": "Products found",
+      "ayuda_buscar": "Type to search. Enter adds the first one in the list.",
+      "sin_resultados": "No active products match",
+      "disponible": "{{n}} available",
+      "carrito": "Cart",
+      "carrito_vacio": "Add products from the search box.",
+      "ver_carrito": "Cart ({{n}})",
+      "cantidad_de": "Quantity {{n}}",
+      "quitar": "Remove {{nombre}}",
+      "consumidor_final": "Walk-in customer (optional)",
+      "cambio": "Change",
+      "falta": "Missing",
+      "cobrar": "Charge",
+      "atajos": "Shortcuts",
+      "atajo_buscar": "Go to search",
+      "atajo_agregar": "Add the highlighted product",
+      "atajo_mover": "Move between results",
+      "atajo_limpiar": "Clear the search",
+      "atajo_cobrar": "Charge",
+      "confirmar_titulo": "Record the sale?",
+      "confirmar_mensaje": "{{n}} products for {{total}}, paid by {{metodo}}.",
+      "confirmar_con_cambio": "{{n}} products for {{total}}, paid by {{metodo}}. Change: {{cambio}}.",
+      "exito_titulo": "Sale {{numero}} recorded"
+    }
   },
   "auth": {
     "panel": {

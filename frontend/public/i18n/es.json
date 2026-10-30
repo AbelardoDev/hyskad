@@ -184,7 +184,8 @@
     "vinInvalido": "El VIN tiene 17 letras y números, sin I, O ni Q",
     "cantidadInvalida": "Escribe una cantidad con máximo 2 decimales",
     "cantidadPositiva": "La cantidad debe ser mayor que cero",
-    "fechaFutura": "La fecha no puede ser posterior a hoy"
+    "fechaFutura": "La fecha no puede ser posterior a hoy",
+    "maxDisponible": "Solo hay {{max}} disponibles"
   },
   "errors": {
     "DESCONOCIDO": "Ocurrió un error inesperado. Intenta de nuevo.",
@@ -250,7 +251,11 @@
     "COMPRA_ANULADA": "La compra ya está anulada",
     "PRODUCTO_REPETIDO": "Este producto ya está en otra fila",
     "FECHA_FUTURA": "La fecha no puede ser posterior a hoy",
-    "NOT_EMPTY": "Agrega al menos un elemento"
+    "NOT_EMPTY": "Agrega al menos un elemento",
+    "VENTA_ANULADA": "La venta ya está anulada",
+    "DESCUENTO_INVALIDO": "El descuento no puede ser mayor que el subtotal",
+    "REFERENCIA_REQUERIDA": "Escribe la referencia del pago",
+    "MONTO_INSUFICIENTE": "Lo recibido no alcanza para el total"
   },
   "roles": {
     "ADMIN": "Administrador",
@@ -292,7 +297,88 @@
     "texto": "Si crees que deberías tener acceso, pídeselo a un administrador."
   },
   "ventas": {
-    "nueva": "Nueva venta"
+    "nueva": "Nueva venta",
+    "subtitulo": "Ventas de mostrador y sus comprobantes",
+    "consumidor_final": "Consumidor final",
+    "todos_metodos": "Todos los métodos",
+    "solo_mias": "Solo mis ventas",
+    "vacio_titulo": "No hay ventas con estos filtros",
+    "vacio_texto": "Cambia las fechas o registra una venta nueva.",
+    "error_titulo": "No se pudieron cargar las ventas",
+    "anular": "Anular venta",
+    "anulada": "Venta {{numero}} anulada",
+    "comprobante": "Comprobante",
+    "comprobante_de": "Comprobante de la venta {{numero}}",
+    "comprobante_volver": "Volver a la venta",
+    "imprimir": "Imprimir / Guardar como PDF",
+    "imprimir_comprobante": "Imprimir comprobante",
+    "formato": "Formato de impresión",
+    "formatos": {
+      "carta": "Carta",
+      "tirilla": "Tirilla 80 mm"
+    },
+    "estados": {
+      "PAGADA": "Pagada",
+      "ANULADA": "Anulada"
+    },
+    "metodos": {
+      "EFECTIVO": "Efectivo",
+      "TRANSFERENCIA": "Transferencia",
+      "TARJETA": "Tarjeta",
+      "OTRO": "Otro"
+    },
+    "resumen": {
+      "cantidad": "Ventas pagadas del periodo",
+      "total": "Total vendido del periodo"
+    },
+    "campos": {
+      "numero": "Número",
+      "cliente": "Cliente",
+      "vendedor": "Vendedor",
+      "metodo": "Método de pago",
+      "referencia": "Referencia del pago",
+      "recibido": "Recibido en efectivo",
+      "descuento": "Descuento",
+      "precio": "Precio unitario"
+    },
+    "confirmar_anular": {
+      "titulo": "¿Anular la venta {{numero}}?",
+      "mensaje": "Todo lo vendido vuelve al inventario y la venta queda anulada. No se puede deshacer."
+    },
+    "detalle": {
+      "miga": "Detalle",
+      "titulo": "Venta {{numero}}",
+      "datos": "Datos de la venta",
+      "no_encontrada": "Venta no encontrada",
+      "volver": "Volver a ventas"
+    },
+    "pos": {
+      "subtitulo": "Busca, agrega y cobra; todo funciona con el teclado",
+      "buscar": "Buscar producto por código o nombre…",
+      "resultados": "Productos encontrados",
+      "ayuda_buscar": "Escribe para buscar. Enter agrega el primero de la lista.",
+      "sin_resultados": "No hay productos activos con esa búsqueda",
+      "disponible": "{{n}} disponibles",
+      "carrito": "Carrito",
+      "carrito_vacio": "Agrega productos desde el buscador.",
+      "ver_carrito": "Carrito ({{n}})",
+      "cantidad_de": "Cantidad {{n}}",
+      "quitar": "Quitar {{nombre}}",
+      "consumidor_final": "Consumidor final (opcional)",
+      "cambio": "Cambio",
+      "falta": "Falta",
+      "cobrar": "Cobrar",
+      "atajos": "Atajos",
+      "atajo_buscar": "Ir al buscador",
+      "atajo_agregar": "Agregar el producto resaltado",
+      "atajo_mover": "Moverse entre resultados",
+      "atajo_limpiar": "Limpiar la búsqueda",
+      "atajo_cobrar": "Cobrar",
+      "confirmar_titulo": "¿Registrar la venta?",
+      "confirmar_mensaje": "{{n}} productos por {{total}}, pago en {{metodo}}.",
+      "confirmar_con_cambio": "{{n}} productos por {{total}}, pago en {{metodo}}. Cambio: {{cambio}}.",
+      "exito_titulo": "Venta {{numero}} registrada"
+    }
   },
   "auth": {
     "panel": {

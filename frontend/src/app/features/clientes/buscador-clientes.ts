@@ -4,7 +4,7 @@ import { map, switchMap, timer } from 'rxjs';
 
 import { erroresManejados } from '../../core/http/contexto-http';
 import { OpcionCombobox } from '../../shared/ui/forms/combobox';
-import { ClientesApiService } from './clientes-api.service';
+import { ClienteResumen, ClientesApiService } from './clientes-api.service';
 
 const ESPERA_MS = 250;
 const RESULTADOS = 10;
@@ -17,6 +17,10 @@ const RESULTADOS = 10;
 export function buscadorClientes(excluir?: number) {
   const api = inject(ClientesApiService);
   const texto = signal('');
+  const conocido = signal<Pick<
+    ClienteResumen,
+    'id' | 'nombreCompleto' | 'tipoDocumento' | 'numeroDocumento' | 'telefono'
+  > | null>(null);
   const resultados = rxResource({
     params: () => texto(),
     stream: ({ params }) =>
@@ -31,19 +35,23 @@ export function buscadorClientes(excluir?: number) {
       ),
   });
 
-  const opciones = computed<OpcionCombobox[]>(() =>
-    (resultados.value() ?? [])
+  const opciones = computed<OpcionCombobox[]>(() => {
+    const lista = resultados.value() ?? [];
+    const extra = conocido();
+    return (extra && !lista.some((c) => c.id === extra.id) ? [extra, ...lista] : lista)
       .filter((c) => c.id !== excluir)
       .map((c) => ({
         valor: String(c.id),
         etiqueta: c.nombreCompleto,
         descripcion: `${c.tipoDocumento} ${c.numeroDocumento} · ${c.telefono}`,
-      })),
-  );
+      }));
+  });
 
   return {
     opciones,
     cargando: resultados.isLoading,
     buscar: (consulta: string) => texto.set(consulta.trim()),
+    /** Agrega un cliente conocido (p. ej. recién creado) para que el combobox muestre su nombre. */
+    incluir: (cliente: Parameters<typeof conocido.set>[0]) => conocido.set(cliente),
   };
 }

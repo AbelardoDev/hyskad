@@ -26,12 +26,44 @@
         } catch (e) {}
       })();
     </script>
+    <style>
+      /* Splash mientras Angular arranca y recupera la sesión (AuthService.restaurar). */
+      .hk-splash {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f5f8fd;
+      }
+      .dark .hk-splash {
+        background: #070d1a;
+      }
+      .hk-splash img {
+        animation: hk-splash-pulso 1.4s ease-in-out infinite;
+      }
+      @keyframes hk-splash-pulso {
+        50% {
+          opacity: 0.55;
+          transform: scale(0.94);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .hk-splash img {
+          animation: none;
+        }
+      }
+    </style>
     <link rel="icon" href="brand/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="brand/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="brand/apple-touch-icon.png" />
     <link rel="manifest" href="brand/site.webmanifest" />
   </head>
   <body>
-    <hk-root></hk-root>
+    <hk-root>
+      <div class="hk-splash" role="status" aria-busy="true">
+        <img src="brand/logo-mark.svg" alt="HYSKAD" width="72" height="72" />
+      </div>
+    </hk-root>
   </body>
 </html>

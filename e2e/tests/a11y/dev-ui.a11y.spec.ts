@@ -1,6 +1,13 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 
+import { nuevaSesion } from '../support/sesion';
+
+// El shell exige sesión: cada prueba entra con un admin propio (cambiar idioma lo guarda en su cuenta).
+test.beforeEach(async ({ page }) => {
+  await nuevaSesion(page);
+});
+
 const GRAVES = ['serious', 'critical'];
 
 for (const tema of ['light', 'dark'] as const) {

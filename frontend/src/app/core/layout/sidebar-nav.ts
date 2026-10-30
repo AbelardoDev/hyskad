@@ -1,14 +1,21 @@
-import { booleanAttribute, ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import {
+  booleanAttribute,
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LucideDynamicIcon } from '@lucide/angular';
 
 import { HkLogo } from '../../shared/ui/logo/logo';
 import { HkTooltipDirective } from '../../shared/ui/tooltip/tooltip';
-import { MENU } from './menu.config';
+import { NavegacionService } from './navegacion.service';
 
 /**
- * Contenido del sidebar (logo + menú agrupado). Lo usan el sidebar fijo de escritorio/tablet
+ * Contenido del sidebar (logo + menú agrupado, filtrado por permisos). Lo usan el sidebar fijo de escritorio/tablet
  * y el drawer de móvil. El fondo es oscuro en ambos temas (identidad de marca).
  */
 @Component({
@@ -23,10 +30,10 @@ import { MENU } from './menu.config';
   ],
   template: `
     <a
-      routerLink="/dashboard"
+      [routerLink]="navegacion.rutaInicio()"
       class="flex h-16 shrink-0 items-center rounded-lg outline-offset-[-2px] focus-visible:outline-2 focus-visible:outline-brand-300"
       [class]="colapsado() ? 'justify-center px-2' : 'px-5'"
-      [attr.aria-label]="'menu.dashboard' | transloco"
+      [attr.aria-label]="'layout.ir_inicio' | transloco"
       (click)="navegar.emit()"
     >
       @if (colapsado()) {
@@ -40,7 +47,7 @@ import { MENU } from './menu.config';
       class="flex-1 [scrollbar-color:rgb(255_255_255/0.15)_transparent] overflow-x-hidden overflow-y-auto px-3 pt-2 pb-6"
       [attr.aria-label]="'layout.navegacion_principal' | transloco"
     >
-      @for (grupo of menu; track grupo.clave) {
+      @for (grupo of navegacion.grupos(); track grupo.clave) {
         <div class="mt-5 first:mt-1">
           @if (colapsado()) {
             <div
@@ -100,5 +107,5 @@ export class HkSidebarNav {
   /** Se emite al elegir un destino (el drawer móvil se cierra). */
   readonly navegar = output<void>();
 
-  protected readonly menu = MENU;
+  protected readonly navegacion = inject(NavegacionService);
 }

@@ -12,9 +12,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -92,6 +98,28 @@ class AuthControllerIT {
         assertThat(auditorias("LOGIN_EXITOSO", vendedor.id())).isEqualTo(1);
         assertThat(salida.getAll().substring(inicioSalida))
                 .doesNotContain(PASSWORD, accessToken(resultado), valorCookie(resultado));
+    }
+
+    /** Dos dispositivos del mismo usuario entrando a la vez no deben bloquearse mutuamente (deadlock). */
+    @Test
+    void loginsSimultaneosDelMismoUsuarioResponden200() throws Exception {
+        Creado vendedor = usuarios.crear(Rol.VENDEDOR);
+        int intentos = 8;
+        CountDownLatch salida = new CountDownLatch(1);
+        try (ExecutorService hilos = Executors.newFixedThreadPool(intentos)) {
+            List<Future<Integer>> estados = new ArrayList<>();
+            for (int i = 0; i < intentos; i++) {
+                estados.add(hilos.submit(() -> {
+                    salida.await();
+                    return mvc.perform(login(vendedor.email(), PASSWORD, ipUnica())).andReturn().getResponse()
+                            .getStatus();
+                }));
+            }
+            salida.countDown();
+            for (Future<Integer> estado : estados) {
+                assertThat(estado.get(30, TimeUnit.SECONDS)).isEqualTo(200);
+            }
+        }
     }
 
     @Test

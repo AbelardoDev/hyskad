@@ -1,0 +1,50 @@
+# Infraestructura de las pruebas E2E: MySQL 8.4 desechable, Mailpit y Nginx con el frontend compilado.
+# Uso (desde la raíz, con frontend/dist ya generado y el backend en :8080 con el perfil e2e):
+#   docker compose -f infra/docker-compose.e2e.yml up -d --wait
+# Si el 8080 está ocupado (p. ej. el backend de dev), arranca el de e2e en otro puerto y usa
+#   BACKEND_PORT=8081 docker compose -f infra/docker-compose.e2e.yml up -d --wait
+# Puertos distintos a los de dev para poder tener ambos levantados.
+name: hyskad-e2e
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: hyskad_e2e
+      MYSQL_USER: hyskad
+      MYSQL_PASSWORD: hyskad_e2e
+      MYSQL_ROOT_PASSWORD: root_e2e
+      TZ: UTC
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
+    ports:
+      - "127.0.0.1:3307:3306"
+    tmpfs:
+      - /var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -proot_e2e --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:1026:1025"
+      - "127.0.0.1:8026:8025"
+
+  web:
+    image: nginx:1.29-alpine
+    depends_on:
+      - mailpit
+    ports:
+      - "127.0.0.1:4300:80"
+    environment:
+      BACKEND_PORT: ${BACKEND_PORT:-8080}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ../frontend/dist/frontend/browser:/usr/share/nginx/html:ro
+      - ./nginx/e2e.conf.template:/etc/nginx/templates/default.conf.template:ro

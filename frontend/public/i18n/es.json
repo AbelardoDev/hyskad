@@ -11,7 +11,8 @@
     "guardar": "Guardar",
     "opcional": "opcional",
     "proximamente": "Próximamente",
-    "volver_inicio": "Volver al inicio"
+    "volver_inicio": "Volver al inicio",
+    "reintentar": "Reintentar"
   },
   "menu": {
     "grupos": {
@@ -58,11 +59,10 @@
     "sin_notificaciones": "No tienes notificaciones",
     "sin_notificaciones_texto": "Aquí verás los avisos del taller en tiempo real.",
     "menu_usuario": "Menú de usuario",
-    "usuario_invitado": "Usuario",
-    "sin_sesion": "Sin sesión iniciada",
     "perfil": "Mi perfil",
     "cambiar_password": "Cambiar contraseña",
-    "cerrar_sesion": "Cerrar sesión"
+    "cerrar_sesion": "Cerrar sesión",
+    "ir_inicio": "Ir al inicio"
   },
   "idiomas": {
     "es": "Español",
@@ -126,6 +126,21 @@
       "actual": "paso actual",
       "pendiente": "pendiente",
       "cancelado": "cancelado"
+    },
+    "password": {
+      "nueva": "Contraseña nueva",
+      "confirmar": "Confirma la contraseña",
+      "actual": "Contraseña actual",
+      "guardar": "Cambiar contraseña",
+      "cambiada": "Tu contraseña se cambió",
+      "debil": "Débil",
+      "aceptable": "Aceptable",
+      "fuerte": "Fuerte",
+      "regla_longitud": "8 caracteres o más",
+      "regla_letras": "Al menos una letra",
+      "regla_numeros": "Al menos un número",
+      "cumplida": "(cumplido)",
+      "pendiente": "(pendiente)"
     }
   },
   "validacion": {
@@ -136,7 +151,9 @@
     "maxlength": "Escribe máximo {{requiredLength}} caracteres",
     "min": "El valor mínimo es {{min}}",
     "max": "El valor máximo es {{max}}",
-    "pattern": "El formato no es válido"
+    "pattern": "El formato no es válido",
+    "passwordDebil": "Usa al menos 8 caracteres, con letras y números",
+    "noCoincide": "Las contraseñas no coinciden"
   },
   "errors": {
     "DESCONOCIDO": "Ocurrió un error inesperado. Intenta de nuevo.",
@@ -144,6 +161,220 @@
     "PASSWORD_DEBIL": "La contraseña debe tener al menos 8 caracteres, con letras y números",
     "PLACA_INVALIDA": "La placa no tiene un formato válido",
     "DOCUMENTO_INVALIDO": "El número de documento no es válido",
-    "NIT_INVALIDO": "El NIT no es válido"
+    "NIT_INVALIDO": "El NIT no es válido",
+    "SIN_CONEXION": "No hay conexión con el servidor. Revisa tu red e inténtalo de nuevo.",
+    "SOLICITUD_MALFORMADA": "La solicitud no es válida",
+    "PARAMETRO_INVALIDO": "Uno de los filtros no es válido",
+    "PARAMETRO_REQUERIDO": "Falta un dato obligatorio",
+    "NO_AUTENTICADO": "Tu sesión terminó. Inicia sesión de nuevo.",
+    "ACCESO_DENEGADO": "No tienes permiso para hacer esto",
+    "RECURSO_NO_ENCONTRADO": "El registro no existe o fue eliminado",
+    "RUTA_NO_ENCONTRADA": "El recurso solicitado no existe",
+    "METODO_NO_PERMITIDO": "Operación no permitida",
+    "TIPO_CONTENIDO_NO_SOPORTADO": "Formato de datos no soportado",
+    "CONFLICTO_CONCURRENCIA": "Otra persona modificó este registro. Recarga e inténtalo de nuevo.",
+    "CONFLICTO_DATOS": "Los datos entran en conflicto con otro registro",
+    "DEMASIADAS_SOLICITUDES": "Demasiados intentos seguidos. Espera un momento.",
+    "CREDENCIALES_INVALIDAS": "Correo o contraseña incorrectos",
+    "SESION_INVALIDA": "Tu sesión terminó. Inicia sesión de nuevo.",
+    "PASSWORD_ACTUAL_INCORRECTA": "La contraseña actual no es correcta",
+    "TOKEN_INVALIDO": "El enlace no es válido o ya venció",
+    "EMAIL_DUPLICADO": "Ya existe un usuario con ese correo",
+    "ULTIMO_ADMIN": "Debe quedar al menos un administrador activo",
+    "AUTO_MODIFICACION": "No puedes cambiar tu propio estado, rol ni permisos",
+    "PERMISO_SOLO_ADMIN": "Ese permiso solo puede tenerlo un administrador",
+    "ERROR_INTERNO": "Ocurrió un error en el servidor. Intenta de nuevo en unos minutos.",
+    "NOT_BLANK": "Este campo es obligatorio",
+    "NOT_NULL": "Este campo es obligatorio",
+    "EMAIL": "Escribe un correo válido",
+    "SIZE": "La longitud no es válida",
+    "PATTERN": "El formato no es válido",
+    "TELEFONO_INVALIDO": "El teléfono no es válido",
+    "IDIOMA_INVALIDO": "El idioma no es válido",
+    "PERMISO_REPETIDO": "Hay un permiso repetido",
+    "PROPIEDAD_DESCONOCIDA": "Se envió un dato desconocido",
+    "TIPO_INVALIDO": "Un dato tiene un formato inválido"
+  },
+  "roles": {
+    "ADMIN": "Administrador",
+    "ALMACEN": "Almacén",
+    "VENDEDOR": "Vendedor",
+    "MECANICO": "Mecánico"
+  },
+  "permisos": {
+    "DASHBOARD_VER": "Ver el dashboard",
+    "USUARIOS_GESTIONAR": "Gestionar usuarios y permisos",
+    "CONFIGURACION_GESTIONAR": "Gestionar la configuración",
+    "AUDITORIA_VER": "Ver la auditoría",
+    "CLIENTES_VER": "Ver clientes",
+    "CLIENTES_GESTIONAR": "Crear y editar clientes",
+    "MOTOS_VER": "Ver motocicletas",
+    "MOTOS_GESTIONAR": "Crear y editar motocicletas",
+    "PRODUCTOS_VER": "Ver productos",
+    "PRODUCTOS_GESTIONAR": "Crear y editar productos",
+    "INVENTARIO_AJUSTAR": "Ajustar inventario",
+    "PROVEEDORES_GESTIONAR": "Gestionar proveedores",
+    "COMPRAS_GESTIONAR": "Registrar compras",
+    "VENTAS_VER": "Ver ventas",
+    "VENTAS_CREAR": "Registrar ventas",
+    "VENTAS_ANULAR": "Anular ventas",
+    "SERVICIOS_GESTIONAR": "Gestionar el catálogo de servicios",
+    "ORDENES_VER_TODAS": "Ver todas las órdenes",
+    "ORDENES_VER_ASIGNADAS": "Ver las órdenes asignadas",
+    "ORDENES_CREAR": "Crear órdenes",
+    "ORDENES_ASIGNAR": "Asignar órdenes a mecánicos",
+    "ORDENES_TRABAJAR": "Trabajar órdenes (diagnóstico, ítems y estados)",
+    "PRESUPUESTOS_GESTIONAR": "Gestionar presupuestos",
+    "PAGOS_REGISTRAR": "Registrar pagos",
+    "ENTREGAS_REGISTRAR": "Registrar entregas",
+    "REPORTES_VER": "Ver reportes"
+  },
+  "acceso_denegado": {
+    "miga": "Acceso denegado",
+    "titulo": "No tienes permiso para ver esta sección",
+    "texto": "Si crees que deberías tener acceso, pídeselo a un administrador."
+  },
+  "ventas": {
+    "nueva": "Nueva venta"
+  },
+  "auth": {
+    "panel": {
+      "titulo": "Tu taller y tu almacén, en un solo lugar.",
+      "texto": "Órdenes de trabajo, inventario y ventas conectados en tiempo real.",
+      "pie": "HYSKAD · Almacén y taller de motos",
+      "punto_taller": "Órdenes de trabajo de principio a fin",
+      "punto_inventario": "Inventario siempre al día",
+      "punto_ventas": "Ventas y comprobantes al instante"
+    },
+    "campos": {
+      "email": "Correo electrónico",
+      "password": "Contraseña"
+    },
+    "login": {
+      "miga": "Iniciar sesión",
+      "titulo": "Inicia sesión",
+      "subtitulo": "Entra con el correo y la contraseña que te dio el administrador.",
+      "olvide": "¿Olvidaste tu contraseña?",
+      "entrar": "Entrar"
+    },
+    "espera": "Podrás intentarlo de nuevo en {{segundos}} s.",
+    "demasiados_intentos": "Demasiados intentos seguidos.",
+    "volver_login": "Volver a iniciar sesión",
+    "olvide": {
+      "miga": "Recuperar contraseña",
+      "titulo": "Recupera tu contraseña",
+      "subtitulo": "Escribe tu correo y te enviaremos un enlace para crear una nueva.",
+      "enviar": "Enviar enlace",
+      "enviado_titulo": "Revisa tu correo",
+      "enviado_texto": "Si {{email}} pertenece a una cuenta, te enviamos un enlace para restablecer la contraseña. Vence en 30 minutos."
+    },
+    "restablecer": {
+      "miga": "Restablecer contraseña",
+      "titulo": "Crea una contraseña nueva",
+      "subtitulo": "Al guardarla se cerrarán tus sesiones abiertas.",
+      "guardar": "Guardar contraseña",
+      "exito": "Contraseña actualizada. Ya puedes iniciar sesión.",
+      "invalido_titulo": "El enlace no es válido",
+      "invalido_texto": "Puede que haya vencido o que ya se haya usado. Pide uno nuevo.",
+      "pedir_otro": "Pedir un enlace nuevo"
+    },
+    "cambiar": {
+      "miga": "Cambiar contraseña",
+      "titulo": "Cambia tu contraseña",
+      "subtitulo": "Hola, {{nombre}}. Antes de continuar debes elegir una contraseña nueva."
+    }
+  },
+  "perfil": {
+    "titulo": "Mi perfil",
+    "subtitulo": "Tus datos y preferencias",
+    "datos": "Datos de la cuenta",
+    "datos_ayuda": "Para cambiar tu nombre o tu correo, pídeselo a un administrador.",
+    "preferencias": "Preferencias",
+    "idioma": "Idioma preferido",
+    "idioma_ayuda": "Se guarda en tu cuenta y se aplica cada vez que entres.",
+    "password_ayuda": "Tus otras sesiones seguirán abiertas."
+  },
+  "usuarios": {
+    "titulo": "Usuarios",
+    "subtitulo": "Cuentas, roles y permisos del equipo",
+    "nuevo": "Nuevo usuario",
+    "buscar": "Buscar por nombre o correo…",
+    "tu": "tú",
+    "nunca": "Nunca",
+    "campos": {
+      "nombre": "Nombre",
+      "email": "Correo electrónico",
+      "telefono": "Teléfono",
+      "rol": "Rol",
+      "estado": "Estado",
+      "idioma": "Idioma",
+      "password": "Contraseña inicial",
+      "ultimo_acceso": "Último acceso",
+      "acciones": "Acciones"
+    },
+    "filtros": {
+      "todos_roles": "Todos los roles",
+      "todos_estados": "Todos los estados",
+      "activos": "Activos",
+      "inactivos": "Inactivos"
+    },
+    "estado": {
+      "activo": "Activo",
+      "inactivo": "Inactivo"
+    },
+    "vacio_titulo": "No hay usuarios que coincidan",
+    "vacio_texto": "Prueba con otra búsqueda o quita los filtros.",
+    "error_titulo": "No se pudieron cargar los usuarios",
+    "error_texto": "Revisa tu conexión e inténtalo de nuevo.",
+    "acciones_de": "Acciones para {{nombre}}",
+    "editar": "Editar",
+    "activar": "Activar",
+    "desactivar": "Desactivar",
+    "creado": "Usuario {{nombre}} creado",
+    "actualizado": "Cambios de {{nombre}} guardados",
+    "activado": "{{nombre}} ya puede iniciar sesión",
+    "desactivado": "{{nombre}} fue desactivado y su sesión se cerrará",
+    "confirmar_activar": {
+      "titulo": "¿Activar usuario?",
+      "mensaje": "{{nombre}} podrá volver a iniciar sesión con su contraseña."
+    },
+    "confirmar_desactivar": {
+      "titulo": "¿Desactivar usuario?",
+      "mensaje": "{{nombre}} no podrá iniciar sesión y sus sesiones abiertas se cerrarán en máximo 15 minutos."
+    },
+    "form": {
+      "titulo_nuevo": "Nuevo usuario",
+      "titulo_editar": "Editar usuario",
+      "telefono_ayuda": "Solo números y espacios, con + opcional.",
+      "rol_ayuda": "Define los permisos por defecto; puedes ajustarlos después.",
+      "elige_rol": "Elige un rol",
+      "password_ayuda": "Compártela con la persona; podrá cambiarla en su perfil."
+    },
+    "permisos": {
+      "ver": "Permisos",
+      "miga": "Permisos",
+      "titulo": "Permisos del usuario",
+      "subtitulo": "Concede o retira permisos sobre los que trae su rol",
+      "volver": "Volver a usuarios",
+      "ayuda": "Los permisos marcados como «Del rol» vienen por defecto. Los cambios cierran la sesión del usuario en máximo 15 minutos.",
+      "propios": "No puedes cambiar tus propios permisos.",
+      "solo_admin": "Solo admin",
+      "del_rol": "Del rol",
+      "concedido": "Concedido",
+      "retirado": "Retirado",
+      "sin_guardar": "Tienes cambios sin guardar",
+      "restablecer": "Restablecer a los del rol",
+      "guardar": "Guardar cambios",
+      "guardados": "Permisos de {{nombre}} actualizados",
+      "error_titulo": "No se pudieron cargar los permisos",
+      "modulos": {
+        "general": "General",
+        "clientes": "Clientes y motocicletas",
+        "taller": "Taller",
+        "ventas": "Ventas",
+        "inventario": "Inventario y compras",
+        "administracion": "Administración"
+      }
+    }
   }
 }

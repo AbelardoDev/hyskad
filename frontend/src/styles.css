@@ -34,7 +34,9 @@
   --shadow-overlay: 0 4px 12px rgb(15 29 63 / 0.08), 0 24px 48px -16px rgb(15 29 63 / 0.28);
 
   --animate-shimmer: hk-shimmer 1.6s linear infinite;
-  --animate-entrada: hk-entrada 200ms var(--ease-hk) both;
+  --animate-entrada: hk-entrada 200ms var(--ease-hk) backwards;
+  /* Solo opacidad: para contenedores con hijos `position: fixed` (un transform los volvería relativos). */
+  --animate-aparecer: hk-aparecer 200ms var(--ease-hk) backwards;
   --animate-pulso: hk-pulso 2s var(--ease-hk) infinite;
 
   @keyframes hk-shimmer {
@@ -43,6 +45,11 @@
     }
     to {
       background-position: -200% 0;
+    }
+  }
+  @keyframes hk-aparecer {
+    from {
+      opacity: 0;
     }
   }
   @keyframes hk-entrada {

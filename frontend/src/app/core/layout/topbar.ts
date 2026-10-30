@@ -17,6 +17,7 @@ import { DialogosService } from '../../shared/ui/dialog/dialogos.service';
 import { HkDropdownMenu, ItemMenu } from '../../shared/ui/dropdown-menu/dropdown-menu';
 import { HkEmptyState } from '../../shared/ui/empty-state/empty-state';
 import { HkTooltipDirective } from '../../shared/ui/tooltip/tooltip';
+import { AuthService } from '../auth/auth.service';
 import { IDIOMAS, LanguageService } from '../i18n/language.service';
 import { PreferenciaTema, ThemeService } from '../theme/theme.service';
 import { BusquedaProximamente } from './busqueda-proximamente';
@@ -182,18 +183,19 @@ const POSICION_PANEL: ConnectedPosition[] = [
       <!-- Usuario -->
       <hk-dropdown-menu
         [etiqueta]="'layout.menu_usuario' | transloco"
+        [nombreEnContenido]="true"
         [items]="itemsUsuario()"
         claseDisparador="ml-1 inline-flex rounded-full hk-foco max-md:size-11 max-md:items-center max-md:justify-center"
         (seleccion)="alElegirUsuario($event)"
       >
-        <hk-avatar
-          [nombre]="'layout.usuario_invitado' | transloco"
-          tamano="sm"
-          aria-hidden="true"
-        />
+        <!-- Nombre accesible desde el texto oculto: las iniciales visibles no forman parte de él (axe). -->
+        <span class="sr-only">{{ 'layout.menu_usuario' | transloco }}</span>
+        <hk-avatar [nombre]="usuario()?.nombre ?? ''" tamano="sm" aria-hidden="true" />
         <div hkMenuEncabezado class="mb-1.5 border-b border-border px-2.5 pt-1 pb-2.5">
-          <p class="text-sm font-semibold text-fg">{{ 'layout.usuario_invitado' | transloco }}</p>
-          <p class="text-xs text-muted">{{ 'layout.sin_sesion' | transloco }}</p>
+          @if (usuario(); as u) {
+            <p class="truncate text-sm font-semibold text-fg">{{ u.nombre }}</p>
+            <p class="truncate text-xs text-muted">{{ 'roles.' + u.rol | transloco }}</p>
+          }
         </div>
       </hk-dropdown-menu>
     </div>
@@ -211,9 +213,11 @@ export class HkTopbar {
   protected readonly idioma = inject(LanguageService);
   private readonly dialogos = inject(DialogosService);
   private readonly router = inject(Router);
+  private readonly auth = inject(AuthService);
 
   readonly alternarMenu = output<void>();
 
+  protected readonly usuario = this.auth.usuario;
   protected readonly posicionPanel = POSICION_PANEL;
   protected readonly notificacionesAbiertas = signal(false);
   protected readonly atajo = /Mac|iPhone|iPad/.test(globalThis.navigator?.platform ?? '')
@@ -246,21 +250,13 @@ export class HkTopbar {
     return [
       { id: 'perfil', etiqueta: perfil, icono: 'user' },
       { id: 'password', etiqueta: password, icono: 'key-round' },
-      // Cerrar sesión se habilita con la autenticación del frontend (F04B).
-      {
-        id: 'salir',
-        etiqueta: salir,
-        icono: 'log-out',
-        peligro: true,
-        separadorAntes: true,
-        deshabilitado: true,
-      },
+      { id: 'salir', etiqueta: salir, icono: 'log-out', peligro: true, separadorAntes: true },
     ];
   });
 
   protected cambiarIdioma(id: string): void {
     const idioma = IDIOMAS.find((i) => i === id);
-    if (idioma) this.idioma.cambiar(idioma);
+    if (idioma) this.auth.cambiarIdioma(idioma);
   }
 
   protected cambiarTema(id: string): void {
@@ -269,7 +265,9 @@ export class HkTopbar {
   }
 
   protected alElegirUsuario(id: string): void {
-    if (id === 'perfil' || id === 'password') void this.router.navigateByUrl('/perfil');
+    if (id === 'perfil') void this.router.navigateByUrl('/perfil');
+    else if (id === 'password') void this.router.navigate(['/perfil'], { fragment: 'password' });
+    else if (id === 'salir') void this.auth.logout();
   }
 
   protected abrirBusqueda(): void {

@@ -1,18 +1,21 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { LucideDynamicIcon } from '@lucide/angular';
 
-import { ACCESOS_RAPIDOS } from './menu.config';
+import { NavegacionService } from './navegacion.service';
 
-/** Barra de navegación inferior en móvil con los accesos rápidos del menú. */
+/** Barra de navegación inferior en móvil con los accesos rápidos permitidos al usuario. */
 @Component({
   selector: 'hk-bottom-nav',
   imports: [RouterLink, RouterLinkActive, TranslocoPipe, LucideDynamicIcon],
   template: `
     <nav [attr.aria-label]="'layout.navegacion_inferior' | transloco">
-      <ul class="grid grid-cols-4">
-        @for (item of accesos; track item.ruta) {
+      <ul
+        class="grid"
+        [style.grid-template-columns]="'repeat(' + accesos().length + ', minmax(0, 1fr))'"
+      >
+        @for (item of accesos(); track item.ruta) {
           <li>
             <a
               [routerLink]="item.ruta"
@@ -42,5 +45,5 @@ import { ACCESOS_RAPIDOS } from './menu.config';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HkBottomNav {
-  protected readonly accesos = ACCESOS_RAPIDOS;
+  protected readonly accesos = inject(NavegacionService).accesosRapidos;
 }

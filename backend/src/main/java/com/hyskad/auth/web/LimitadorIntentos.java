@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.hyskad.shared.error.DemasiadasSolicitudesException;
@@ -15,6 +17,8 @@ import io.github.bucket4j.ConsumptionProbe;
 /**
  * Rate limiting en memoria con Bucket4j (IC6, RN-49): un bucket por regla y clave (IP, IP+email o
  * usuario). Basta con un nodo; si el mapa crece demasiado se vacía, lo que solo devuelve intentos.
+ * Solo el perfil {@code e2e} lo apaga ({@code hyskad.auth.rate-limit=false}): las pruebas E2E inician
+ * sesión muchas veces desde la misma IP.
  */
 @Component
 public class LimitadorIntentos {
@@ -38,9 +42,22 @@ public class LimitadorIntentos {
     }
 
     private final Map<String, Bucket> buckets = new ConcurrentHashMap<>();
+    private final boolean habilitado;
+
+    public LimitadorIntentos() {
+        this(true);
+    }
+
+    @Autowired
+    public LimitadorIntentos(@Value("${hyskad.auth.rate-limit:true}") boolean habilitado) {
+        this.habilitado = habilitado;
+    }
 
     /** Consume un intento o lanza 429 con los segundos que faltan para el siguiente. */
     public void consumir(Regla regla, String clave) {
+        if (!habilitado) {
+            return;
+        }
         if (buckets.size() > MAX_CLAVES) {
             buckets.clear();
         }

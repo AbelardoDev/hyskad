@@ -5,6 +5,8 @@ const baseURL = process.env['E2E_BASE_URL'] ?? 'http://localhost:4200';
 
 export default defineConfig({
   testDir: './tests',
+  // Reinicia la BD del backend (perfil e2e) con los datos semilla.
+  globalSetup: './global-setup.ts',
   fullyParallel: true,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,

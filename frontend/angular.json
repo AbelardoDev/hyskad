@@ -49,6 +49,9 @@
                 }
               ]
             },
+            "e2e": {
+              "outputHashing": "all"
+            },
             "development": {
               "optimization": false,
               "extractLicenses": false,

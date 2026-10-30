@@ -4,6 +4,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { LucideDynamicIcon } from '@lucide/angular';
 
 import { HK_ID_TITULO_DIALOGO } from '../../shared/ui/dialog/dialogos.service';
+import { AuthService } from '../auth/auth.service';
 import { IDIOMAS, LanguageService } from '../i18n/language.service';
 import { HkSidebarNav } from './sidebar-nav';
 
@@ -42,7 +43,7 @@ import { HkSidebarNav } from './sidebar-nav';
             "
             [attr.aria-pressed]="idioma.idioma() === opcion"
             [attr.lang]="opcion"
-            (click)="idioma.cambiar(opcion)"
+            (click)="auth.cambiarIdioma(opcion)"
           >
             {{ opcion }}
           </button>
@@ -60,5 +61,6 @@ export class HkMenuMovil {
   protected readonly ref = inject(DialogRef);
   protected readonly idTitulo = inject(HK_ID_TITULO_DIALOGO);
   protected readonly idioma = inject(LanguageService);
+  protected readonly auth = inject(AuthService);
   protected readonly idiomas = IDIOMAS;
 }

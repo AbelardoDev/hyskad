@@ -3,6 +3,7 @@ package com.hyskad.shared.config;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -34,10 +35,14 @@ public class SecurityConfig {
         "/api/v1/auth/password/olvide", "/api/v1/auth/password/restablecer"
     };
 
+    /** Solo con el perfil {@code e2e}: el controller de reinicio no existe en los demás. */
+    private static final String RESET_E2E = "/api/v1/test/reset";
+
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http,
             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver,
-            JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
+            JwtAuthenticationConverter jwtAuthenticationConverter, Environment entorno) throws Exception {
+        boolean e2e = entorno.matchesProfiles("e2e");
         AuthenticationEntryPoint noAutenticado = (req, res, ex) -> resolver.resolveException(req, res, null, ex);
         AccessDeniedHandler accesoDenegado = (req, res, ex) -> resolver.resolveException(req, res, null, ex);
         return http
@@ -47,10 +52,14 @@ public class SecurityConfig {
                 .formLogin(form -> form.disable())
                 .logout(logout -> logout.disable())
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(RUTAS_PUBLICAS).permitAll()
-                        .requestMatchers(HttpMethod.POST, AUTH_PUBLICAS).permitAll()
-                        .anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(RUTAS_PUBLICAS).permitAll()
+                            .requestMatchers(HttpMethod.POST, AUTH_PUBLICAS).permitAll();
+                    if (e2e) {
+                        auth.requestMatchers(HttpMethod.POST, RESET_E2E).permitAll();
+                    }
+                    auth.anyRequest().authenticated();
+                })
                 .oauth2ResourceServer(oauth -> oauth
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter))
                         .authenticationEntryPoint(noAutenticado)

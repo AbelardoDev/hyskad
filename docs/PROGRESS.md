@@ -11,7 +11,7 @@
 | F02 | Base del backend | ✅ Terminada | #7 | Swagger en /api/docs (dev) |
 | F03 | Autenticación, usuarios y permisos (backend) | ✅ Terminada | #8 | Usuarios dev en el README |
 | F04A | Sistema de diseño, tema, i18n y layout | ✅ Terminada | #9 | Galería en /dev/ui (solo dev) |
-| F04B | Sesión, guards y administración de usuarios (frontend) | ⬜ Pendiente | | |
+| F04B | Sesión, guards y administración de usuarios (frontend) | ✅ Terminada | #10 | Job `e2e` en el CI; capturas en `docs/capturas/f04b` |
 | F05 | Clientes y motocicletas | ⬜ Pendiente | | |
 | F06 | Catálogo de productos e inventario | ⬜ Pendiente | | |
 | F07 | Proveedores y compras | ⬜ Pendiente | | |
@@ -28,15 +28,24 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F04A ✅ (cerrada 2026-10-29, PR #9)
-- **Rama:** `feature/f04a-design-system` → `main`
-- **Hecho:** tokens completos en `styles.css` (escalas, semánticos claro/oscuro, `-soft`, `-ink`, `border-strong`) con `npm run contrast:check`; fuentes Inter y Plus Jakarta Sans auto-alojadas; íconos `@lucide/angular` registrados en `shared/ui/iconos.ts`; `ThemeService` + script anti-parpadeo + `theme-color`; `LanguageService` (Transloco con scopes, `<html lang>`, `es-CO`/`en-US`), pipes `cop`, `fecha`, `tiempoRelativo` y `npm run i18n:check` (en el CI). Kit `shared/ui` completo salvo `hk-chart` y `hk-command-palette` (ver DESIGN-SYSTEM §6), campos con `ControlValueAccessor` y `hk-form-field` que traduce `validacion.*` y `errors.<CODE>`. Layout: `HkShell` (sidebar 260/76 px recordado, colapsado en tablet, drawer + barra inferior en móvil), topbar (migas, buscador placeholder con Ctrl+K, idioma, tema, notificaciones, usuario), `TituloStrategy`, 13 rutas lazy con página "Próximamente" y 404 de marca. Galería `/dev/ui` excluida del build de producción. Pruebas: 92 unitarias (Vitest), 13 E2E + axe en claro/oscuro (Chromium, Firefox y WebKit). Revisado en 375/768/1024/1440 px, claro y oscuro, es y en, sin scroll horizontal.
-- **Siguiente paso concreto:** iniciar F04B con `/fase F04B` (sesión, guards, filtrado del menú por permiso, login). Revisar los PRs de dependabot abiertos.
+- **Fase:** F04B ✅ (cerrada 2026-10-30, PR #10)
+- **Rama:** `feature/f04b-sesion-usuarios` → `main`
+- **Hecho:** sesión en el frontend (`AuthService` con access token solo en memoria, restauración con `/auth/refresh` al arrancar tras un splash, renovación 60 s antes de vencer, interceptor con un único refresh compartido y reintento, interceptor de errores → toast por `code` y `errors[]` marcados en el formulario). Guards `authGuard` (incluye cambio obligatorio de contraseña), `invitadoGuard`, `sesionGuard`, `permisoGuard` (`canMatch`) y página 403; directiva `*hkTienePermiso`; menú, drawer y barra inferior filtrados por permiso. Pantallas: login dividido (429 con cuenta regresiva), olvidé/restablecer contraseña con medidor de fortaleza, cambio obligatorio, Mi perfil (idioma guardado en la cuenta) y Usuarios (tabla con búsqueda y filtros, drawer crear/editar, activar/desactivar, permisos por módulo). Backend: perfil `e2e` con `POST /api/v1/test/reset` y arreglo del deadlock en logins simultáneos. CI: job `e2e` (MySQL + Mailpit + Nginx en `docker-compose.e2e.yml`, backend con perfil e2e, Playwright en Chromium, reporte como artefacto si falla). Pruebas: 148 unitarias, 32 E2E + axe (estables en 3 repeticiones). Capturas en `docs/capturas/f04b/` (claro/oscuro, escritorio/móvil); revisado también 768 px y en inglés.
+- **Siguiente paso concreto:** iniciar F05 con `/fase F05`. Revisar los PRs de dependabot abiertos.
 - **Bloqueos o dudas:** ninguno.
 
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-10-30 · F04B · El enlace de recuperación usa la ruta `/restablecer?token=` (la que ya arma el backend desde F03) · no cambiar el contrato del correo.
+- 2026-10-30 · F04B · Con sesión iniciada, el idioma elegido se guarda en la cuenta (`PUT /auth/me/preferencias`) y al recuperar la sesión manda el de la cuenta · el idioma es una preferencia del usuario (RF de perfil), no del navegador.
+- 2026-10-30 · F04B · CP-09 se cubre con la acción "Nueva venta" (`*hkTienePermiso="'VENTAS_CREAR'"`) y la ruta `/ventas/nueva` con `permisoGuard`, aprobado por el usuario · el módulo de ventas llega en F08.
+- 2026-10-30 · F04B · Rate limit desactivable solo en el perfil e2e (`hyskad.auth.rate-limit=false`); el 429 de la UI se prueba con una respuesta simulada · las E2E inician sesión muchas veces desde la misma IP; CP-03 sigue en la integración.
+- 2026-10-30 · F04B · `POST /api/v1/test/reset` hace `flyway.clean()` + `migrate()` con `db/dev-data`; se llama una vez en el `globalSetup` y cada E2E crea sus propios usuarios por la API · las pruebas corren en paralelo sin pisarse.
+- 2026-10-30 · F04B · Build `e2e` (optimizado, sin reemplazar `dev.routes`) para que la galería `/dev/ui` siga probándose en el CI; Nginx de e2e con `BACKEND_PORT` configurable · en local el 8080 suele estar ocupado por el backend de dev.
+- 2026-10-30 · F04B · `hk-page-header` entra solo con opacidad (`animate-aparecer`) y `--animate-entrada` usa `fill-mode: backwards` (antes `both`) · un `transform` animado convierte al elemento en contenedor de los `position: fixed`: la acción flotante del encabezado quedaba detrás de la topbar en móvil.
+- 2026-10-30 · F04B · Seis íconos nuevos reemplazados por equivalentes ya registrados y `AuthLayout` cargado en diferido · el bundle inicial pasaba el presupuesto de aviso (819 kB → 796 kB).
+- 2026-10-30 · F04B · `CuentaService.autenticar` hace `flush()` tras registrar el último acceso · dos logins simultáneos del mismo usuario provocaban un deadlock en MySQL (bloqueo compartido por las FK de auditoría/refresh token y luego exclusivo por el UPDATE).
 - 2026-10-29 · F04A · Íconos con `@lucide/angular` (paquete oficial sucesor) en vez de `lucide-angular` · `lucide-angular` 1.0 solo admite Angular ≤ 21.
 - 2026-10-29 · F04A · Presupuesto del bundle inicial subido a 800 kB (aviso) / 1,2 MB (error), aprobado por el usuario · cada ícono de `@lucide/angular` trae su plantilla compilada (~4 kB, ~250 kB en total); transferido comprimido ≈ 132 kB.
 - 2026-10-29 · F04A · `ring` claro `#2F74F5` (no `#5698FF`), tokens `-ink` para texto sobre `-soft` y `border-strong` para bordes de controles · el contraste AA no se cumplía con los valores originales; documentado en DESIGN-SYSTEM §1.2.
@@ -81,7 +90,8 @@ pm-cache-hk`.
 
 <!-- Qué quedó pendiente a propósito y por qué -->
 - Los refresh tokens y enlaces de recuperación vencidos no se purgan de la BD (crecen despacio; se puede agregar una tarea programada más adelante).
-- `debeCambiarPassword` no bloquea otros endpoints en el backend: lo hace cumplir el frontend (F04B).
+- `debeCambiarPassword` no bloquea otros endpoints en el backend: solo lo hace cumplir el frontend (`authGuard`).
 - Aviso de Mockito por auto-attach del agente en las pruebas del backend (JDK 25); sin impacto por ahora.
-- Las E2E no corren en el CI todavía (necesitan backend y frontend levantados); se ejecutan localmente. Bajo carga paralela del servidor de desarrollo, Firefox puede exceder el timeout de 30 s (en serie pasan).
-- El menú de usuario y la campana muestran datos de ejemplo hasta F04B/F10; "Cerrar sesión" está deshabilitado.
+- Las E2E corren en el CI solo en Chromium (los tres navegadores en F12). Bajo carga paralela del servidor de desarrollo, Firefox puede exceder el timeout de 30 s (en serie pasan).
+- La campana de notificaciones muestra un estado vacío hasta F10.
+- Detrás de Nginx (F13) el rate limit verá la IP del proxy: configurar `server.forward-headers-strategy` y confiar solo en el proxy propio.

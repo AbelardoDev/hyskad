@@ -1,18 +1,4 @@
-/** Permisos del backend (ARCHITECTURE §5) que usa el menú. */
-export type Permiso =
-  | 'DASHBOARD_VER'
-  | 'ORDENES_VER_TODAS'
-  | 'ORDENES_VER_ASIGNADAS'
-  | 'CLIENTES_VER'
-  | 'MOTOS_VER'
-  | 'SERVICIOS_GESTIONAR'
-  | 'VENTAS_VER'
-  | 'PRODUCTOS_VER'
-  | 'COMPRAS_GESTIONAR'
-  | 'PROVEEDORES_GESTIONAR'
-  | 'REPORTES_VER'
-  | 'USUARIOS_GESTIONAR'
-  | 'CONFIGURACION_GESTIONAR';
+import { Permiso } from '../auth/permisos';
 
 export interface ItemMenuNavegacion {
   /** Clave i18n del texto (`menu.*`). */
@@ -21,7 +7,7 @@ export interface ItemMenuNavegacion {
   claveCorta?: string;
   icono: string;
   ruta: string;
-  /** Basta con tener uno de estos permisos para ver el ítem (el filtrado llega en F04B). */
+  /** Basta con tener uno de estos permisos para ver el ítem (`NavegacionService`). */
   permisos: readonly Permiso[];
   /** Aparece en la barra inferior en móvil (máximo 4). */
   accesoRapido?: boolean;

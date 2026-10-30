@@ -24,7 +24,7 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       </div>
     </div>
   `,
-  host: { class: 'mb-6 flex flex-wrap items-end justify-between gap-4 animate-entrada' },
+  host: { class: 'mb-6 flex flex-wrap items-end justify-between gap-4 animate-aparecer' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HkPageHeader {

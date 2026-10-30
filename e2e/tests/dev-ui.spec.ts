@@ -1,5 +1,12 @@
 import { expect, test } from '@playwright/test';
 
+import { nuevaSesion } from './support/sesion';
+
+// El shell exige sesión: cada prueba entra con un admin propio (cambiar idioma lo guarda en su cuenta).
+test.beforeEach(async ({ page }) => {
+  await nuevaSesion(page);
+});
+
 test.describe('galería /dev/ui', () => {
   test.beforeEach(async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' });
@@ -33,7 +40,10 @@ test.describe('galería /dev/ui', () => {
   });
 
   test('alterna el idioma, actualiza <html lang> y se mantiene tras recargar', async ({ page }) => {
+    // Con sesión, el idioma se guarda en la cuenta y es el que se aplica al recuperar la sesión.
+    const guardado = page.waitForResponse('**/api/v1/auth/me/preferencias');
     await page.getByTestId('idioma-en').click();
+    await guardado;
 
     await expect(page.getByRole('heading', { level: 1, name: 'UI kit' })).toBeVisible();
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');

@@ -11,7 +11,8 @@
     "guardar": "Save",
     "opcional": "optional",
     "proximamente": "Coming soon",
-    "volver_inicio": "Back to home"
+    "volver_inicio": "Back to home",
+    "reintentar": "Try again"
   },
   "menu": {
     "grupos": {
@@ -58,11 +59,10 @@
     "sin_notificaciones": "You have no notifications",
     "sin_notificaciones_texto": "Workshop alerts will show up here in real time.",
     "menu_usuario": "User menu",
-    "usuario_invitado": "User",
-    "sin_sesion": "Not signed in",
     "perfil": "My profile",
     "cambiar_password": "Change password",
-    "cerrar_sesion": "Sign out"
+    "cerrar_sesion": "Sign out",
+    "ir_inicio": "Go to home"
   },
   "idiomas": {
     "es": "Español",
@@ -126,6 +126,21 @@
       "actual": "current step",
       "pendiente": "pending",
       "cancelado": "cancelled"
+    },
+    "password": {
+      "nueva": "New password",
+      "confirmar": "Confirm password",
+      "actual": "Current password",
+      "guardar": "Change password",
+      "cambiada": "Your password was changed",
+      "debil": "Weak",
+      "aceptable": "Fair",
+      "fuerte": "Strong",
+      "regla_longitud": "8 characters or more",
+      "regla_letras": "At least one letter",
+      "regla_numeros": "At least one number",
+      "cumplida": "(met)",
+      "pendiente": "(pending)"
     }
   },
   "validacion": {
@@ -136,7 +151,9 @@
     "maxlength": "Enter at most {{requiredLength}} characters",
     "min": "The minimum value is {{min}}",
     "max": "The maximum value is {{max}}",
-    "pattern": "The format is not valid"
+    "pattern": "The format is not valid",
+    "passwordDebil": "Use at least 8 characters, with letters and numbers",
+    "noCoincide": "Passwords don't match"
   },
   "errors": {
     "DESCONOCIDO": "Something went wrong. Please try again.",
@@ -144,6 +161,220 @@
     "PASSWORD_DEBIL": "The password must have at least 8 characters, with letters and numbers",
     "PLACA_INVALIDA": "The plate format is not valid",
     "DOCUMENTO_INVALIDO": "The document number is not valid",
-    "NIT_INVALIDO": "The NIT is not valid"
+    "NIT_INVALIDO": "The NIT is not valid",
+    "SIN_CONEXION": "Can't reach the server. Check your network and try again.",
+    "SOLICITUD_MALFORMADA": "The request is not valid",
+    "PARAMETRO_INVALIDO": "One of the filters is not valid",
+    "PARAMETRO_REQUERIDO": "A required value is missing",
+    "NO_AUTENTICADO": "Your session ended. Sign in again.",
+    "ACCESO_DENEGADO": "You don't have permission to do this",
+    "RECURSO_NO_ENCONTRADO": "The record doesn't exist or was deleted",
+    "RUTA_NO_ENCONTRADA": "The requested resource doesn't exist",
+    "METODO_NO_PERMITIDO": "Operation not allowed",
+    "TIPO_CONTENIDO_NO_SOPORTADO": "Unsupported data format",
+    "CONFLICTO_CONCURRENCIA": "Someone else changed this record. Reload and try again.",
+    "CONFLICTO_DATOS": "The data conflicts with another record",
+    "DEMASIADAS_SOLICITUDES": "Too many attempts in a row. Wait a moment.",
+    "CREDENCIALES_INVALIDAS": "Incorrect email or password",
+    "SESION_INVALIDA": "Your session ended. Sign in again.",
+    "PASSWORD_ACTUAL_INCORRECTA": "The current password is not correct",
+    "TOKEN_INVALIDO": "The link is not valid or has expired",
+    "EMAIL_DUPLICADO": "A user with that email already exists",
+    "ULTIMO_ADMIN": "There must be at least one active administrator",
+    "AUTO_MODIFICACION": "You can't change your own status, role or permissions",
+    "PERMISO_SOLO_ADMIN": "Only an administrator can have that permission",
+    "ERROR_INTERNO": "Something went wrong on the server. Try again in a few minutes.",
+    "NOT_BLANK": "This field is required",
+    "NOT_NULL": "This field is required",
+    "EMAIL": "Enter a valid email",
+    "SIZE": "The length is not valid",
+    "PATTERN": "The format is not valid",
+    "TELEFONO_INVALIDO": "The phone number is not valid",
+    "IDIOMA_INVALIDO": "The language is not valid",
+    "PERMISO_REPETIDO": "A permission is repeated",
+    "PROPIEDAD_DESCONOCIDA": "An unknown field was sent",
+    "TIPO_INVALIDO": "A value has an invalid format"
+  },
+  "roles": {
+    "ADMIN": "Administrator",
+    "ALMACEN": "Warehouse",
+    "VENDEDOR": "Sales",
+    "MECANICO": "Mechanic"
+  },
+  "permisos": {
+    "DASHBOARD_VER": "View dashboard",
+    "USUARIOS_GESTIONAR": "Manage users and permissions",
+    "CONFIGURACION_GESTIONAR": "Manage settings",
+    "AUDITORIA_VER": "View audit log",
+    "CLIENTES_VER": "View customers",
+    "CLIENTES_GESTIONAR": "Create and edit customers",
+    "MOTOS_VER": "View motorcycles",
+    "MOTOS_GESTIONAR": "Create and edit motorcycles",
+    "PRODUCTOS_VER": "View products",
+    "PRODUCTOS_GESTIONAR": "Create and edit products",
+    "INVENTARIO_AJUSTAR": "Adjust inventory",
+    "PROVEEDORES_GESTIONAR": "Manage suppliers",
+    "COMPRAS_GESTIONAR": "Record purchases",
+    "VENTAS_VER": "View sales",
+    "VENTAS_CREAR": "Record sales",
+    "VENTAS_ANULAR": "Void sales",
+    "SERVICIOS_GESTIONAR": "Manage service catalog",
+    "ORDENES_VER_TODAS": "View all work orders",
+    "ORDENES_VER_ASIGNADAS": "View assigned work orders",
+    "ORDENES_CREAR": "Create work orders",
+    "ORDENES_ASIGNAR": "Assign work orders to mechanics",
+    "ORDENES_TRABAJAR": "Work on orders (diagnosis, items and status)",
+    "PRESUPUESTOS_GESTIONAR": "Manage quotes",
+    "PAGOS_REGISTRAR": "Record payments",
+    "ENTREGAS_REGISTRAR": "Record deliveries",
+    "REPORTES_VER": "View reports"
+  },
+  "acceso_denegado": {
+    "miga": "Access denied",
+    "titulo": "You don't have permission to view this section",
+    "texto": "If you think you should have access, ask an administrator."
+  },
+  "ventas": {
+    "nueva": "New sale"
+  },
+  "auth": {
+    "panel": {
+      "titulo": "Your workshop and your warehouse, in one place.",
+      "texto": "Work orders, inventory and sales connected in real time.",
+      "pie": "HYSKAD · Motorcycle warehouse and workshop",
+      "punto_taller": "Work orders from start to finish",
+      "punto_inventario": "Inventory always up to date",
+      "punto_ventas": "Instant sales and receipts"
+    },
+    "campos": {
+      "email": "Email",
+      "password": "Password"
+    },
+    "login": {
+      "miga": "Sign in",
+      "titulo": "Sign in",
+      "subtitulo": "Use the email and password your administrator gave you.",
+      "olvide": "Forgot your password?",
+      "entrar": "Sign in"
+    },
+    "espera": "You can try again in {{segundos}} s.",
+    "demasiados_intentos": "Too many attempts in a row.",
+    "volver_login": "Back to sign in",
+    "olvide": {
+      "miga": "Recover password",
+      "titulo": "Recover your password",
+      "subtitulo": "Enter your email and we'll send you a link to create a new one.",
+      "enviar": "Send link",
+      "enviado_titulo": "Check your email",
+      "enviado_texto": "If {{email}} belongs to an account, we sent you a link to reset your password. It expires in 30 minutes."
+    },
+    "restablecer": {
+      "miga": "Reset password",
+      "titulo": "Create a new password",
+      "subtitulo": "Saving it will sign you out of your open sessions.",
+      "guardar": "Save password",
+      "exito": "Password updated. You can sign in now.",
+      "invalido_titulo": "This link is not valid",
+      "invalido_texto": "It may have expired or already been used. Request a new one.",
+      "pedir_otro": "Request a new link"
+    },
+    "cambiar": {
+      "miga": "Change password",
+      "titulo": "Change your password",
+      "subtitulo": "Hi, {{nombre}}. Before continuing you must choose a new password."
+    }
+  },
+  "perfil": {
+    "titulo": "My profile",
+    "subtitulo": "Your details and preferences",
+    "datos": "Account details",
+    "datos_ayuda": "To change your name or email, ask an administrator.",
+    "preferencias": "Preferences",
+    "idioma": "Preferred language",
+    "idioma_ayuda": "It's saved to your account and applied every time you sign in.",
+    "password_ayuda": "Your other sessions will stay open."
+  },
+  "usuarios": {
+    "titulo": "Users",
+    "subtitulo": "Team accounts, roles and permissions",
+    "nuevo": "New user",
+    "buscar": "Search by name or email…",
+    "tu": "you",
+    "nunca": "Never",
+    "campos": {
+      "nombre": "Name",
+      "email": "Email",
+      "telefono": "Phone",
+      "rol": "Role",
+      "estado": "Status",
+      "idioma": "Language",
+      "password": "Initial password",
+      "ultimo_acceso": "Last access",
+      "acciones": "Actions"
+    },
+    "filtros": {
+      "todos_roles": "All roles",
+      "todos_estados": "All statuses",
+      "activos": "Active",
+      "inactivos": "Inactive"
+    },
+    "estado": {
+      "activo": "Active",
+      "inactivo": "Inactive"
+    },
+    "vacio_titulo": "No users match",
+    "vacio_texto": "Try another search or clear the filters.",
+    "error_titulo": "Users could not be loaded",
+    "error_texto": "Check your connection and try again.",
+    "acciones_de": "Actions for {{nombre}}",
+    "editar": "Edit",
+    "activar": "Activate",
+    "desactivar": "Deactivate",
+    "creado": "User {{nombre}} created",
+    "actualizado": "Changes to {{nombre}} saved",
+    "activado": "{{nombre}} can sign in again",
+    "desactivado": "{{nombre}} was deactivated and will be signed out",
+    "confirmar_activar": {
+      "titulo": "Activate user?",
+      "mensaje": "{{nombre}} will be able to sign in again with their password."
+    },
+    "confirmar_desactivar": {
+      "titulo": "Deactivate user?",
+      "mensaje": "{{nombre}} won't be able to sign in and their open sessions will end within 15 minutes."
+    },
+    "form": {
+      "titulo_nuevo": "New user",
+      "titulo_editar": "Edit user",
+      "telefono_ayuda": "Digits and spaces only, optional +.",
+      "rol_ayuda": "Sets the default permissions; you can adjust them later.",
+      "elige_rol": "Choose a role",
+      "password_ayuda": "Share it with the person; they can change it in their profile."
+    },
+    "permisos": {
+      "ver": "Permissions",
+      "miga": "Permissions",
+      "titulo": "User permissions",
+      "subtitulo": "Grant or revoke permissions on top of their role",
+      "volver": "Back to users",
+      "ayuda": "Permissions marked “From role” come by default. Changes sign the user out within 15 minutes.",
+      "propios": "You can't change your own permissions.",
+      "solo_admin": "Admin only",
+      "del_rol": "From role",
+      "concedido": "Granted",
+      "retirado": "Revoked",
+      "sin_guardar": "You have unsaved changes",
+      "restablecer": "Reset to role defaults",
+      "guardar": "Save changes",
+      "guardados": "{{nombre}}'s permissions updated",
+      "error_titulo": "Permissions could not be loaded",
+      "modulos": {
+        "general": "General",
+        "clientes": "Customers and motorcycles",
+        "taller": "Workshop",
+        "ventas": "Sales",
+        "inventario": "Inventory and purchases",
+        "administracion": "Administration"
+      }
+    }
   }
 }

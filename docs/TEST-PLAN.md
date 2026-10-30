@@ -70,19 +70,25 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 ### Autenticación y usuarios (F03–F04)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
-| CP-01 | RF2 | Login con credenciales válidas | I, E | 200, access token y cookie refresh `HttpOnly`; el front entra al dashboard | Pendiente (I aprobada en F03; E en F04B) |
+| CP-01 | RF2 | Login con credenciales válidas | I, E | 200, access token y cookie refresh `HttpOnly`; el front entra al dashboard | Aprobado (I en F03; E en F04B: también verifica que recargar mantiene la sesión sin el token en `localStorage`/`sessionStorage`) |
 | CP-02 | RF2, RN-49 | Login con contraseña errónea o usuario inactivo | I | 401 con mensaje genérico idéntico en ambos casos | Aprobado (F03) |
 | CP-03 | IC6, RN-49 | Sexto intento de login en un minuto | I | 429 | Aprobado (F03) |
-| CP-04 | IC3 | Petición con token expirado → refresh automático | U (interceptor), E | Se renueva el token y la petición original se completa | Pendiente |
+| CP-04 | IC3 | Petición con token expirado → refresh automático | U (interceptor), E | Se renueva el token y la petición original se completa | Aprobado (F04B: U con 3 peticiones simultáneas y un único refresh; E con 401 simulado) |
 | CP-05 | IC3 | Reutilizar un refresh token ya rotado | I | 401 y se revoca toda la familia de tokens | Aprobado (F03) |
 | CP-06 | RF1, RNF Seg. | Crear usuario con contraseña débil | I | 400 `PASSWORD_DEBIL` | Aprobado (F03): `VALIDACION` con `errors[].code = PASSWORD_DEBIL` |
 | CP-07 | RF1 | Crear usuario con email repetido | I | 409 `EMAIL_DUPLICADO` | Aprobado (F03) |
 | CP-08 | RF3, RN-47 | Desactivar el único admin activo | I | 409 `ULTIMO_ADMIN` | Aprobado (F03) |
-| CP-09 | RF4 | Retirar `VENTAS_CREAR` a un vendedor | I, E | El endpoint responde 403 y la opción desaparece del menú | Pendiente (I aprobada en F03; E en F04B) |
+| CP-09 | RF4 | Retirar `VENTAS_CREAR` a un vendedor | I, E | El endpoint responde 403 y la opción desaparece del menú | Aprobado (I en F03; E en F04B: desaparece "Nueva venta" y `/ventas/nueva` lleva a la página 403) |
 | CP-10 | IS4 | Mecánico llama a `GET /usuarios` | I | 403 | Aprobado (F03) |
 | CP-11 | RF35, RN-50 | Recuperación con correo existente y no existente | I | Misma respuesta 202; solo el existente recibe correo (Mailpit/GreenMail) | Aprobado (F03, GreenMail) |
 | CP-12 | RF35 | Usar enlace de recuperación vencido o ya usado | I | 400 `TOKEN_INVALIDO` | Aprobado (F03) |
 | CP-13 | RNF Seg. | Contraseña guardada | I | Hash BCrypt, nunca texto plano; no aparece en logs ni respuestas | Aprobado (F03) |
+| CP-82 | RF2, RF35 | Login fallido (UI), reacción al 429 con cuenta regresiva y recuperación completa leyendo el correo de Mailpit (enlace de un solo uso) | U, E | Mensaje genérico; botón bloqueado con los segundos de `Retry-After`; contraseña cambiada y segundo uso del enlace rechazado | Aprobado (F04B) |
+| CP-83 | RF4, IS4 | Mecánico entra por URL a `/usuarios`; menú, drawer y barra inferior filtrados por permiso | U, E | No ve "Usuarios" y llega a la página 403 | Aprobado (F04B) |
+| CP-84 | RF2, IC3 | Cerrar sesión y recargar; sin sesión, una ruta protegida pide login y vuelve a ella | U, E | La cookie queda revocada; login con `returnUrl` interno (rechaza URLs externas) | Aprobado (F04B) |
+| CP-85 | RF1, RF3 | Crear usuario en el drawer (validaciones espejo), buscar, filtrar por rol y desactivar con confirmación; no cambiar el estado ni los permisos propios | U, E | Errores traducidos; badge "Inactivo"; acciones propias deshabilitadas | Aprobado (F04B) |
+| CP-86 | RNF Integridad | 8 logins simultáneos del mismo usuario | I | Todos 200 (antes: deadlock en MySQL y 500) | Aprobado (F04B) |
+| CP-87 | RNF Acc. | axe en login (con errores), usuarios, drawer de nuevo usuario y permisos, en claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F04B) |
 
 ### Clientes y motocicletas (F05)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |

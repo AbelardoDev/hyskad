@@ -1,0 +1,25 @@
+# Perfil SOLO para las pruebas E2E (infra/docker-compose.e2e.yml y el job e2e del CI).
+# BD desechable con los datos semilla de dev; POST /api/v1/test/reset la reinicia.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3307/hyskad_e2e?useUnicode=true&characterEncoding=utf8&connectionTimeZone=UTC}
+    username: ${DB_USER:hyskad}
+    password: ${DB_PASSWORD:hyskad_e2e}
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1026}
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev-data
+    # El reinicio de datos hace flyway.clean(); nunca habilitarlo en otro perfil.
+    clean-disabled: false
+
+hyskad:
+  base-url: ${APP_BASE_URL:http://localhost:4300}
+  mail-from: ${MAIL_FROM:no-reply@hyskad.local}
+  jwt:
+    secret: ${JWT_SECRET:Qm9vL8m2Wc1hXy0tJk4rZp7sNf3dVe6aLu9gTq5bHw2iYo8xRc1nMj4kSv7zEa0P}
+  auth:
+    # Sin HTTPS en las pruebas: la cookie no puede llevar Secure.
+    cookie-secure: false
+    # Las pruebas inician sesión muchas veces desde la misma IP; el 429 se prueba en las IT (CP-03).
+    rate-limit: false

@@ -1,5 +1,346 @@
 @import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/plus-jakarta-sans';
+@import '@angular/cdk/overlay-prebuilt.css';
 
-/* El modo oscuro se activa con la clase .dark en <html> (ver docs/DESIGN-SYSTEM.md §1.4-1.5).
-   Los tokens completos del sistema de diseño llegan en F04A. */
+/* Sistema de diseño de HYSKAD: ver docs/DESIGN-SYSTEM.md.
+   El modo oscuro se activa con la clase .dark en <html> (ThemeService + script de index.html).
+   `npm run contrast:check` verifica el contraste AA de los pares de esta hoja. */
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme static {
+  --color-brand-50: #eef5ff;
+  --color-brand-100: #d9e8ff;
+  --color-brand-200: #bbd6ff;
+  --color-brand-300: #8cbcff;
+  --color-brand-400: #5698ff;
+  --color-brand-500: #2f74f5;
+  --color-brand-600: #1d58e0;
+  --color-brand-700: #1a46b5;
+  --color-brand-800: #1b3c8e;
+  --color-brand-900: #1b3570;
+  --color-brand-950: #0f1d3f;
+  --color-navy-900: #121e36;
+  --color-navy-950: #0c1528;
+  --color-navy-975: #070d1a;
+  --color-accent: #38bdf8;
+
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Plus Jakarta Sans Variable', 'Inter Variable', sans-serif;
+  --radius-card: 1rem;
+
+  --ease-hk: cubic-bezier(0.2, 0, 0, 1);
+  --shadow-card: 0 1px 2px rgb(15 29 63 / 0.06), 0 8px 24px -12px rgb(15 29 63 / 0.12);
+  --shadow-overlay: 0 4px 12px rgb(15 29 63 / 0.08), 0 24px 48px -16px rgb(15 29 63 / 0.28);
+
+  --animate-shimmer: hk-shimmer 1.6s linear infinite;
+  --animate-entrada: hk-entrada 200ms var(--ease-hk) both;
+  --animate-pulso: hk-pulso 2s var(--ease-hk) infinite;
+
+  @keyframes hk-shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+  @keyframes hk-entrada {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes hk-pulso {
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.45;
+      transform: scale(1.35);
+    }
+  }
+}
+
+:root {
+  --bg: #f5f8fd;
+  --surface: #ffffff;
+  --surface-2: #f0f4fb;
+  --border: #e2e8f3;
+  --border-strong: #7d8db0;
+  --fg: #0f1d3f;
+  --muted: #5b6b8a;
+  --primary: #1d58e0;
+  --primary-hover: #1a46b5;
+  --primary-fg: #ffffff;
+  --ring: #2f74f5;
+  --sidebar-bg: #0f1d3f;
+  --sidebar-bg-2: #1b3570;
+  --sidebar-fg: #c9d7f2;
+  --sidebar-active: #ffffff;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+  --info: #0284c7;
+  --accent-tone: #38bdf8;
+  --success-ink: #047857;
+  --warning-ink: #a14f05;
+  --danger-ink: #b91c1c;
+  --info-ink: #0369a1;
+  --accent-ink: #0e6a8a;
+  --primary-ink: #1a46b5;
+  --neutral-ink: #4a5878;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #070d1a;
+  --surface: #0c1528;
+  --surface-2: #121e36;
+  --border: #1c2b4a;
+  --border-strong: #5a6f98;
+  --fg: #e6edf8;
+  --muted: #8a9bbd;
+  --primary: #5698ff;
+  --primary-hover: #8cbcff;
+  --primary-fg: #06122b;
+  --ring: #8cbcff;
+  --sidebar-bg: #0a1222;
+  --sidebar-bg-2: #0a1222;
+  --sidebar-fg: #a9b8d6;
+  --sidebar-active: #ffffff;
+  --success: #34d399;
+  --warning: #fbbf24;
+  --danger: #f87171;
+  --info: #38bdf8;
+  --accent-tone: #38bdf8;
+  --success-ink: #34d399;
+  --warning-ink: #fbbf24;
+  --danger-ink: #f87171;
+  --info-ink: #38bdf8;
+  --accent-ink: #38bdf8;
+  --primary-ink: #8cbcff;
+  --neutral-ink: #a9b8d6;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  --color-ring: var(--ring);
+  --color-sidebar-bg: var(--sidebar-bg);
+  --color-sidebar-bg-2: var(--sidebar-bg-2);
+  --color-sidebar-fg: var(--sidebar-fg);
+  --color-sidebar-active: var(--sidebar-active);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-danger: var(--danger);
+  --color-info: var(--info);
+  --color-success-soft: color-mix(in srgb, var(--success) 12%, transparent);
+  --color-warning-soft: color-mix(in srgb, var(--warning) 12%, transparent);
+  --color-danger-soft: color-mix(in srgb, var(--danger) 12%, transparent);
+  --color-info-soft: color-mix(in srgb, var(--info) 12%, transparent);
+  --color-accent-soft: color-mix(in srgb, var(--accent-tone) 12%, transparent);
+  --color-primary-soft: color-mix(in srgb, var(--primary) 12%, transparent);
+  --color-success-ink: var(--success-ink);
+  --color-warning-ink: var(--warning-ink);
+  --color-danger-ink: var(--danger-ink);
+  --color-info-ink: var(--info-ink);
+  --color-accent-ink: var(--accent-ink);
+  --color-primary-ink: var(--primary-ink);
+  --color-neutral-ink: var(--neutral-ink);
+}
+
+/* Clases compartidas por los controles del kit (shared/ui). */
+@utility hk-control {
+  display: block;
+  width: 100%;
+  min-height: 2.75rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-strong);
+  background-color: var(--surface);
+  color: var(--fg);
+  font-size: var(--text-sm);
+  padding-inline: --spacing(3);
+  transition:
+    border-color 150ms var(--ease-hk),
+    box-shadow 150ms var(--ease-hk);
+
+  &::placeholder {
+    color: var(--muted);
+  }
+  &:hover:not(:disabled) {
+    border-color: var(--primary);
+  }
+  &:focus-visible {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 45%, transparent);
+  }
+  &:disabled {
+    cursor: not-allowed;
+    background-color: var(--surface-2);
+    color: var(--muted);
+    opacity: 0.75;
+  }
+  &[aria-invalid='true'] {
+    border-color: var(--danger);
+  }
+  &[aria-invalid='true']:focus-visible {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--danger) 35%, transparent);
+  }
+}
+
+@utility hk-foco {
+  &:focus-visible {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--ring);
+  }
+}
+
+@utility hk-panel {
+  border-radius: var(--radius-2xl);
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-card);
+
+  :where(.dark) & {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.04);
+  }
+}
+
+@utility hk-overlay {
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border);
+  background-color: var(--surface);
+  color: var(--fg);
+  box-shadow: var(--shadow-overlay);
+  animation: var(--animate-entrada);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: color-mix(in srgb, var(--muted) 45%, transparent) transparent;
+    scrollbar-width: thin;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-sm);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--primary) 28%, transparent);
+    color: var(--fg);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-thumb {
+    border: 3px solid transparent;
+    border-radius: 9999px;
+    background-clip: padding-box;
+    background-color: color-mix(in srgb, var(--muted) 45%, transparent);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--muted) 70%, transparent);
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Transición suave al cambiar de tema (ThemeService añade la clase unos milisegundos). */
+  html.hk-cambiando-tema *,
+  html.hk-cambiando-tema *::before,
+  html.hk-cambiando-tema *::after {
+    transition:
+      background-color 200ms var(--ease-hk),
+      border-color 200ms var(--ease-hk),
+      color 200ms var(--ease-hk),
+      fill 200ms var(--ease-hk) !important;
+  }
+}
+
+/* Fondo semitransparente de los diálogos del CDK. */
+.hk-backdrop {
+  background-color: rgb(7 13 26 / 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.hk-dialogo-panel .cdk-dialog-container,
+.hk-drawer-panel .cdk-dialog-container {
+  outline: none;
+}
+
+.hk-drawer-panel {
+  height: 100dvh;
+}
+
+.hk-drawer-izquierda .cdk-dialog-container > * {
+  animation: hk-desde-izquierda 250ms var(--ease-hk) both;
+}
+
+.hk-drawer-derecha .cdk-dialog-container > * {
+  animation: hk-desde-derecha 250ms var(--ease-hk) both;
+}
+
+@keyframes hk-desde-izquierda {
+  from {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes hk-desde-derecha {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  body {
+    background: #ffffff;
+  }
+}

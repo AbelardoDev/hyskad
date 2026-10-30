@@ -1,5 +1,149 @@
 {
   "app": {
-    "nombre": "HYSKAD"
+    "nombre": "HYSKAD",
+    "eslogan": "Almacén y taller de motos"
+  },
+  "comun": {
+    "cancelar": "Cancelar",
+    "cargando": "Cargando…",
+    "cerrar": "Cerrar",
+    "confirmar": "Confirmar",
+    "guardar": "Guardar",
+    "opcional": "opcional",
+    "proximamente": "Próximamente",
+    "volver_inicio": "Volver al inicio"
+  },
+  "menu": {
+    "grupos": {
+      "general": "General",
+      "taller": "Taller",
+      "comercial": "Comercial",
+      "administracion": "Administración"
+    },
+    "dashboard": "Inicio",
+    "ordenes": "Órdenes de trabajo",
+    "clientes": "Clientes",
+    "motocicletas": "Motocicletas",
+    "servicios": "Servicios",
+    "ventas": "Ventas",
+    "inventario": "Inventario",
+    "compras": "Compras",
+    "proveedores": "Proveedores",
+    "reportes": "Reportes",
+    "usuarios": "Usuarios",
+    "configuracion": "Configuración",
+    "perfil": "Mi perfil",
+    "dev_ui": "Kit de interfaz",
+    "ordenes_corto": "Órdenes"
+  },
+  "layout": {
+    "saltar_contenido": "Saltar al contenido",
+    "navegacion_principal": "Navegación principal",
+    "navegacion_inferior": "Accesos rápidos",
+    "abrir_menu": "Abrir menú",
+    "cerrar_menu": "Cerrar menú",
+    "colapsar_menu": "Colapsar menú",
+    "expandir_menu": "Expandir menú",
+    "migas": "Ruta de navegación",
+    "buscar": "Buscar…",
+    "buscar_etiqueta": "Buscar clientes, placas, órdenes o productos",
+    "buscar_proximamente": "La búsqueda global llega pronto",
+    "buscar_proximamente_texto": "Podrás encontrar clientes, motos por placa, órdenes, productos y acciones rápidas desde aquí, con Ctrl + K.",
+    "idioma": "Idioma",
+    "tema": "Tema",
+    "tema_system": "Sistema",
+    "tema_light": "Claro",
+    "tema_dark": "Oscuro",
+    "notificaciones": "Notificaciones",
+    "sin_notificaciones": "No tienes notificaciones",
+    "sin_notificaciones_texto": "Aquí verás los avisos del taller en tiempo real.",
+    "menu_usuario": "Menú de usuario",
+    "usuario_invitado": "Usuario",
+    "sin_sesion": "Sin sesión iniciada",
+    "perfil": "Mi perfil",
+    "cambiar_password": "Cambiar contraseña",
+    "cerrar_sesion": "Cerrar sesión"
+  },
+  "idiomas": {
+    "es": "Español",
+    "en": "English"
+  },
+  "proximamente": {
+    "titulo": "{{modulo}} llega pronto",
+    "texto": "Estamos construyendo este módulo. Mientras tanto, puedes seguir explorando el resto de HYSKAD."
+  },
+  "no_encontrada": {
+    "codigo": "Error 404",
+    "titulo": "Esta página se salió de la ruta",
+    "texto": "La dirección que buscas no existe o fue movida. Revisa el enlace o vuelve al inicio."
+  },
+  "estados": {
+    "orden": {
+      "RECIBIDA": "Recibida",
+      "EN_DIAGNOSTICO": "En diagnóstico",
+      "PENDIENTE_APROBACION": "Pendiente de aprobación",
+      "EN_REPARACION": "En reparación",
+      "FINALIZADA": "Finalizada",
+      "ENTREGADA": "Entregada",
+      "CANCELADA": "Cancelada"
+    }
+  },
+  "ui": {
+    "input": {
+      "mostrar_password": "Mostrar contraseña",
+      "ocultar_password": "Ocultar contraseña"
+    },
+    "combobox": {
+      "sin_resultados": "Sin resultados"
+    },
+    "tabla": {
+      "vacio": "No hay registros",
+      "seleccionar_todo": "Seleccionar todas las filas",
+      "seleccionar_fila": "Seleccionar fila"
+    },
+    "paginacion": {
+      "etiqueta": "Paginación",
+      "rango": "{{desde}}–{{hasta}} de {{total}}",
+      "anterior": "Página anterior",
+      "siguiente": "Página siguiente",
+      "pagina": "Página {{n}}"
+    },
+    "filtros": {
+      "buscar": "Buscar…",
+      "activos": "Filtros activos",
+      "quitar": "Quitar filtro {{filtro}}",
+      "limpiar": "Limpiar filtros"
+    },
+    "confirmar": {
+      "motivo": "Motivo",
+      "motivo_ayuda": "Escribe al menos {{min}} caracteres. Quedará en el historial."
+    },
+    "stat": {
+      "vs_anterior": "vs. periodo anterior"
+    },
+    "stepper": {
+      "completado": "completado",
+      "actual": "paso actual",
+      "pendiente": "pendiente",
+      "cancelado": "cancelado"
+    }
+  },
+  "validacion": {
+    "required": "Este campo es obligatorio",
+    "requiredTrue": "Debes marcar esta casilla",
+    "email": "Escribe un correo válido",
+    "minlength": "Escribe al menos {{requiredLength}} caracteres",
+    "maxlength": "Escribe máximo {{requiredLength}} caracteres",
+    "min": "El valor mínimo es {{min}}",
+    "max": "El valor máximo es {{max}}",
+    "pattern": "El formato no es válido"
+  },
+  "errors": {
+    "DESCONOCIDO": "Ocurrió un error inesperado. Intenta de nuevo.",
+    "VALIDACION": "Revisa los datos del formulario",
+    "PASSWORD_DEBIL": "La contraseña debe tener al menos 8 caracteres, con letras y números",
+    "PLACA_INVALIDA": "La placa no tiene un formato válido",
+    "DOCUMENTO_INVALIDO": "El número de documento no es válido",
+    "NIT_INVALIDO": "El NIT no es válido"
   }
 }

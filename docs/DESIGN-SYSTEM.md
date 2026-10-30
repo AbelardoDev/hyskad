@@ -39,7 +39,8 @@
 | `primary` | `#1D58E0` | `#5698FF` |
 | `primary-hover` | `#1A46B5` | `#8CBCFF` |
 | `primary-fg` (texto sobre primario) | `#FFFFFF` | `#06122B` |
-| `ring` (foco) | `#5698FF` | `#8CBCFF` |
+| `ring` (foco) | `#2F74F5` | `#8CBCFF` |
+| `border-strong` (borde de controles: inputs, checkbox) | `#7D8DB0` | `#5A6F98` |
 | `sidebar-bg` | `#0F1D3F` → `#1B3570` (degradado vertical) | `#0A1222` |
 | `sidebar-fg` | `#C9D7F2` | `#A9B8D6` |
 | `success` | `#059669` | `#34D399` |
@@ -47,7 +48,19 @@
 | `danger` | `#DC2626` | `#F87171` |
 | `info` | `#0284C7` | `#38BDF8` |
 
-Cada color de estado tiene su variante `-soft` (fondo de badge/alerta al 12 % de opacidad) para badges y alertas.
+Cada color de estado (y `primary` y `accent`) tiene su variante `-soft` (fondo de badge/alerta al 12 % de opacidad) y su variante `-ink` (texto sobre ese fondo suave):
+
+| Token `-ink` | Claro | Oscuro |
+|---|---|---|
+| `success-ink` | `#047857` | `#34D399` |
+| `warning-ink` | `#A14F05` | `#FBBF24` |
+| `danger-ink` | `#B91C1C` | `#F87171` |
+| `info-ink` | `#0369A1` | `#38BDF8` |
+| `accent-ink` | `#0E6A8A` | `#38BDF8` |
+| `primary-ink` | `#1A46B5` | `#8CBCFF` |
+| `neutral-ink` (badge neutro sobre `surface-2`) | `#4A5878` | `#A9B8D6` |
+
+> Ajustes de F04A verificados con `npm run contrast:check` (lee `styles.css`): el `ring` claro pasó de `#5698FF` (2,7:1 sobre `bg`) a `#2F74F5` (4,0:1); los bordes de controles usan `border-strong` (≥ 3:1) porque `border` es decorativo; los colores de estado en claro no alcanzan 4,5:1 sobre su `-soft`, por eso existen los `-ink`.
 
 El **sidebar es oscuro en ambos temas** (identidad de marca). En modo claro va con un degradado navy sutil.
 
@@ -155,7 +168,7 @@ Así existen utilidades como `bg-surface`, `text-muted`, `border-border`, `bg-pr
 | `hk-tabs`, `hk-stepper` (línea de tiempo del estado de la orden) | |
 | `hk-empty-state` | Ícono grande en círculo degradado, título, texto y acción |
 | `hk-skeleton` | |
-| `hk-avatar` | Iniciales con color derivado del nombre |
+| `hk-avatar` | Iniciales con color derivado del nombre (6 fondos de la escala de marca: `brand-600/800/950` con texto `brand-50`; `accent`, `brand-200/400` con texto `brand-950`) |
 | `hk-dropdown-menu`, `hk-tooltip` | CDK Overlay |
 | `hk-command-palette` | Búsqueda global de clientes, motos (por placa), órdenes, productos y acciones rápidas |
 | `hk-chart` | Wrapper de Chart.js que lee los tokens de color y se re-renderiza al cambiar el tema |

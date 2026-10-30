@@ -1,0 +1,146 @@
+{
+  "titulo": "Kit de interfaz",
+  "subtitulo": "Vitrina de los componentes y tokens del sistema de diseño. Solo existe en desarrollo.",
+  "controles": {
+    "tema": "Tema",
+    "idioma": "Idioma"
+  },
+  "secciones": {
+    "colores": "Colores",
+    "tipografia": "Tipografía",
+    "botones": "Botones",
+    "formularios": "Formularios",
+    "badges": "Badges y estados de orden",
+    "tarjetas": "Tarjetas e indicadores",
+    "tabla": "Tabla",
+    "navegacion": "Pestañas y línea de tiempo",
+    "overlays": "Diálogos, menús y avisos",
+    "feedback": "Vacío, carga y avatares",
+    "formato": "Formato de moneda y fechas",
+    "marca": "Logo"
+  },
+  "colores": {
+    "escala": "Escala de marca",
+    "semanticos": "Tokens semánticos",
+    "estados": "Estados"
+  },
+  "tipografia": {
+    "titulo_pagina": "Título de página",
+    "titulo_seccion": "Título de sección o tarjeta",
+    "cuerpo": "Texto del cuerpo para leer durante horas sin cansarse.",
+    "ayuda": "Etiqueta o texto de ayuda",
+    "kpi": "Número de KPI"
+  },
+  "botones": {
+    "primario": "Guardar orden",
+    "secundario": "Cancelar",
+    "fantasma": "Ver detalle",
+    "peligro": "Anular venta",
+    "enlace": "Ver historial",
+    "cargando": "Guardando…",
+    "deshabilitado": "No disponible",
+    "pequeno": "Pequeño",
+    "grande": "Grande",
+    "nuevo": "Nueva orden",
+    "editar": "Editar",
+    "eliminar": "Eliminar"
+  },
+  "form": {
+    "nombre": "Nombre del cliente",
+    "nombre_ayuda": "Como aparece en el documento",
+    "email": "Correo",
+    "password": "Contraseña",
+    "documento": "Tipo de documento",
+    "documento_placeholder": "Elige un tipo",
+    "moto": "Motocicleta",
+    "moto_placeholder": "Busca por placa o modelo",
+    "fecha": "Fecha de ingreso",
+    "monto": "Valor del anticipo",
+    "observaciones": "Observaciones",
+    "acepta": "El cliente autoriza el tratamiento de datos",
+    "notificar": "Notificar por correo",
+    "enviar": "Validar formulario",
+    "valido": "Formulario válido",
+    "error_servidor": "Simular error del servidor",
+    "tipos": {
+      "CC": "Cédula de ciudadanía",
+      "CE": "Cédula de extranjería",
+      "NIT": "NIT",
+      "PA": "Pasaporte"
+    }
+  },
+  "tarjetas": {
+    "titulo": "Resumen del día",
+    "subtitulo": "Actualizado hace un momento",
+    "texto": "Las tarjetas agrupan contenido relacionado con relleno p-5 (p-4 en móvil).",
+    "ventas_hoy": "Ventas de hoy",
+    "ordenes_activas": "Órdenes activas",
+    "pendientes": "Pendientes de aprobación",
+    "stock_bajo": "Productos con stock bajo"
+  },
+  "tabla": {
+    "etiqueta": "Órdenes de ejemplo",
+    "numero": "Número",
+    "placa": "Placa",
+    "cliente": "Cliente",
+    "estado": "Estado",
+    "total": "Total",
+    "ingreso": "Ingreso",
+    "cargando": "Simular carga",
+    "vacia": "Simular vacío",
+    "seleccionadas": "{{n}} seleccionadas",
+    "vacio_titulo": "No hay órdenes con estos filtros",
+    "vacio_texto": "Prueba con otra búsqueda o limpia los filtros.",
+    "filtro_estado": "Estado: En reparación",
+    "abierta": "Abriste la orden {{numero}}"
+  },
+  "navegacion": {
+    "resumen": "Resumen",
+    "diagnostico": "Diagnóstico",
+    "items": "Servicios y repuestos",
+    "historial": "Historial",
+    "contenido": "Contenido de la pestaña «{{pestana}}».",
+    "cancelada": "Ver como cancelada"
+  },
+  "overlays": {
+    "abrir_modal": "Abrir modal",
+    "abrir_drawer": "Abrir drawer",
+    "confirmar": "Confirmar acción",
+    "confirmar_peligro": "Acción peligrosa con motivo",
+    "modal_titulo": "Registrar diagnóstico",
+    "modal_texto": "Los modales atrapan el foco, se cierran con Esc y devuelven el foco al botón que los abrió.",
+    "drawer_titulo": "Filtros avanzados",
+    "drawer_texto": "El drawer entra desde la derecha y sirve para formularios secundarios o filtros.",
+    "confirmar_titulo": "¿Enviar presupuesto?",
+    "confirmar_mensaje": "Se enviará el presupuesto al cliente por correo.",
+    "peligro_titulo": "Anular venta V-000123",
+    "peligro_mensaje": "La anulación devuelve el stock y no se puede deshacer.",
+    "peligro_boton": "Anular venta",
+    "confirmado": "Acción confirmada",
+    "confirmado_motivo": "Motivo: {{motivo}}",
+    "cancelado": "Acción cancelada",
+    "toast_exito": "Toast de éxito",
+    "toast_error": "Toast de error",
+    "toast_aviso": "Toast de aviso",
+    "toast_info": "Toast informativo",
+    "toast_titulo_exito": "Orden guardada",
+    "toast_titulo_error": "No se pudo guardar",
+    "toast_titulo_aviso": "Stock bajo",
+    "toast_titulo_info": "Nueva orden asignada",
+    "toast_mensaje": "Este aviso se cierra solo en 4 segundos.",
+    "menu": "Acciones",
+    "menu_elegido": "Elegiste «{{opcion}}»",
+    "tooltip": "Pasa el puntero o enfoca",
+    "tooltip_texto": "Soy un tooltip accesible"
+  },
+  "feedback": {
+    "vacio_titulo": "Aún no hay clientes",
+    "vacio_texto": "Registra el primer cliente para empezar a crear órdenes de trabajo.",
+    "vacio_accion": "Nuevo cliente"
+  },
+  "formato": {
+    "moneda": "Moneda (COP)",
+    "fecha": "Fecha",
+    "relativa": "Fecha relativa"
+  }
+}

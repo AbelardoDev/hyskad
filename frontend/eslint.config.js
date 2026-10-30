@@ -29,7 +29,8 @@ module.exports = defineConfig([
       '@angular-eslint/component-selector': [
         'error',
         {
-          type: 'element',
+          // Atributo para los que envuelven elementos nativos (`<button hk-button>`).
+          type: ['element', 'attribute'],
           prefix: 'hk',
           style: 'kebab-case',
         },
@@ -39,6 +40,9 @@ module.exports = defineConfig([
   {
     files: ['**/*.html'],
     extends: [angular.configs.templateRecommended, angular.configs.templateAccessibility],
-    rules: {},
+    rules: {
+      // hk-icon-button pone `aria-label` a partir de su input obligatorio `etiqueta`.
+      '@angular-eslint/template/elements-content': ['error', { allowList: ['etiqueta'] }],
+    },
   },
 ]);

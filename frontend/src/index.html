@@ -4,8 +4,28 @@
     <meta charset="utf-8" />
     <title>HYSKAD</title>
     <base href="/" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#1B3570" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#F5F8FD" />
+    <script>
+      // Aplica tema e idioma guardados antes de que arranque Angular (sin parpadeo blanco).
+      // Mantener en sincronía con ThemeService y LanguageService.
+      (function () {
+        var d = document.documentElement;
+        try {
+          var tema = localStorage.getItem('hk.tema');
+          var idioma = localStorage.getItem('hk.idioma');
+          var oscuro =
+            tema === 'dark' ||
+            (tema !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
+          if (oscuro) {
+            d.classList.add('dark');
+            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#070D1A');
+          }
+          if (idioma === 'en') d.lang = 'en';
+        } catch (e) {}
+      })();
+    </script>
     <link rel="icon" href="brand/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="brand/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="brand/apple-touch-icon.png" />

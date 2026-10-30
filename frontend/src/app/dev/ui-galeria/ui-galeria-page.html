@@ -1,0 +1,487 @@
+<hk-page-header [titulo]="'devUi.titulo' | transloco" [subtitulo]="'devUi.subtitulo' | transloco">
+  <div class="flex flex-wrap items-center gap-3">
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-medium text-muted" id="galeria-tema">{{
+        'devUi.controles.tema' | transloco
+      }}</span>
+      <div
+        class="inline-flex rounded-xl border border-border bg-surface p-1"
+        role="group"
+        aria-labelledby="galeria-tema"
+      >
+        @for (opcion of temas; track opcion.id) {
+          <button
+            type="button"
+            class="inline-flex h-8 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium hk-foco transition-colors"
+            [class]="
+              tema.preferencia() === opcion.id
+                ? 'bg-primary text-primary-fg'
+                : 'text-muted hover:bg-surface-2 hover:text-fg'
+            "
+            [attr.aria-pressed]="tema.preferencia() === opcion.id"
+            [attr.data-testid]="'tema-' + opcion.id"
+            (click)="tema.cambiar(opcion.id)"
+          >
+            {{ 'layout.tema_' + opcion.id | transloco }}
+          </button>
+        }
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-medium text-muted" id="galeria-idioma">{{
+        'devUi.controles.idioma' | transloco
+      }}</span>
+      <div
+        class="inline-flex rounded-xl border border-border bg-surface p-1"
+        role="group"
+        aria-labelledby="galeria-idioma"
+      >
+        @for (opcion of idiomas; track opcion) {
+          <button
+            type="button"
+            class="inline-flex h-8 items-center rounded-lg px-2.5 text-xs font-semibold uppercase hk-foco transition-colors"
+            [class]="
+              idioma.idioma() === opcion
+                ? 'bg-primary text-primary-fg'
+                : 'text-muted hover:bg-surface-2 hover:text-fg'
+            "
+            [attr.aria-pressed]="idioma.idioma() === opcion"
+            [attr.lang]="opcion"
+            [attr.data-testid]="'idioma-' + opcion"
+            (click)="idioma.cambiar(opcion)"
+          >
+            {{ opcion }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+</hk-page-header>
+
+<div class="flex flex-col gap-6">
+  <!-- Colores -->
+  <hk-card [titulo]="'devUi.secciones.colores' | transloco">
+    <h3 class="mb-3 text-xs font-medium text-muted">{{ 'devUi.colores.escala' | transloco }}</h3>
+    <div class="grid grid-cols-6 gap-2 sm:grid-cols-11">
+      @for (paso of escala; track paso) {
+        <div>
+          <div
+            class="h-12 rounded-xl ring-1 ring-border ring-inset"
+            [style.background]="'var(--color-brand-' + paso + ')'"
+          ></div>
+          <p class="mt-1 text-[0.6875rem] text-muted tabular">{{ paso }}</p>
+        </div>
+      }
+    </div>
+    <div class="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+      @for (token of navy; track token) {
+        <div class="flex items-center gap-2">
+          <span
+            class="size-8 shrink-0 rounded-lg ring-1 ring-border ring-inset"
+            [style.background]="'var(--color-' + token + ')'"
+          ></span>
+          <span class="text-xs text-muted">{{ token }}</span>
+        </div>
+      }
+    </div>
+    <h3 class="mt-6 mb-3 text-xs font-medium text-muted">
+      {{ 'devUi.colores.semanticos' | transloco }}
+    </h3>
+    <div class="grid grid-cols-2 gap-2 sm:grid-cols-5">
+      @for (token of semanticos; track token) {
+        <div class="flex items-center gap-2 rounded-xl border border-border p-2">
+          <span
+            class="size-8 shrink-0 rounded-lg ring-1 ring-border ring-inset"
+            [style.background]="'var(--' + token + ')'"
+          ></span>
+          <code class="truncate text-xs text-fg">{{ token }}</code>
+        </div>
+      }
+    </div>
+    <h3 class="mt-6 mb-3 text-xs font-medium text-muted">
+      {{ 'devUi.colores.estados' | transloco }}
+    </h3>
+    <div class="flex flex-wrap gap-2">
+      @for (tono of tonos; track tono) {
+        <hk-badge [tono]="tono" [punto]="true">{{ tono }}</hk-badge>
+      }
+    </div>
+  </hk-card>
+
+  <!-- Tipografía -->
+  <hk-card [titulo]="'devUi.secciones.tipografia' | transloco">
+    <div class="flex flex-col gap-4">
+      <p class="font-display text-2xl font-bold tracking-tight">
+        {{ 'devUi.tipografia.titulo_pagina' | transloco }}
+      </p>
+      <p class="text-base font-semibold">{{ 'devUi.tipografia.titulo_seccion' | transloco }}</p>
+      <p class="text-sm">{{ 'devUi.tipografia.cuerpo' | transloco }}</p>
+      <p class="text-xs font-medium text-muted">{{ 'devUi.tipografia.ayuda' | transloco }}</p>
+      <p class="font-display text-3xl font-bold tabular">
+        {{ 1250000 | cop }}
+        <span class="ml-2 text-xs font-medium text-muted">{{
+          'devUi.tipografia.kpi' | transloco
+        }}</span>
+      </p>
+    </div>
+  </hk-card>
+
+  <!-- Botones -->
+  <hk-card [titulo]="'devUi.secciones.botones' | transloco">
+    <div class="flex flex-wrap items-center gap-3">
+      <button hk-button icono="plus">{{ 'devUi.botones.primario' | transloco }}</button>
+      <button hk-button variante="secondary">{{ 'devUi.botones.secundario' | transloco }}</button>
+      <button hk-button variante="ghost" icono="eye">
+        {{ 'devUi.botones.fantasma' | transloco }}
+      </button>
+      <button hk-button variante="danger" icono="trash">
+        {{ 'devUi.botones.peligro' | transloco }}
+      </button>
+      <button hk-button variante="link">{{ 'devUi.botones.enlace' | transloco }}</button>
+    </div>
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <button hk-button [cargando]="true">{{ 'devUi.botones.cargando' | transloco }}</button>
+      <button hk-button variante="secondary" [deshabilitado]="true">
+        {{ 'devUi.botones.deshabilitado' | transloco }}
+      </button>
+      <button hk-button tamano="sm" variante="secondary">
+        {{ 'devUi.botones.pequeno' | transloco }}
+      </button>
+      <button hk-button tamano="lg" iconoFinal="chevron-right">
+        {{ 'devUi.botones.grande' | transloco }}
+      </button>
+    </div>
+    <div class="mt-4 flex flex-wrap items-center gap-2">
+      <button
+        hk-icon-button
+        icono="pencil"
+        [etiqueta]="'devUi.botones.editar' | transloco"
+      ></button>
+      <button
+        hk-icon-button
+        icono="pencil"
+        variante="secondary"
+        [etiqueta]="'devUi.botones.editar' | transloco"
+      ></button>
+      <button
+        hk-icon-button
+        icono="plus"
+        variante="primary"
+        [etiqueta]="'devUi.botones.nuevo' | transloco"
+      ></button>
+      <button
+        hk-icon-button
+        icono="trash"
+        variante="danger"
+        [etiqueta]="'devUi.botones.eliminar' | transloco"
+      ></button>
+      <button
+        hk-icon-button
+        icono="trash"
+        tamano="sm"
+        [deshabilitado]="true"
+        [etiqueta]="'devUi.botones.eliminar' | transloco"
+      ></button>
+    </div>
+  </hk-card>
+
+  <!-- Formularios -->
+  <hk-card [titulo]="'devUi.secciones.formularios' | transloco">
+    <form
+      class="grid gap-5 md:grid-cols-2"
+      [formGroup]="formulario"
+      (ngSubmit)="enviarFormulario()"
+      novalidate
+    >
+      <hk-form-field
+        [etiqueta]="'devUi.form.nombre' | transloco"
+        [ayuda]="'devUi.form.nombre_ayuda' | transloco"
+      >
+        <hk-input formControlName="nombre" autocompletar="name" />
+      </hk-form-field>
+      <hk-form-field [etiqueta]="'devUi.form.email' | transloco">
+        <hk-input formControlName="email" tipo="email" autocompletar="email" />
+      </hk-form-field>
+      <hk-form-field [etiqueta]="'devUi.form.password' | transloco">
+        <hk-input formControlName="password" tipo="password" autocompletar="new-password" />
+      </hk-form-field>
+      <hk-form-field [etiqueta]="'devUi.form.documento' | transloco">
+        <hk-select
+          formControlName="documento"
+          [opciones]="tiposDocumento()"
+          [placeholder]="'devUi.form.documento_placeholder' | transloco"
+        />
+      </hk-form-field>
+      <hk-form-field [etiqueta]="'devUi.form.moto' | transloco">
+        <hk-combobox
+          formControlName="moto"
+          [opciones]="motos"
+          [placeholder]="'devUi.form.moto_placeholder' | transloco"
+        />
+      </hk-form-field>
+      <hk-form-field [etiqueta]="'devUi.form.fecha' | transloco">
+        <hk-date-input formControlName="fecha" />
+      </hk-form-field>
+      <hk-form-field [etiqueta]="'devUi.form.monto' | transloco">
+        <hk-money-input formControlName="monto" />
+      </hk-form-field>
+      <hk-form-field [etiqueta]="'devUi.form.observaciones' | transloco" [opcional]="true">
+        <hk-textarea formControlName="observaciones" [filas]="3" [maxCaracteres]="300" />
+      </hk-form-field>
+      <hk-form-field>
+        <hk-checkbox formControlName="acepta">{{ 'devUi.form.acepta' | transloco }}</hk-checkbox>
+      </hk-form-field>
+      <hk-form-field>
+        <hk-switch formControlName="notificar">{{ 'devUi.form.notificar' | transloco }}</hk-switch>
+      </hk-form-field>
+      <div class="flex flex-wrap gap-3 md:col-span-2">
+        <button hk-button tipo="submit" icono="check">{{ 'devUi.form.enviar' | transloco }}</button>
+        <button hk-button variante="secondary" (click)="simularErrorServidor()">
+          {{ 'devUi.form.error_servidor' | transloco }}
+        </button>
+      </div>
+    </form>
+  </hk-card>
+
+  <!-- Badges -->
+  <hk-card [titulo]="'devUi.secciones.badges' | transloco">
+    <div class="flex flex-wrap gap-2">
+      @for (estado of estados; track estado) {
+        <hk-status-badge [estado]="estado" />
+      }
+    </div>
+    <div class="mt-4 flex flex-wrap gap-2">
+      @for (tono of tonos; track tono) {
+        <hk-badge [tono]="tono" icono="info">{{ tono }}</hk-badge>
+      }
+    </div>
+  </hk-card>
+
+  <!-- Tarjetas e indicadores -->
+  <section class="flex flex-col gap-4" aria-labelledby="galeria-tarjetas">
+    <h2 id="galeria-tarjetas" class="text-base font-semibold">
+      {{ 'devUi.secciones.tarjetas' | transloco }}
+    </h2>
+    <div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <hk-stat-card
+        [titulo]="'devUi.tarjetas.ventas_hoy' | transloco"
+        [valor]="3480000 | cop"
+        icono="shopping-cart"
+        [variacion]="12.5"
+        [tendencia]="[12, 18, 14, 22, 19, 27, 31]"
+      />
+      <hk-stat-card
+        [titulo]="'devUi.tarjetas.ordenes_activas' | transloco"
+        valor="18"
+        icono="wrench"
+        [variacion]="-4"
+        [tendencia]="[20, 22, 19, 21, 18, 17, 18]"
+      />
+      <hk-stat-card
+        [titulo]="'devUi.tarjetas.pendientes' | transloco"
+        valor="5"
+        icono="hourglass"
+        [variacion]="25"
+        [subirEsMalo]="true"
+      />
+      <hk-stat-card
+        [titulo]="'devUi.tarjetas.stock_bajo' | transloco"
+        valor="7"
+        icono="package"
+        [variacion]="0"
+      />
+    </div>
+    <hk-card
+      [titulo]="'devUi.tarjetas.titulo' | transloco"
+      [subtitulo]="'devUi.tarjetas.subtitulo' | transloco"
+    >
+      <button hkCardAcciones hk-button tamano="sm" variante="secondary" icono="download">
+        PDF
+      </button>
+      <p class="text-sm text-muted">{{ 'devUi.tarjetas.texto' | transloco }}</p>
+    </hk-card>
+  </section>
+
+  <!-- Tabla -->
+  <hk-card [titulo]="'devUi.secciones.tabla' | transloco">
+    <div hkCardAcciones class="flex flex-wrap gap-4">
+      <hk-switch [valor]="tablaCargando()" (valorChange)="tablaCargando.set($event)">{{
+        'devUi.tabla.cargando' | transloco
+      }}</hk-switch>
+      <hk-switch [valor]="tablaVacia()" (valorChange)="tablaVacia.set($event)">{{
+        'devUi.tabla.vacia' | transloco
+      }}</hk-switch>
+    </div>
+    <hk-filter-bar
+      class="mb-4"
+      [filtros]="filtros()"
+      (busquedaCambio)="alBuscar($event)"
+      (quitar)="filtroEstado.set(false)"
+      (limpiar)="filtroEstado.set(false)"
+    >
+      @if (seleccion().length > 0) {
+        <hk-badge tono="primary">{{
+          'devUi.tabla.seleccionadas' | transloco: { n: seleccion().length }
+        }}</hk-badge>
+      }
+    </hk-filter-bar>
+    <hk-table
+      [columnas]="columnas()"
+      [filas]="filas()"
+      [cargando]="tablaCargando()"
+      [etiqueta]="'devUi.tabla.etiqueta' | transloco"
+      [(orden)]="orden"
+      [seleccionable]="true"
+      [(seleccion)]="seleccion"
+      [filasClicables]="true"
+      [pagina]="pagina()"
+      [tamano]="tamanoPagina"
+      [total]="totalFilas()"
+      [vacioTitulo]="'devUi.tabla.vacio_titulo' | transloco"
+      [vacioTexto]="'devUi.tabla.vacio_texto' | transloco"
+      vacioIcono="search-x"
+      (paginaCambio)="pagina.set($event)"
+      (filaClic)="abrirOrden($event)"
+    >
+      <ng-template hkCelda="numero" let-fila
+        ><span class="font-medium text-primary-ink tabular">{{ fila.numero }}</span></ng-template
+      >
+      <ng-template hkCelda="placa" let-fila>
+        <span
+          class="inline-flex rounded-md border border-brand-950 bg-warning-soft px-1.5 font-mono text-xs font-semibold tracking-wider text-fg dark:border-border-strong"
+          >{{ fila.placa }}</span
+        >
+      </ng-template>
+      <ng-template hkCelda="estado" let-fila
+        ><hk-status-badge [estado]="fila.estado"
+      /></ng-template>
+      <ng-template hkCelda="total" let-fila>{{ fila.total | cop }}</ng-template>
+      <ng-template hkCelda="ingreso" let-fila
+        ><span class="text-muted">{{ fila.ingreso | fecha: 'corta' }}</span></ng-template
+      >
+    </hk-table>
+  </hk-card>
+
+  <!-- Pestañas y stepper -->
+  <hk-card [titulo]="'devUi.secciones.navegacion' | transloco">
+    <hk-tabs [pestanas]="pestanas()" [(activa)]="pestanaActiva">
+      <p class="text-sm text-muted">
+        {{ 'devUi.navegacion.contenido' | transloco: { pestana: etiquetaPestanaActiva() } }}
+      </p>
+    </hk-tabs>
+    <div class="mt-8 flex justify-end">
+      <hk-switch [valor]="ordenCancelada()" (valorChange)="ordenCancelada.set($event)">{{
+        'devUi.navegacion.cancelada' | transloco
+      }}</hk-switch>
+    </div>
+    <hk-stepper
+      class="mt-6"
+      [pasos]="pasos()"
+      actual="EN_REPARACION"
+      [cancelado]="ordenCancelada()"
+    />
+  </hk-card>
+
+  <!-- Overlays -->
+  <hk-card [titulo]="'devUi.secciones.overlays' | transloco">
+    <div class="flex flex-wrap items-center gap-3">
+      <button hk-button variante="secondary" (click)="abrirModal()">
+        {{ 'devUi.overlays.abrir_modal' | transloco }}
+      </button>
+      <button hk-button variante="secondary" (click)="abrirDrawer()">
+        {{ 'devUi.overlays.abrir_drawer' | transloco }}
+      </button>
+      <button hk-button variante="secondary" (click)="confirmar(false)">
+        {{ 'devUi.overlays.confirmar' | transloco }}
+      </button>
+      <button hk-button variante="danger" (click)="confirmar(true)">
+        {{ 'devUi.overlays.confirmar_peligro' | transloco }}
+      </button>
+    </div>
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <button hk-button variante="ghost" icono="circle-check" (click)="mostrarToast('exito')">
+        {{ 'devUi.overlays.toast_exito' | transloco }}
+      </button>
+      <button hk-button variante="ghost" icono="circle-alert" (click)="mostrarToast('error')">
+        {{ 'devUi.overlays.toast_error' | transloco }}
+      </button>
+      <button hk-button variante="ghost" icono="triangle-alert" (click)="mostrarToast('aviso')">
+        {{ 'devUi.overlays.toast_aviso' | transloco }}
+      </button>
+      <button hk-button variante="ghost" icono="info" (click)="mostrarToast('info')">
+        {{ 'devUi.overlays.toast_info' | transloco }}
+      </button>
+    </div>
+    <div class="mt-4 flex flex-wrap items-center gap-3">
+      <hk-dropdown-menu
+        [etiqueta]="'devUi.overlays.menu' | transloco"
+        [items]="itemsMenu()"
+        alineacion="inicio"
+        claseDisparador="inline-flex h-10 items-center gap-2 rounded-xl border border-border bg-surface px-4 text-sm font-medium text-fg hover:bg-surface-2 hk-foco"
+        (seleccion)="alElegirMenu($event)"
+      >
+        {{ 'devUi.overlays.menu' | transloco }}
+        <svg lucideIcon="chevron-down" class="size-4" aria-hidden="true"></svg>
+      </hk-dropdown-menu>
+      <button hk-button variante="ghost" [hkTooltip]="'devUi.overlays.tooltip_texto' | transloco">
+        {{ 'devUi.overlays.tooltip' | transloco }}
+      </button>
+    </div>
+  </hk-card>
+
+  <!-- Vacío, carga, avatares -->
+  <hk-card [titulo]="'devUi.secciones.feedback' | transloco">
+    <div class="grid gap-6 lg:grid-cols-2">
+      <div class="rounded-2xl border border-dashed border-border">
+        <hk-empty-state
+          icono="users-round"
+          [titulo]="'devUi.feedback.vacio_titulo' | transloco"
+          [texto]="'devUi.feedback.vacio_texto' | transloco"
+        >
+          <button hk-button icono="plus">{{ 'devUi.feedback.vacio_accion' | transloco }}</button>
+        </hk-empty-state>
+      </div>
+      <div class="flex flex-col gap-6">
+        <div class="flex items-center gap-3">
+          <hk-skeleton variante="circulo" />
+          <hk-skeleton class="flex-1" [lineas]="2" />
+        </div>
+        <hk-skeleton variante="rectangulo" />
+        <div class="flex flex-wrap items-center gap-3">
+          <hk-avatar nombre="Andrea Martínez" tamano="sm" />
+          <hk-avatar nombre="Luis Pérez" />
+          <hk-avatar nombre="Camila Rojas" tamano="lg" />
+          <hk-avatar nombre="Jorge Herrera" />
+          <hk-avatar nombre="Valentina" />
+          <hk-avatar nombre="Santiago Díaz" />
+        </div>
+      </div>
+    </div>
+  </hk-card>
+
+  <!-- Formato y marca -->
+  <div class="grid gap-6 lg:grid-cols-2">
+    <hk-card [titulo]="'devUi.secciones.formato' | transloco">
+      <dl class="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
+        <dt class="text-muted">{{ 'devUi.formato.moneda' | transloco }}</dt>
+        <dd class="text-right tabular">{{ 1250000 | cop }} · {{ 99999.5 | cop }}</dd>
+        <dt class="text-muted">{{ 'devUi.formato.fecha' | transloco }}</dt>
+        <dd class="text-right">{{ ahora | fecha: 'fechaHora' }}</dd>
+        <dt class="text-muted">{{ 'devUi.formato.relativa' | transloco }}</dt>
+        <dd class="text-right">{{ haceUnRato | tiempoRelativo }} · {{ ayer | tiempoRelativo }}</dd>
+      </dl>
+    </hk-card>
+    <hk-card [titulo]="'devUi.secciones.marca' | transloco">
+      <div class="flex flex-wrap items-center gap-6">
+        <hk-logo class="h-8" />
+        <hk-logo variante="simbolo" class="h-10" />
+        <div
+          class="flex items-center gap-4 rounded-xl bg-linear-to-b from-sidebar-bg to-sidebar-bg-2 px-4 py-3"
+        >
+          <hk-logo fondo="oscuro" class="h-7" />
+          <hk-logo variante="simbolo" fondo="oscuro" class="h-8" />
+        </div>
+      </div>
+    </hk-card>
+  </div>
+</div>

@@ -183,7 +183,8 @@
     "telefonoInvalido": "Escribe un celular o un fijo de 10 dígitos",
     "vinInvalido": "El VIN tiene 17 letras y números, sin I, O ni Q",
     "cantidadInvalida": "Escribe una cantidad con máximo 2 decimales",
-    "cantidadPositiva": "La cantidad debe ser mayor que cero"
+    "cantidadPositiva": "La cantidad debe ser mayor que cero",
+    "fechaFutura": "La fecha no puede ser posterior a hoy"
   },
   "errors": {
     "DESCONOCIDO": "Ocurrió un error inesperado. Intenta de nuevo.",
@@ -224,7 +225,7 @@
     "PERMISO_REPETIDO": "Hay un permiso repetido",
     "PROPIEDAD_DESCONOCIDA": "Se envió un dato desconocido",
     "TIPO_INVALIDO": "Un dato tiene un formato inválido",
-    "DOCUMENTO_DUPLICADO": "Ya existe un cliente con ese documento",
+    "DOCUMENTO_DUPLICADO": "Ya existe un registro con ese documento",
     "PLACA_DUPLICADA": "Ya existe una moto con esa placa",
     "VIN_DUPLICADO": "Ya existe una moto con ese VIN",
     "VIN_INVALIDO": "El VIN tiene 17 letras y números, sin I, O ni Q",
@@ -243,7 +244,13 @@
     "RESERVA_PENDIENTE": "El producto tiene unidades reservadas en órdenes: no se puede desactivar",
     "CANTIDAD_INVALIDA": "La cantidad debe ser mayor que cero y tener máximo 2 decimales",
     "DECIMAL_MIN": "El valor es menor que el permitido",
-    "DIGITS": "El número tiene demasiados dígitos o decimales"
+    "DIGITS": "El número tiene demasiados dígitos o decimales",
+    "PROVEEDOR_INACTIVO": "El proveedor está inactivo: actívalo para registrarle compras",
+    "FACTURA_DUPLICADA": "Ya hay una compra registrada con esa factura de este proveedor",
+    "COMPRA_ANULADA": "La compra ya está anulada",
+    "PRODUCTO_REPETIDO": "Este producto ya está en otra fila",
+    "FECHA_FUTURA": "La fecha no puede ser posterior a hoy",
+    "NOT_EMPTY": "Agrega al menos un elemento"
   },
   "roles": {
     "ADMIN": "Administrador",
@@ -447,20 +454,9 @@
       "titulo": "¿Desactivar cliente?",
       "mensaje": "{{nombre}} no se podrá elegir para nuevas motos ni órdenes. Sus datos y su historial se conservan."
     },
-    "tipos": {
-      "CC": "Cédula de ciudadanía (CC)",
-      "TI": "Tarjeta de identidad (TI)",
-      "CE": "Cédula de extranjería (CE)",
-      "PA": "Pasaporte (PA)",
-      "PPT": "Permiso por protección temporal (PPT)",
-      "NIT": "NIT (empresa)"
-    },
     "campos": {
       "nombre": "Nombre o razón social",
       "documento": "Documento",
-      "tipo_documento": "Tipo de documento",
-      "numero_documento": "Número de documento",
-      "nit": "NIT (sin dígito de verificación)",
       "nombres": "Nombres",
       "apellidos": "Apellidos",
       "razon_social": "Razón social",
@@ -473,10 +469,6 @@
     "form": {
       "titulo_nuevo": "Nuevo cliente",
       "titulo_editar": "Editar cliente",
-      "documento_ayuda": "Sin puntos ni espacios; se limpian solos.",
-      "nit_ayuda": "Los 9 dígitos; el dígito de verificación se calcula solo.",
-      "dv": "DV",
-      "dv_accesible": "Dígito de verificación: {{dv}}",
       "telefono_ayuda": "Celular (3…) o fijo con indicativo (60…), 10 dígitos.",
       "datos_personales": "Tratamiento de datos personales",
       "autoriza": "El cliente autoriza el tratamiento de sus datos personales",
@@ -674,7 +666,8 @@
       "resultante": "Quedarán",
       "excede": "La salida supera el disponible ({{disponible}}).",
       "confirmar": "Registrar ajuste",
-      "registrado": "Ajuste de {{nombre}} registrado"
+      "registrado": "Ajuste de {{nombre}} registrado",
+      "costo_opcion": "costo"
     },
     "tipos": {
       "ENTRADA_COMPRA": "Entrada por compra",
@@ -713,6 +706,129 @@
       "no_encontrado": "Producto no encontrado",
       "no_encontrado_texto": "Puede que el enlace esté mal o que no tengas acceso.",
       "volver": "Volver a inventario"
+    }
+  },
+  "documentos": {
+    "tipo": "Tipo de documento",
+    "numero": "Número de documento",
+    "nit": "NIT (sin dígito de verificación)",
+    "numero_ayuda": "Sin puntos ni espacios; se limpian solos.",
+    "nit_ayuda": "Los 9 dígitos; el dígito de verificación se calcula solo.",
+    "dv": "DV",
+    "dv_accesible": "Dígito de verificación: {{dv}}",
+    "tipos": {
+      "CC": "Cédula de ciudadanía (CC)",
+      "TI": "Tarjeta de identidad (TI)",
+      "CE": "Cédula de extranjería (CE)",
+      "PA": "Pasaporte (PA)",
+      "PPT": "Permiso por protección temporal (PPT)",
+      "NIT": "NIT (empresa)"
+    },
+    "titulo": "Documento"
+  },
+  "proveedores": {
+    "titulo": "Proveedores",
+    "subtitulo": "Empresas a las que se compran repuestos",
+    "nuevo": "Nuevo proveedor",
+    "buscar": "Buscar por razón social, NIT, contacto o teléfono…",
+    "vacio_titulo": "No hay proveedores que coincidan",
+    "vacio_texto": "Prueba con otra búsqueda o registra un proveedor.",
+    "error_titulo": "No se pudieron cargar los proveedores",
+    "creado": "Proveedor {{nombre}} registrado",
+    "actualizado": "Cambios de {{nombre}} guardados",
+    "activado": "{{nombre}} está activo de nuevo",
+    "desactivado": "{{nombre}} fue desactivado",
+    "confirmar_activar": {
+      "titulo": "¿Activar proveedor?",
+      "mensaje": "A {{nombre}} se le podrán registrar compras otra vez."
+    },
+    "confirmar_desactivar": {
+      "titulo": "¿Desactivar proveedor?",
+      "mensaje": "A {{nombre}} no se le podrán registrar compras nuevas. Sus compras se conservan."
+    },
+    "campos": {
+      "razon_social": "Razón social",
+      "contacto": "Persona de contacto",
+      "telefono": "Teléfono",
+      "email": "Correo electrónico",
+      "direccion": "Dirección"
+    },
+    "form": {
+      "titulo_nuevo": "Nuevo proveedor",
+      "titulo_editar": "Editar proveedor",
+      "telefono_ayuda": "Celular (3…) o fijo con indicativo (60…), 10 dígitos."
+    },
+    "detalle": {
+      "miga": "Ficha",
+      "datos": "Datos del proveedor",
+      "compras": "Últimas compras",
+      "sin_compras": "Todavía no hay compras a este proveedor",
+      "no_encontrado": "Proveedor no encontrado",
+      "no_encontrado_texto": "Puede que el enlace esté mal o que no tengas acceso.",
+      "volver": "Volver a proveedores"
+    }
+  },
+  "compras": {
+    "titulo": "Compras",
+    "subtitulo": "Facturas de proveedores y entradas de mercancía",
+    "nueva": "Nueva compra",
+    "nueva_subtitulo": "El stock de cada producto entra al registrarla",
+    "buscar_numero": "C-000001 o factura…",
+    "buscar_proveedor": "Buscar proveedor…",
+    "todos_proveedores": "Todos los proveedores",
+    "vacio_titulo": "No hay compras que coincidan",
+    "vacio_texto": "Cambia los filtros o registra una compra nueva.",
+    "error_titulo": "No se pudieron cargar las compras",
+    "factura": "Factura del proveedor",
+    "items": "Productos",
+    "items_ayuda": "Costos unitarios sin IVA.",
+    "agregar_item": "Agregar producto",
+    "quitar_item": "Quitar el producto {{n}}",
+    "totales": "Totales",
+    "subtotal": "Subtotal",
+    "iva": "IVA {{porcentaje}} %",
+    "total": "Total",
+    "costos_sin_iva": "El costo promedio de cada producto se calcula con el costo sin IVA.",
+    "registrar": "Registrar compra",
+    "registrada": "Compra {{numero}} registrada",
+    "anular": "Anular compra",
+    "anulada": "Compra {{numero}} anulada",
+    "aviso_costo_mayor": "{{porcentaje}} % más que el costo promedio ({{promedio}})",
+    "aviso_costo_menor": "{{porcentaje}} % menos que el costo promedio ({{promedio}})",
+    "estados": {
+      "REGISTRADA": "Registrada",
+      "ANULADA": "Anulada"
+    },
+    "campos": {
+      "numero": "Número",
+      "proveedor": "Proveedor",
+      "factura": "Número de factura",
+      "factura_corta": "Factura",
+      "fecha": "Fecha de la factura",
+      "producto": "Producto {{n}}",
+      "producto_columna": "Producto",
+      "cantidad": "Cantidad",
+      "costo": "Costo unitario"
+    },
+    "confirmar": {
+      "titulo": "¿Registrar la compra?",
+      "mensaje": "Entrarán al inventario {{n}} productos de {{proveedor}} por un total de {{total}}."
+    },
+    "confirmar_anular": {
+      "titulo": "¿Anular la compra {{numero}}?",
+      "mensaje": "Se sacará del inventario todo lo que entró con ella, al costo promedio actual. Solo es posible si hay disponible suficiente de cada producto."
+    },
+    "detalle": {
+      "miga": "Detalle",
+      "titulo": "Compra {{numero}}",
+      "efecto_stock": "Entraron al inventario con estos costos; a la derecha, el stock actual.",
+      "stock_actual": "Stock actual",
+      "costo_actual": "costo prom. {{costo}}",
+      "registrada_por": "Registrada por",
+      "anulada": "Anulada el {{fecha}} por {{nombre}}",
+      "no_encontrada": "Compra no encontrada",
+      "no_encontrada_texto": "Puede que el enlace esté mal o que no tengas acceso.",
+      "volver": "Volver a compras"
     }
   }
 }

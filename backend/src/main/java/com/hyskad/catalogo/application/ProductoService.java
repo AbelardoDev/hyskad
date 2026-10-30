@@ -22,6 +22,9 @@ import com.hyskad.shared.error.ConflictException;
 import com.hyskad.shared.error.ErrorCode;
 import com.hyskad.shared.error.NotFoundException;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+
 /**
  * Catálogo de productos (RF17, RF29). Código único en mayúsculas, categoría activa al asignarla y
  * auditoría del CRUD. Las existencias no se editan aquí: las mueve {@code InventarioService}, que
@@ -35,11 +38,14 @@ public class ProductoService {
     private final ProductoRepository repository;
     private final CategoriaService categorias;
     private final AuditoriaService auditoria;
+    private final EntityManager entityManager;
 
-    public ProductoService(ProductoRepository repository, CategoriaService categorias, AuditoriaService auditoria) {
+    public ProductoService(ProductoRepository repository, CategoriaService categorias, AuditoriaService auditoria,
+            EntityManager entityManager) {
         this.repository = repository;
         this.categorias = categorias;
         this.auditoria = auditoria;
+        this.entityManager = entityManager;
     }
 
     @Transactional(readOnly = true)
@@ -65,11 +71,17 @@ public class ProductoService {
 
     /**
      * RN-12: el producto con su fila bloqueada ({@code PESSIMISTIC_WRITE}) hasta que termine la
-     * transacción del llamador, que debe existir.
+     * transacción del llamador, que debe existir. Si ya estaba cargado en la transacción (p. ej. al
+     * validar una compra) se relee con el bloqueo para no trabajar con existencias viejas.
      */
     @Transactional(propagation = Propagation.MANDATORY)
     public Producto bloquear(Long id) {
-        return repository.bloquear(id).orElseThrow(() -> new NotFoundException(ENTIDAD, id));
+        Producto cargado = entityManager.find(Producto.class, id);
+        if (cargado == null) {
+            throw new NotFoundException(ENTIDAD, id);
+        }
+        entityManager.refresh(cargado, LockModeType.PESSIMISTIC_WRITE);
+        return cargado;
     }
 
     @Transactional

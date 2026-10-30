@@ -14,7 +14,7 @@
 | F04B | Sesión, guards y administración de usuarios (frontend) | ✅ Terminada | #10 | Job `e2e` en el CI; capturas en `docs/capturas/f04b` |
 | F05 | Clientes y motocicletas | ✅ Terminada | #11 | Plantilla CRUD en ARCHITECTURE §6.1; capturas en `docs/capturas/f05` |
 | F06 | Catálogo de productos e inventario | ✅ Terminada | #12 | Contrato de `InventarioService` en su Javadoc; capturas en `docs/capturas/f06` |
-| F07 | Proveedores y compras | ⬜ Pendiente | | |
+| F07 | Proveedores y compras | ✅ Terminada | #13 | `CalculadoraTotales` (RN-04) lista para ventas y órdenes; capturas en `docs/capturas/f07` |
 | F08 | Ventas y comprobantes | ⬜ Pendiente | | |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ⬜ Pendiente | | |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ⬜ Pendiente | | |
@@ -28,11 +28,16 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
+- **Fase:** F07 ✅ (cerrada 2026-10-30, PR #13)
+- **Rama:** `feature/f07-compras` → `main`
+- **Hecho:** módulos `proveedores` (CRUD con NIT y DV, según la plantilla) y `compras`. Migración V5; registro de compra en una sola transacción (proveedor activo, fecha no futura, factura no repetida, ítems validados con errores por fila, numeración `C-000001`, totales con el IVA vigente y una entrada por ítem vía `InventarioService`); anulación con motivo (RN-17) que deja el promedio igual; filtros y auditoría. `shared.dinero.CalculadoraTotales` (RN-04) y `GET /configuracion/iva`. Frontend: proveedores (lista, drawer, ficha con sus compras), nueva compra con tabla editable (producto con stock y costo visibles, aviso de costo ±30 %, totales en vivo, confirmación), lista y detalle de compras con anulación; `hk-campos-documento` compartido con clientes. Pruebas: backend 153 unitarias y 175 IT; frontend 231 unitarias; 56 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f07/`.
+- **Siguiente paso concreto:** iniciar F08 con `/fase F08` (ventas: usa `CalculadoraTotales` y `registrarSalidaVenta`; decidir la deuda RN-15 vs. RN-21).
+- **Bloqueos o dudas:** ninguno.
+
+### Sesión anterior (F06)
 - **Fase:** F06 ✅ (cerrada 2026-10-30, PR #12)
 - **Rama:** `feature/f06-inventario` → `main`
 - **Hecho:** módulos `catalogo` (categorías y productos) e `inventario`. Migración V4 (cantidades `DECIMAL(12,2)`, `CHECK` de stock, `version`), `InventarioService` como única puerta del stock (entrada por compra, salida por venta, reservar/liberar/consumir, devolución de venta, salida por anulación de compra y ajustes) con `PESSIMISTIC_WRITE`, RN-07 a RN-15 y `StockBajoDetectado`; movimientos inmutables con filtros y CSV; costo promedio oculto para quien no gestiona productos; datos dev (6 categorías, 40 productos). Frontend: productos con nivel de stock y badge, ficha con kárdex en línea de tiempo, formulario con `hk-money-input` y categoría rápida, modal de categorías, ajuste con vista previa del stock resultante, movimientos globales con CSV y contador de stock bajo en el menú. Pruebas: backend 148 unitarias y 164 IT (incluida la concurrencia de 20 reservas); frontend 218 unitarias; 49 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f06/`.
-- **Siguiente paso concreto:** iniciar F07 con `/fase F07` (proveedores y compras: usan `registrarEntradaCompra` y `registrarSalidaAnulacionCompra`).
-- **Bloqueos o dudas:** ninguno.
 
 ### Sesión anterior (F05)
 - **Fase:** F05 ✅ (cerrada 2026-10-30, PR #11)
@@ -47,6 +52,16 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-10-30 · F07 · Un producto inactivo, repetido o inexistente en una compra responde 400 `VALIDACION` con `errors[]` por ítem (`items[i].productoId`), aprobado por el usuario · el prompt pide 400 y así el formulario marca la fila; el 409 del inventario queda de respaldo en la misma transacción.
+- 2026-10-30 · F07 · Los costos de compra se ingresan sin IVA; el IVA (vigente, RN-03) se suma al total y el costo promedio usa el costo sin IVA, aprobado por el usuario · RN-02 registra precios sin IVA.
+- 2026-10-30 · F07 · `FACTURA_DUPLICADA` (409) si el mismo proveedor ya tiene una compra registrada con ese número de factura; anulada la primera, se puede volver a registrar, aprobado por el usuario · evita meter el stock dos veces.
+- 2026-10-30 · F07 · La compra guarda `iva_porcentaje` además del valor del impuesto y los datos de anulación (`motivo_anulacion`, `anulada_por`, `anulada_en`); quien la registra es `created_by` · RN-03 y RN-17; ARCHITECTURE no los listaba.
+- 2026-10-30 · F07 · `ProductoService.bloquear` relee el producto con `refresh(PESSIMISTIC_WRITE)` · la compra valida los productos antes de moverlos; si el producto ya estaba cargado, un `select … for update` no refresca su estado y se trabajaría con existencias viejas.
+- 2026-10-30 · F07 · Los ítems se mueven en orden de id de producto · dos compras simultáneas con los mismos productos bloquean las filas en el mismo orden (sin deadlock).
+- 2026-10-30 · F07 · `GET /api/v1/configuracion/iva` para cualquier usuario autenticado · la nueva compra (y la venta en F08) muestra totales en vivo; la edición de la configuración llega en F11.
+- 2026-10-30 · F07 · `hk-campos-documento` (tipo, número y DV en vivo) en el kit y `numeroConDv`/`documentoSegunTipo` en `validadores.ts`; el mensaje de `DOCUMENTO_DUPLICADO` pasa a ser genérico · lo comparten clientes y proveedores.
+- 2026-10-30 · F07 · `formatoFecha` trata `aaaa-mm-dd` como día del calendario · `new Date('2026-10-30')` es medianoche UTC y en Colombia mostraba el 29 (lo reveló una captura).
+- 2026-10-30 · F07 · El ayudante de axe de las E2E espera a que terminen las animaciones finitas · con la opacidad de entrada a medias, axe calculaba mal el contraste (fallo intermitente).
 - 2026-10-30 · F06 · Cantidades de inventario `DECIMAL(12,2)`, aprobado por el usuario · hay unidades fraccionables (litro, galón, metro).
 - 2026-10-30 · F06 · El ajuste de entrada lleva un costo unitario opcional (sin él, el promedio vigente) y recalcula el promedio con RN-07, aprobado por el usuario · si entrara siempre al promedio, el stock inicial de un producto nuevo entraría a $0 y distorsionaría la primera compra.
 - 2026-10-30 · F06 · Presupuesto del bundle inicial: aviso en 900 kB (error 1,2 MB), aprobado por el usuario · `@lucide/angular` es un solo módulo y cada ícono suma ~4 kB al inicial; hoy 821 kB (156 kB comprimido).

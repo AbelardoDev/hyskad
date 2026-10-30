@@ -183,7 +183,8 @@
     "telefonoInvalido": "Enter a 10-digit mobile or landline number",
     "vinInvalido": "The VIN has 17 letters and digits, without I, O or Q",
     "cantidadInvalida": "Enter a quantity with at most 2 decimals",
-    "cantidadPositiva": "The quantity must be greater than zero"
+    "cantidadPositiva": "The quantity must be greater than zero",
+    "fechaFutura": "The date can't be later than today"
   },
   "errors": {
     "DESCONOCIDO": "Something went wrong. Please try again.",
@@ -224,7 +225,7 @@
     "PERMISO_REPETIDO": "A permission is repeated",
     "PROPIEDAD_DESCONOCIDA": "An unknown field was sent",
     "TIPO_INVALIDO": "A value has an invalid format",
-    "DOCUMENTO_DUPLICADO": "A customer with that document already exists",
+    "DOCUMENTO_DUPLICADO": "A record with that document already exists",
     "PLACA_DUPLICADA": "A motorcycle with that plate already exists",
     "VIN_DUPLICADO": "A motorcycle with that VIN already exists",
     "VIN_INVALIDO": "The VIN has 17 letters and digits, without I, O or Q",
@@ -243,7 +244,13 @@
     "RESERVA_PENDIENTE": "The product has units reserved in work orders: it can't be deactivated",
     "CANTIDAD_INVALIDA": "The quantity must be greater than zero with at most 2 decimals",
     "DECIMAL_MIN": "The value is below the minimum allowed",
-    "DIGITS": "The number has too many digits or decimals"
+    "DIGITS": "The number has too many digits or decimals",
+    "PROVEEDOR_INACTIVO": "The supplier is inactive: activate it to record purchases",
+    "FACTURA_DUPLICADA": "A purchase with that invoice from this supplier is already recorded",
+    "COMPRA_ANULADA": "The purchase is already voided",
+    "PRODUCTO_REPETIDO": "This product is already in another row",
+    "FECHA_FUTURA": "The date can't be later than today",
+    "NOT_EMPTY": "Add at least one item"
   },
   "roles": {
     "ADMIN": "Administrator",
@@ -447,20 +454,9 @@
       "titulo": "Deactivate customer?",
       "mensaje": "{{nombre}} can't be chosen for new motorcycles or orders. Their data and history are kept."
     },
-    "tipos": {
-      "CC": "Citizenship ID (CC)",
-      "TI": "Identity card (TI)",
-      "CE": "Foreigner ID (CE)",
-      "PA": "Passport (PA)",
-      "PPT": "Temporary protection permit (PPT)",
-      "NIT": "NIT (company)"
-    },
     "campos": {
       "nombre": "Name or company name",
       "documento": "Document",
-      "tipo_documento": "Document type",
-      "numero_documento": "Document number",
-      "nit": "NIT (without check digit)",
       "nombres": "First names",
       "apellidos": "Last names",
       "razon_social": "Company name",
@@ -473,10 +469,6 @@
     "form": {
       "titulo_nuevo": "New customer",
       "titulo_editar": "Edit customer",
-      "documento_ayuda": "Dots and spaces are removed automatically.",
-      "nit_ayuda": "The 9 digits; the check digit is calculated for you.",
-      "dv": "CD",
-      "dv_accesible": "Check digit: {{dv}}",
       "telefono_ayuda": "Mobile (3…) or landline with area code (60…), 10 digits.",
       "datos_personales": "Personal data processing",
       "autoriza": "The customer authorizes the processing of their personal data",
@@ -674,7 +666,8 @@
       "resultante": "Will remain",
       "excede": "The removal exceeds the available stock ({{disponible}}).",
       "confirmar": "Save adjustment",
-      "registrado": "Adjustment of {{nombre}} saved"
+      "registrado": "Adjustment of {{nombre}} saved",
+      "costo_opcion": "cost"
     },
     "tipos": {
       "ENTRADA_COMPRA": "Purchase receipt",
@@ -713,6 +706,129 @@
       "no_encontrado": "Product not found",
       "no_encontrado_texto": "The link may be wrong or you may not have access.",
       "volver": "Back to inventory"
+    }
+  },
+  "documentos": {
+    "tipo": "Document type",
+    "numero": "Document number",
+    "nit": "NIT (without check digit)",
+    "numero_ayuda": "Dots and spaces are removed automatically.",
+    "nit_ayuda": "The 9 digits; the check digit is calculated for you.",
+    "dv": "CD",
+    "dv_accesible": "Check digit: {{dv}}",
+    "tipos": {
+      "CC": "Citizenship ID (CC)",
+      "TI": "Identity card (TI)",
+      "CE": "Foreigner ID (CE)",
+      "PA": "Passport (PA)",
+      "PPT": "Temporary protection permit (PPT)",
+      "NIT": "NIT (company)"
+    },
+    "titulo": "Document"
+  },
+  "proveedores": {
+    "titulo": "Suppliers",
+    "subtitulo": "Companies you buy parts from",
+    "nuevo": "New supplier",
+    "buscar": "Search by company name, NIT, contact or phone…",
+    "vacio_titulo": "No suppliers match",
+    "vacio_texto": "Try another search or register a supplier.",
+    "error_titulo": "Suppliers couldn't be loaded",
+    "creado": "Supplier {{nombre}} registered",
+    "actualizado": "Changes to {{nombre}} saved",
+    "activado": "{{nombre}} is active again",
+    "desactivado": "{{nombre}} was deactivated",
+    "confirmar_activar": {
+      "titulo": "Activate supplier?",
+      "mensaje": "Purchases from {{nombre}} can be recorded again."
+    },
+    "confirmar_desactivar": {
+      "titulo": "Deactivate supplier?",
+      "mensaje": "No new purchases from {{nombre}} can be recorded. Its purchases are kept."
+    },
+    "campos": {
+      "razon_social": "Company name",
+      "contacto": "Contact person",
+      "telefono": "Phone",
+      "email": "Email",
+      "direccion": "Address"
+    },
+    "form": {
+      "titulo_nuevo": "New supplier",
+      "titulo_editar": "Edit supplier",
+      "telefono_ayuda": "Mobile (3…) or landline with area code (60…), 10 digits."
+    },
+    "detalle": {
+      "miga": "Details",
+      "datos": "Supplier details",
+      "compras": "Latest purchases",
+      "sin_compras": "No purchases from this supplier yet",
+      "no_encontrado": "Supplier not found",
+      "no_encontrado_texto": "The link may be wrong or you may not have access.",
+      "volver": "Back to suppliers"
+    }
+  },
+  "compras": {
+    "titulo": "Purchases",
+    "subtitulo": "Supplier invoices and goods received",
+    "nueva": "New purchase",
+    "nueva_subtitulo": "Each product's stock goes in when it's recorded",
+    "buscar_numero": "C-000001 or invoice…",
+    "buscar_proveedor": "Search supplier…",
+    "todos_proveedores": "All suppliers",
+    "vacio_titulo": "No purchases match",
+    "vacio_texto": "Change the filters or record a new purchase.",
+    "error_titulo": "Purchases couldn't be loaded",
+    "factura": "Supplier invoice",
+    "items": "Products",
+    "items_ayuda": "Unit costs before VAT.",
+    "agregar_item": "Add product",
+    "quitar_item": "Remove product {{n}}",
+    "totales": "Totals",
+    "subtotal": "Subtotal",
+    "iva": "VAT {{porcentaje}} %",
+    "total": "Total",
+    "costos_sin_iva": "Each product's average cost uses the cost before VAT.",
+    "registrar": "Record purchase",
+    "registrada": "Purchase {{numero}} recorded",
+    "anular": "Void purchase",
+    "anulada": "Purchase {{numero}} voided",
+    "aviso_costo_mayor": "{{porcentaje}} % above the average cost ({{promedio}})",
+    "aviso_costo_menor": "{{porcentaje}} % below the average cost ({{promedio}})",
+    "estados": {
+      "REGISTRADA": "Recorded",
+      "ANULADA": "Voided"
+    },
+    "campos": {
+      "numero": "Number",
+      "proveedor": "Supplier",
+      "factura": "Invoice number",
+      "factura_corta": "Invoice",
+      "fecha": "Invoice date",
+      "producto": "Product {{n}}",
+      "producto_columna": "Product",
+      "cantidad": "Quantity",
+      "costo": "Unit cost"
+    },
+    "confirmar": {
+      "titulo": "Record the purchase?",
+      "mensaje": "{{n}} products from {{proveedor}} will go into inventory for a total of {{total}}."
+    },
+    "confirmar_anular": {
+      "titulo": "Void purchase {{numero}}?",
+      "mensaje": "Everything it brought in will be taken out of inventory at the current average cost. Only possible if every product has enough available stock."
+    },
+    "detalle": {
+      "miga": "Details",
+      "titulo": "Purchase {{numero}}",
+      "efecto_stock": "They went into inventory at these costs; on the right, the current stock.",
+      "stock_actual": "Current stock",
+      "costo_actual": "avg. cost {{costo}}",
+      "registrada_por": "Recorded by",
+      "anulada": "Voided on {{fecha}} by {{nombre}}",
+      "no_encontrada": "Purchase not found",
+      "no_encontrada_texto": "The link may be wrong or you may not have access.",
+      "volver": "Back to purchases"
     }
   }
 }

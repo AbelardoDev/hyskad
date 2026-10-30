@@ -2,6 +2,7 @@ package com.hyskad.shared.config;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Optional;
 
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,9 @@ import com.hyskad.shared.security.UsuarioActual;
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorActual", dateTimeProviderRef = "proveedorFechaAuditoria")
 public class TiempoConfig {
+
+    /** Zona del negocio: las fechas que escribe el usuario (fecha de factura, filtros) son de Colombia. */
+    public static final ZoneId ZONA_NEGOCIO = ZoneId.of("America/Bogota");
 
     @Bean
     Clock clock() {

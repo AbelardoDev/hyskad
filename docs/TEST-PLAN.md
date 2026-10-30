@@ -113,7 +113,7 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
 | CP-22 | RF17 | Crear producto con código duplicado | I | 409 | Aprobado (F06, `CODIGO_DUPLICADO` aunque cambien mayúsculas o espacios) |
-| CP-23 | RF21, RN-07 | Compra de 10 u a $12.000 sobre 10 u a $10.000 | U, I | Stock 20, costo promedio $11.000, movimiento `ENTRADA_COMPRA` | Aprobado (F06: U de la fórmula; I con `registrarEntradaCompra`. La compra en sí llega en F07) |
+| CP-23 | RF21, RN-07 | Compra de 10 u a $12.000 sobre 10 u a $10.000 | U, I | Stock 20, costo promedio $11.000, movimiento `ENTRADA_COMPRA` | Aprobado (F06: U de la fórmula e I con el servicio; F07: I de punta a punta con dos `POST /compras` y E2E con stock y costo en la ficha) |
 | CP-24 | RF18, RN-13 | Ajuste de salida que dejaría stock bajo lo reservado | I | 409 `STOCK_INSUFICIENTE` | Aprobado (F06, servicio y `POST /inventario/ajustes`) |
 | CP-25 | RN-11 | Cada movimiento queda registrado con stock resultante y usuario | I | Fila en `movimiento_inventario` coherente | Aprobado (F06) |
 | CP-26 | RN-14 | Stock cruza el mínimo | I | Se publica un único `StockBajoDetectado` | Aprobado (F06; vuelve a publicarse solo si sube y baja de nuevo) |
@@ -126,13 +126,19 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | CP-101 | RF18, RN-13 | Ajuste de entrada desde la UI y su movimiento | U, E | Vista previa del stock resultante; la salida que supera el disponible no se confirma; el movimiento aparece en la ficha y en el listado global | Aprobado (F06) |
 | CP-102 | RF18 | Exportar movimientos a CSV | I | UTF-8 con BOM, `;`, y celdas que empiezan por `= + - @` neutralizadas | Aprobado (F06) |
 | CP-103 | RNF Acc. | axe en productos, drawers de producto y ajuste, ficha con movimientos y listado global, claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F06) |
-| CP-27 | RN-17 | Anular compra sin stock disponible suficiente | I | 409 | Pendiente |
-| CP-28 | RF20 | CRUD de proveedor con NIT válido | I | Operaciones correctas | Pendiente |
+| CP-27 | RN-17 | Anular compra sin stock disponible suficiente | I | 409 | Aprobado (F07, `STOCK_INSUFICIENTE`; no se anula ningún ítem y la compra sigue `REGISTRADA`) |
+| CP-28 | RF20 | CRUD de proveedor con NIT válido | I | Operaciones correctas | Aprobado (F07; también NIT con DV incorrecto, documento duplicado y E2E) |
+| CP-104 | RN-16 | Compra con un producto inactivo entre varios | I | 400 `VALIDACION` con `items[1].productoId: PRODUCTO_INACTIVO`; ni compra, ni movimientos, ni cambio de stock | Aprobado (F07) |
+| CP-105 | RN-17 | Anular una compra | I, E | Stock baja, costo promedio sin cambios, `SALIDA_ANULACION_COMPRA` al promedio, estado `ANULADA`; una segunda anulación da 409 `COMPRA_ANULADA` | Aprobado (F07) |
+| CP-106 | RN-16 | Proveedor inactivo, fecha futura, productos repetidos o inexistentes y factura repetida | I | 409 `PROVEEDOR_INACTIVO`; 400 con `FECHA_FUTURA`, `PRODUCTO_REPETIDO`, `RECURSO_NO_ENCONTRADO`; 409 `FACTURA_DUPLICADA` salvo si la anterior se anuló | Aprobado (F07) |
+| CP-107 | RF21, RN-03 | Totales de la compra con el IVA vigente | U, I, E | Subtotal, IVA 19 % redondeado a pesos y total; el formulario los muestra en vivo igual que el backend | Aprobado (F07) |
+| CP-108 | RF21 | Aviso de costo que difiere más de 30 % del costo promedio | U, E | Se advierte por encima y por debajo; en el límite exacto, no | Aprobado (F07) |
+| CP-109 | RNF Acc. | axe en nueva compra (con errores y con una fila llena), proveedores, ficha de proveedor y compras, claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F07) |
 
 ### Ventas (F08)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
-| CP-29 | RN-04 | Cálculo de totales con descuento e IVA 19 % | U | Valores exactos con redondeo HALF_UP | Pendiente |
+| CP-29 | RN-04 | Cálculo de totales con descuento e IVA 19 % | U | Valores exactos con redondeo HALF_UP | Aprobado (F07: `CalculadoraTotales` del backend y su espejo `calcularTotales` del frontend) |
 | CP-30 | RN-19 | Vender más que el disponible | I | 409 y no cambia el stock | Pendiente |
 | CP-31 | RN-12 | Dos ventas simultáneas de la última unidad | I (concurrencia) | Exactamente una confirma; stock final 0, nunca −1 | Pendiente |
 | CP-32 | RN-21 | Anular venta | I, E | Stock devuelto, movimientos `DEVOLUCION_ANULACION_VENTA`, estado `ANULADA` | Pendiente |

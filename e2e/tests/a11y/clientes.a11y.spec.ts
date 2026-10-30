@@ -1,18 +1,8 @@
-import AxeBuilder from '@axe-core/playwright';
-import { expect, Page, test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 import { crearClienteConMoto, placaUnica } from '../support/datos';
+import { sinViolacionesGraves } from '../support/axe';
 import { nuevaSesion } from '../support/sesion';
-
-const GRAVES = ['serious', 'critical'];
-
-async function sinViolacionesGraves(page: Page) {
-  const resultado = await new AxeBuilder({ page })
-    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
-    .analyze();
-  const graves = resultado.violations.filter((v) => GRAVES.includes(v.impact ?? ''));
-  expect(graves.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(' | ')}`)).toEqual([]);
-}
 
 for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad de clientes y motos en tema ${tema}`, () => {

@@ -91,12 +91,24 @@ const OPCIONES_FECHA: Record<EstiloFecha, Intl.DateTimeFormatOptions> = {
   fechaHora: { dateStyle: 'medium', timeStyle: 'short' },
 };
 
+/**
+ * Una fecha sin hora (`2026-10-30`, como la de una factura) es un día del calendario, no un
+ * instante: `new Date('2026-10-30')` sería medianoche UTC y en Colombia mostraría el día anterior.
+ */
+function aFecha(fecha: Date | string | number): Date {
+  if (fecha instanceof Date) return fecha;
+  const soloFecha = typeof fecha === 'string' ? /^(\d{4})-(\d{2})-(\d{2})$/.exec(fecha) : null;
+  if (soloFecha)
+    return new Date(Number(soloFecha[1]), Number(soloFecha[2]) - 1, Number(soloFecha[3]));
+  return new Date(fecha);
+}
+
 export function formatoFecha(
   fecha: Date | string | number,
   locale: string,
   estilo: EstiloFecha = 'media',
 ): string {
-  const valor = fecha instanceof Date ? fecha : new Date(fecha);
+  const valor = aFecha(fecha);
   if (Number.isNaN(valor.getTime())) return '';
   const clave = `${locale}|${estilo}`;
   let formato = formatosFecha.get(clave);

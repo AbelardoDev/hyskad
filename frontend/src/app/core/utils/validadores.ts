@@ -109,16 +109,30 @@ export function documentoParaMostrar(tipo: TipoDocumento, numero: string): strin
     : normalizado;
 }
 
+/** Dígitos del NIT sin el dígito de verificación (RN-39). */
+export const DIGITOS_NIT = 9;
+
+/**
+ * Número completo para enviar: a un NIT de 9 dígitos se le agrega el DV calculado; si ya trae los
+ * 10, se deja tal cual para que la validación compruebe el DV escrito.
+ */
+export function numeroConDv(tipo: TipoDocumento | '' | null, numero: string): string {
+  const normalizado = normalizarDocumento(numero);
+  if (tipo !== 'NIT' || normalizado.length !== DIGITOS_NIT) return normalizado;
+  return `${normalizado}${digitoVerificacionNit(normalizado) ?? ''}`;
+}
+
 /**
  * Número de documento válido para el tipo que dé `tipo()`: `{ nitInvalido: true }` o
- * `{ documentoInvalido: true }` (los mismos códigos del backend). Revalidar al cambiar el tipo.
+ * `{ documentoInvalido: true }` (los mismos códigos del backend). Un NIT de 9 dígitos es válido
+ * porque el DV se calcula. Revalidar al cambiar el tipo.
  */
-export function documentoSegunTipo(tipo: () => TipoDocumento | '' | null): ValidatorFn {
+export function documentoSegunTipo(tipo: () => TipoDocumento | '' | null | undefined): ValidatorFn {
   return (control: AbstractControl): ValidationErrors | null => {
     const valor: unknown = control.value;
     const actual = tipo();
     if (typeof valor !== 'string' || valor.trim() === '' || !actual) return null;
-    if (documentoValido(actual, valor)) return null;
+    if (documentoValido(actual, numeroConDv(actual, valor))) return null;
     return actual === 'NIT' ? { nitInvalido: true } : { documentoInvalido: true };
   };
 }

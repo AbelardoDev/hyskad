@@ -165,13 +165,22 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | CP-119 | RF29 | Tablero en lista y kanban con filtros en la URL | U, E | Estados, mecánico, fechas y vista sobreviven a recargar; kanban por estado con contadores | Aprobado (F09A) |
 | CP-120 | RF16 | Catálogo de servicios | I, U | Nombre único sin importar mayúsculas (409 `SERVICIO_DUPLICADO`), precio y tiempo positivos, auditoría de campos, lo consulta quien trabaja órdenes | Aprobado (F09A) |
 | CP-121 | RNF Acc. | axe en tablero (lista y kanban), recepción, servicios y detalle con confirmación, claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F09A) |
-| CP-40 | RF19, RN-29 | Agregar repuesto reserva stock; quitarlo lo libera | I | `stock_reservado` correcto en ambos pasos | Pendiente |
-| CP-41 | RN-28 | Agregar ítem con orden `EN_REPARACION` | I | 409 | Pendiente |
-| CP-42 | RF22, RN-31 | Generar presupuesto y luego otro | I | El primero queda `REEMPLAZADO`, versión 2 `PENDIENTE` | Pendiente |
-| CP-43 | RF23, RN-33 | Aprobar presupuesto | I, E | Orden pasa a `EN_REPARACION` | Pendiente |
-| CP-44 | RF23, RN-33 | Rechazar presupuesto | I | Orden `CANCELADA`, reservas liberadas | Pendiente |
-| CP-45 | RF24 | Total de orden con servicios, repuestos, descuento e IVA | U | Coincide con el presupuesto aprobado | Pendiente |
-| CP-46 | RN-29 | Finalizar orden | I | Stock descontado, reservas en 0, movimientos `SALIDA_ORDEN` | Pendiente |
+| CP-40 | RF19, RN-29 | Agregar repuesto reserva stock; quitarlo lo libera | I | `stock_reservado` correcto en ambos pasos | Aprobado (F09B; repetir el producto suma al mismo ítem; sin disponible 409 `STOCK_INSUFICIENTE` y no se agrega nada) |
+| CP-41 | RN-28 | Agregar ítem con orden `EN_REPARACION` | I | 409 | Aprobado (F09B: `ORDEN_ESTADO_INVALIDO`, también en `RECIBIDA`) |
+| CP-42 | RF22, RN-31 | Generar presupuesto y luego otro | I | El primero queda `REEMPLAZADO`, versión 2 `PENDIENTE` | Aprobado (F09B: con retiro intermedio; cada versión congela sus ítems) |
+| CP-43 | RF23, RN-33 | Aprobar presupuesto | I, E | Orden pasa a `EN_REPARACION` | Aprobado (F09B; una segunda decisión → 409 `PRESUPUESTO_NO_PENDIENTE`) |
+| CP-44 | RF23, RN-33 | Rechazar presupuesto | I | Orden `CANCELADA`, reservas liberadas | Aprobado (F09B) |
+| CP-45 | RF24 | Total de orden con servicios, repuestos, descuento e IVA | U | Coincide con el presupuesto aprobado | Aprobado (F09B: I con servicio de catálogo con precio editado, mano de obra libre y repuestos; U del total en vivo y de la vista previa del presupuesto) |
+| CP-46 | RN-29 | Finalizar orden | I | Stock descontado, reservas en 0, movimientos `SALIDA_ORDEN` | Aprobado (F09B; costo congelado y evento `OrdenFinalizada`) |
+| CP-122 | RN-29 | Cambiar la cantidad de un repuesto de 2 a 5 y luego a 1 | I | Reservado 2 → 5 → 1; existencias sin cambio | Aprobado (F09B) |
+| CP-123 | RN-29 | Cancelar una orden con 3 repuestos reservados | I | Las 3 reservas en 0 y el presupuesto pendiente `REEMPLAZADO` | Aprobado (F09B) |
+| CP-124 | RN-15 | Desactivar un producto reservado en una orden | I | 409 `RESERVA_PENDIENTE` | Aprobado (F09B) |
+| CP-125 | RN-27 | Mecánico no asignado agrega un ítem | I | 404 | Aprobado (F09B) |
+| CP-126 | RN-34 | El total del presupuesto aprobado coincide con el de la orden | I | Subtotal y total iguales (con descuento con centavos) | Aprobado (F09B) |
+| CP-127 | RN-29 | Si un repuesto no puede salir al finalizar, no sale ninguno | I | 409; la orden sigue `EN_REPARACION`, el otro repuesto conserva existencias y reserva | Aprobado (F09B) |
+| CP-128 | RF15, RF19, RF22, RF23 | Diagnóstico → 1 servicio y 2 repuestos → enviar presupuesto → aprobar → finalizar → stock en Inventario | E | Total $232.050 en la orden y en el envío; existencias y reservado correctos en la ficha del producto | Aprobado (F09B) |
+| CP-129 | RF22 | Presupuesto imprimible | E | Documento fuera del menú con ítems, placa y leyenda; vuelve a la orden | Aprobado (F09B) |
+| CP-130 | RNF Acc. | axe en las pestañas de ítems y presupuestos, claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F09B) |
 | CP-47 | RF25, RN-35 | Pago con monto distinto al total | I | 400 `MONTO_INVALIDO` | Pendiente |
 | CP-48 | RF28, RN-36 | Entregar sin pago | I | 409 `PAGO_REQUERIDO` | Pendiente |
 | CP-49 | RF26 | Cuentas pendientes | I | Solo órdenes finalizadas sin pago con días transcurridos | Pendiente |

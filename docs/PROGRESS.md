@@ -17,7 +17,7 @@
 | F07 | Proveedores y compras | ✅ Terminada | #13 | `CalculadoraTotales` (RN-04) lista para ventas y órdenes; capturas en `docs/capturas/f07` |
 | F08 | Ventas y comprobantes | ✅ Terminada | #14 | POS con teclado (F2/Enter/F9); comprobante carta/tirilla fuera del shell; capturas en `docs/capturas/f08` |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ✅ Terminada | #15 | Diagrama de estados en ARCHITECTURE §6.2 (verificado por `DiagramaEstadosTest`); capturas en `docs/capturas/f09a` |
-| F09B | Órdenes: servicios, repuestos y presupuestos | 🟦 En curso | | |
+| F09B | Órdenes: servicios, repuestos y presupuestos | ✅ Terminada | #16 | Presupuesto imprimible en `/presupuestos/:id`; capturas en `docs/capturas/f09b` |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ⬜ Pendiente | | |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ⬜ Pendiente | | |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ⬜ Pendiente | | |
@@ -28,11 +28,16 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
+- **Fase:** F09B ✅ (cerrada 2026-10-30, PR #16)
+- **Rama:** `feature/f09b-items-presupuestos` → `main`
+- **Hecho:** migración V8 (`orden_servicio`, `orden_repuesto` con producto único por orden, `presupuesto` y `presupuesto_item` congelados, totales y `fecha_finalizacion` en la orden). `ItemsOrdenService`: servicios de catálogo (descripción, precio y tiempo sugeridos) o mano de obra libre con mecánico asignado opcional; repuestos que reservan, ajustan la reserva por la diferencia y la liberan, solo en diagnóstico (RN-28) y con `version`. Totales con `CalculadoraTotales` e IVA vigente. `PresupuestoService`: generar (exige diagnóstico e ítems, descuento ≤ subtotal, `P-000001` versión n+1, transición a `PENDIENTE_APROBACION`), decidir (aprobado → reparación; rechazado → cancelada liberando reservas), retirar y documento. `OrdenTrabajoService.aplicarTransicion` centraliza efectos: cancelar libera reservas y reemplaza el pendiente; volver a diagnóstico reemplaza el pendiente y quita el descuento; finalizar consume las reservas (todo o nada) y congela el costo. Eventos `PresupuestoEnviado`, `PresupuestoDecidido`, `OrdenFinalizada`. Frontend: pestaña de ítems editable en línea con panel de totales y modales (hoja inferior en el teléfono) para agregar servicio o repuesto con disponible, precio y aviso de mínimo; pestaña de presupuestos (enviar con vista previa, aprobar, rechazar con motivo, retirar) y presupuesto imprimible fuera del shell. Pruebas: backend 217 unitarias y 221 IT; frontend 256 unitarias; 71 E2E + axe. Capturas en `docs/capturas/f09b/`.
+- **Siguiente paso concreto:** iniciar F09C con `/fase F09C` (pago, entrega, historial de la moto y vista del mecánico; quitar el bloqueo `SIN_PAGO`).
+- **Bloqueos o dudas:** ninguno.
+
+### Sesión anterior (F09A)
 - **Fase:** F09A ✅ (cerrada 2026-10-30, PR #15)
 - **Rama:** `feature/f09a-ordenes-base` → `main`
 - **Hecho:** módulos `servicios` (catálogo RF16 según la plantilla, 12 servicios de desarrollo) y `taller`. Migración V7 (`servicio`, `orden_trabajo` con `version` y un índice único sobre la moto mientras la orden está activa, `orden_mecanico`, `orden_estado_historial`). `EstadoOrden` declara transiciones, permiso y nota obligatoria; `OrdenTrabajo.transicionarA` valida y registra el historial; `OrdenTrabajoService` orquesta las condiciones (mecánicos, diagnóstico; ítems y pago bloqueados hasta F09B/C), recepción (RN-24, RN-25, `OT-000001`), mecánicos (RN-26), diagnóstico (RF14), seguridad por fila (RN-27, 404) y `accionesPermitidas` con `bloqueo`. Cada modificación recibe la `version` leída (409 si cambió; `OPTIMISTIC_FORCE_INCREMENT` para que asignar mecánicos también la suba). Eventos `OrdenCreada`, `MecanicoAsignado`, `EstadoOrdenCambiado` y auditoría. `taller` implementa `ConsultaOrdenesActivas` (se borró `SinOrdenesActivas`). Endpoints extra: `GET /ordenes-trabajo/recepcion` y `GET /usuarios/mecanicos`. Frontend: servicios (lista + drawer), recepción en 5 pasos con alta rápida de cliente y moto, última lectura de kilometraje y aviso de orden activa; tablero lista/kanban con filtros en la URL; "Mis órdenes" en tarjetas; detalle con línea de tiempo, acciones según `accionesPermitidas`, edición de recepción, modal de mecánicos y pestañas (ítems, presupuestos y pago deshabilitadas con "Disponible pronto"). Pruebas: backend 217 unitarias (CP-38 con 49 combinaciones y el diagrama Mermaid verificado contra el enum) y 206 IT; frontend 253 unitarias; 69 E2E + axe. Capturas en `docs/capturas/f09a/` (las del mecánico en inglés).
-- **Siguiente paso concreto:** iniciar F09B con `/fase F09B` (ítems, reservas y presupuestos; quitar los bloqueos `SIN_ITEMS` y conectar la transición automática a `EN_REPARACION`).
-- **Bloqueos o dudas:** ninguno.
 
 ### Sesión anterior (F08)
 - **Fase:** F08 ✅ (cerrada 2026-10-30, PR #14)
@@ -62,6 +67,15 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-10-30 · F09B · El descuento de la orden es el del último presupuesto (RN-32); al volver a diagnóstico (retiro o "requiere ajuste") vuelve a 0 hasta el siguiente presupuesto, aprobado por el usuario · el descuento se define al generar el presupuesto.
+- 2026-10-30 · F09B · Cancelar una orden con presupuesto pendiente lo deja `REEMPLAZADO`, no `RECHAZADO`, aprobado por el usuario · el cliente no decidió.
+- 2026-10-30 · F09B · El presupuesto congela el IVA vigente al generarse; la orden en diagnóstico usa el vigente, aprobado por el usuario · RN-31 y RN-03.
+- 2026-10-30 · F09B · Pasar a `PENDIENTE_APROBACION` solo se hace con `POST /ordenes-trabajo/{id}/presupuestos` (la transición genérica responde `TRANSICION_INVALIDA` con `motivo: PRESUPUESTO_REQUERIDO`); `bloqueo` ya no incluye `SIN_ITEMS` cuando hay ítems · enviar el presupuesto lleva descuento y observaciones.
+- 2026-10-30 · F09B · Las decisiones y el retiro de un presupuesto no reciben `version`: cargan la orden con `OPTIMISTIC_FORCE_INCREMENT`, así dos decisiones simultáneas no pasan ambas · el contrato del prompt no la incluye (`{decision, observaciones}`).
+- 2026-10-30 · F09B · Los ítems se borran con `DELETE …?version=` · un `DELETE` no lleva cuerpo.
+- 2026-10-30 · F09B · El mecánico de un servicio, si se indica, debe estar asignado a la orden (`MECANICO_INVALIDO`) · coherente con RN-26.
+- 2026-10-30 · F09B · Si quitar ítems deja el subtotal por debajo del descuento, el descuento baja hasta el subtotal · en diagnóstico el descuento ya es 0 salvo datos anteriores; evita totales negativos.
+- 2026-10-30 · F09B · `DialogosService.abrirModal` acepta `hojaEnMovil` (hoja inferior bajo 640 px) y `hk-money-input` acepta `etiquetaAccesible` · lo piden la vista del mecánico y la edición en línea.
 - 2026-10-30 · F09A · El diagnóstico se registra y corrige en `EN_DIAGNOSTICO` y `EN_REPARACION`, aprobado por el usuario · BUSINESS-RULES no lo fijaba; en reparación a veces hay que precisarlo sin devolver la orden.
 - 2026-10-30 · F09A · La actividad del mecánico asignado es opcional (máx. 200), aprobado por el usuario · con un solo mecánico casi nunca hace falta.
 - 2026-10-30 · F09A · "Último kilometraje registrado" (RN-25) = el mayor entre el de ingreso y el de inspección de las órdenes anteriores de la moto · la moto no guarda kilometraje; la inspección es la lectura más reciente.
@@ -175,7 +189,9 @@ pm-cache-hk`.
 - Presupuesto del bundle inicial: aviso subido a 900 kB en F06 (hoy 843 kB). Si vuelve a acercarse, cambiar el registro de íconos (p. ej. SVG por URL) en vez de seguir subiéndolo.
 - `VentaAnulada` se publica pero nadie lo escucha hasta F10 (auditoría y notificaciones).
 - `OrdenCreada`, `MecanicoAsignado` y `EstadoOrdenCambiado` se publican pero nadie los escucha hasta F10 (notificaciones y correos).
-- Las acciones "Enviar presupuesto" y "Entregar" aparecen bloqueadas (`SIN_ITEMS`, `SIN_PAGO`) hasta F09B/F09C.
+- La acción "Entregar" aparece bloqueada (`SIN_PAGO`) hasta F09C.
+- `PresupuestoEnviado`, `PresupuestoDecidido` y `OrdenFinalizada` se publican pero nadie los escucha hasta F10.
+- E2E locales: el backend e2e que quedó vivo en el 8081 no se pudo detener (permiso denegado); se usó el 8082 con `BACKEND_PORT=8082`.
 - E2E del diagnóstico: una vez, con la suite completa en paralelo, el guardado tardó más de 5 s (sin errores en el backend); vigilar en el CI.
 - `StockBajoDetectado` se publica pero nadie lo escucha hasta F10 (notificaciones); la configuración `stock.alerta.habilitada` se aplicará allí.
 - El filtro por usuario de `GET /inventario/movimientos` existe en la API pero no en la pantalla (almacén no puede listar usuarios).

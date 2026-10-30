@@ -81,7 +81,7 @@ import { Orden, OrdenesApiService, RepuestoOrden, ServicioOrden } from './ordene
             <ul class="divide-y divide-border rounded-lg border border-border">
               @for (s of o.servicios; track s.id) {
                 <li class="flex flex-wrap items-center gap-3 px-3 py-3">
-                  <div class="min-w-0 flex-1">
+                  <div class="min-w-0 basis-full sm:flex-1 sm:basis-auto">
                     <p class="font-medium text-fg">{{ s.descripcion }}</p>
                     <p class="text-xs text-muted">
                       {{
@@ -95,7 +95,7 @@ import { Orden, OrdenesApiService, RepuestoOrden, ServicioOrden } from './ordene
                   </div>
                   @if (editable()) {
                     <hk-money-input
-                      class="w-36"
+                      class="w-36 max-sm:ml-auto"
                       [valor]="s.precio"
                       [etiquetaAccesible]="
                         'taller.items.precio_de' | transloco: { item: s.descripcion }
@@ -145,7 +145,7 @@ import { Orden, OrdenesApiService, RepuestoOrden, ServicioOrden } from './ordene
             <ul class="divide-y divide-border rounded-lg border border-border">
               @for (r of o.repuestos; track r.id) {
                 <li class="flex flex-wrap items-center gap-3 px-3 py-3">
-                  <div class="min-w-0 flex-1">
+                  <div class="min-w-0 basis-full sm:flex-1 sm:basis-auto">
                     <p class="font-medium text-fg">{{ r.nombre }}</p>
                     <p class="text-xs text-muted">
                       {{ r.codigo }} · {{ r.precioUnitario | cop }} ·
@@ -166,7 +166,7 @@ import { Orden, OrdenesApiService, RepuestoOrden, ServicioOrden } from './ordene
                   } @else {
                     <span class="text-sm text-muted tabular">× {{ r.cantidad | cantidad }}</span>
                   }
-                  <span class="w-28 text-right font-medium text-fg tabular">{{
+                  <span class="ml-auto w-28 text-right font-medium text-fg tabular sm:ml-0">{{
                     r.subtotal | cop
                   }}</span>
                   @if (editable()) {

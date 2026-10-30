@@ -121,7 +121,7 @@ function ultimaLlegada(
       <hk-card>
         <div class="flex flex-wrap items-center gap-4">
           <hk-placa tamano="lg" [placa]="o.motocicleta.placa" />
-          <div class="min-w-0 flex-1">
+          <div class="min-w-0 basis-full sm:basis-auto sm:flex-1">
             <p class="font-display text-lg font-semibold text-fg">
               {{ o.motocicleta.marca }} {{ o.motocicleta.modelo }}
               @if (o.motocicleta.anio) {

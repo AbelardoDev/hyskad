@@ -112,7 +112,8 @@ describe('migas y título', () => {
 });
 
 describe('HkShell', () => {
-  async function montar(ancho: number, url = '/clientes', sesion: Partial<UsuarioSesion> = {}) {
+  // Ventas sigue siendo "Próximamente": no hace peticiones al backend.
+  async function montar(ancho: number, url = '/ventas', sesion: Partial<UsuarioSesion> = {}) {
     configurar(ancho, sesion);
     const fixture = TestBed.createComponent(Anfitrion);
     await TestBed.inject(Router).navigateByUrl(url);
@@ -125,12 +126,10 @@ describe('HkShell', () => {
 
     expect(el.querySelector('a[href="#contenido"]')?.textContent).toContain('Saltar al contenido');
     expect(el.querySelector('aside nav')?.getAttribute('aria-label')).toBe('Navegación principal');
-    expect(el.querySelector('aside [aria-current="page"]')?.textContent).toContain('Clientes');
-    expect(el.querySelector('hk-topbar [aria-current="page"]')?.textContent?.trim()).toBe(
-      'Clientes',
-    );
-    expect(el.querySelector('main#contenido h1')?.textContent?.trim()).toBe('Clientes');
-    expect(el.querySelector('main hk-empty-state')?.textContent).toContain('Clientes llega pronto');
+    expect(el.querySelector('aside [aria-current="page"]')?.textContent).toContain('Ventas');
+    expect(el.querySelector('hk-topbar [aria-current="page"]')?.textContent?.trim()).toBe('Ventas');
+    expect(el.querySelector('main#contenido h1')?.textContent?.trim()).toBe('Ventas');
+    expect(el.querySelector('main hk-empty-state')?.textContent).toContain('Ventas llega pronto');
   });
 
   it('el botón de menú colapsa el sidebar a solo íconos en escritorio', async () => {
@@ -170,7 +169,7 @@ describe('HkShell', () => {
       'Ventas',
     ]);
     expect(el.querySelector('hk-bottom-nav [aria-current="page"]')?.textContent).toContain(
-      'Clientes',
+      'Ventas',
     );
   });
 

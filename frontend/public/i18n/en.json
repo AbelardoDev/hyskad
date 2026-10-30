@@ -12,7 +12,27 @@
     "opcional": "optional",
     "proximamente": "Coming soon",
     "volver_inicio": "Back to home",
-    "reintentar": "Try again"
+    "reintentar": "Try again",
+    "entendido": "Got it",
+    "editar": "Edit",
+    "activar": "Activate",
+    "desactivar": "Deactivate",
+    "sin_dato": "Not recorded",
+    "error_texto": "Check your connection and try again.",
+    "estado": {
+      "titulo": "Status",
+      "activo": "Active",
+      "inactivo": "Inactive",
+      "activa": "Active",
+      "inactiva": "Inactive"
+    },
+    "filtros": {
+      "todos_estados": "All statuses",
+      "activos": "Active",
+      "inactivos": "Inactive",
+      "activos_f": "Active",
+      "inactivos_f": "Inactive"
+    }
   },
   "menu": {
     "grupos": {
@@ -153,7 +173,12 @@
     "max": "The maximum value is {{max}}",
     "pattern": "The format is not valid",
     "passwordDebil": "Use at least 8 characters, with letters and numbers",
-    "noCoincide": "Passwords don't match"
+    "noCoincide": "Passwords don't match",
+    "nitInvalido": "Invalid NIT: check the number and the check digit",
+    "documentoInvalido": "The number doesn't match the document type",
+    "placaInvalida": "Valid formats: ABC12D, ABC12 or 123ABC (motor tricycle)",
+    "telefonoInvalido": "Enter a 10-digit mobile or landline number",
+    "vinInvalido": "The VIN has 17 letters and digits, without I, O or Q"
   },
   "errors": {
     "DESCONOCIDO": "Something went wrong. Please try again.",
@@ -193,7 +218,16 @@
     "IDIOMA_INVALIDO": "The language is not valid",
     "PERMISO_REPETIDO": "A permission is repeated",
     "PROPIEDAD_DESCONOCIDA": "An unknown field was sent",
-    "TIPO_INVALIDO": "A value has an invalid format"
+    "TIPO_INVALIDO": "A value has an invalid format",
+    "DOCUMENTO_DUPLICADO": "A customer with that document already exists",
+    "PLACA_DUPLICADA": "A motorcycle with that plate already exists",
+    "VIN_DUPLICADO": "A motorcycle with that VIN already exists",
+    "VIN_INVALIDO": "The VIN has 17 letters and digits, without I, O or Q",
+    "CLIENTE_INACTIVO": "The customer is inactive: activate them before assigning a motorcycle",
+    "ORDENES_ACTIVAS": "There are active work orders; close them before deactivating",
+    "MIN": "The value is below the minimum allowed",
+    "MAX": "The value is above the maximum allowed",
+    "POSITIVE": "The value must be greater than zero"
   },
   "roles": {
     "ADMIN": "Administrator",
@@ -375,6 +409,149 @@
         "inventario": "Inventory and purchases",
         "administracion": "Administration"
       }
+    }
+  },
+  "clientes": {
+    "titulo": "Customers",
+    "subtitulo": "People and companies who bring their motorcycles to the shop",
+    "nuevo": "New customer",
+    "buscar": "Search by name, document, phone or email…",
+    "vacio_titulo": "No customers match",
+    "vacio_texto": "Try another search or register a new customer.",
+    "error_titulo": "Customers couldn't be loaded",
+    "creado": "Customer {{nombre}} registered",
+    "actualizado": "Changes to {{nombre}} saved",
+    "activado": "{{nombre}} is active again",
+    "desactivado": "{{nombre}} was deactivated",
+    "confirmar_activar": {
+      "titulo": "Activate customer?",
+      "mensaje": "{{nombre}} will show up again when registering motorcycles and orders."
+    },
+    "confirmar_desactivar": {
+      "titulo": "Deactivate customer?",
+      "mensaje": "{{nombre}} can't be chosen for new motorcycles or orders. Their data and history are kept."
+    },
+    "tipos": {
+      "CC": "Citizenship ID (CC)",
+      "TI": "Identity card (TI)",
+      "CE": "Foreigner ID (CE)",
+      "PA": "Passport (PA)",
+      "PPT": "Temporary protection permit (PPT)",
+      "NIT": "NIT (company)"
+    },
+    "campos": {
+      "nombre": "Name or company name",
+      "documento": "Document",
+      "tipo_documento": "Document type",
+      "numero_documento": "Document number",
+      "nit": "NIT (without check digit)",
+      "nombres": "First names",
+      "apellidos": "Last names",
+      "razon_social": "Company name",
+      "telefono": "Phone",
+      "email": "Email",
+      "direccion": "Address",
+      "ciudad": "City",
+      "motos": "Motorcycles"
+    },
+    "form": {
+      "titulo_nuevo": "New customer",
+      "titulo_editar": "Edit customer",
+      "documento_ayuda": "Dots and spaces are removed automatically.",
+      "nit_ayuda": "The 9 digits; the check digit is calculated for you.",
+      "dv": "CD",
+      "dv_accesible": "Check digit: {{dv}}",
+      "telefono_ayuda": "Mobile (3…) or landline with area code (60…), 10 digits.",
+      "datos_personales": "Personal data processing",
+      "autoriza": "The customer authorizes the processing of their personal data",
+      "autoriza_ayuda": "Without authorization they won't receive emails.",
+      "autorizado_el": "Authorized data processing on {{fecha}}."
+    },
+    "politica": {
+      "ver": "View policy",
+      "titulo": "Personal data processing authorization",
+      "p1": "In accordance with Colombian Law 1581 of 2012 and its regulations, the customer authorizes the shop to collect, store, use and update their personal data (identification, contact details and vehicle data).",
+      "p2": "The data is used only to provide sales and maintenance services, keep each motorcycle's history, notify the status of their orders and send receipts and estimates.",
+      "p3": "The data owner may access, update, correct and request deletion of their data, and revoke this authorization at any time by asking at the shop.",
+      "p4": "If the customer doesn't authorize, they will still be served, but won't receive emails from the system."
+    },
+    "detalle": {
+      "miga": "Details",
+      "datos": "Contact details",
+      "motos": "Motorcycles",
+      "agregar_moto": "Add motorcycle",
+      "sin_motos": "No motorcycles yet",
+      "sin_motos_texto": "Register their first motorcycle to open work orders.",
+      "autoriza": "Data processing authorized",
+      "no_autoriza": "No data authorization",
+      "sin_correos": "Didn't authorize data processing: no emails are sent.",
+      "no_encontrado": "Customer not found",
+      "no_encontrado_texto": "The link may be wrong or you may not have access.",
+      "volver": "Back to customers"
+    }
+  },
+  "motos": {
+    "titulo": "Motorcycles",
+    "subtitulo": "Registered motorcycles and their owners",
+    "nueva": "New motorcycle",
+    "buscar": "Search by plate…",
+    "vacio_titulo": "No motorcycles match",
+    "vacio_texto": "Check the plate or register a new motorcycle.",
+    "error_titulo": "Motorcycles couldn't be loaded",
+    "creada": "Motorcycle {{placa}} registered",
+    "actualizada": "Changes to motorcycle {{placa}} saved",
+    "activada": "Motorcycle {{placa}} is active again",
+    "desactivada": "Motorcycle {{placa}} was deactivated",
+    "confirmar_activar": {
+      "titulo": "Activate motorcycle?",
+      "mensaje": "Motorcycle {{placa}} can be chosen again for work orders."
+    },
+    "confirmar_desactivar": {
+      "titulo": "Deactivate motorcycle?",
+      "mensaje": "Motorcycle {{placa}} can't be chosen for new orders. Its history is kept."
+    },
+    "campos": {
+      "placa": "Plate",
+      "moto": "Motorcycle",
+      "marca": "Make",
+      "modelo": "Model",
+      "anio": "Year",
+      "cilindrada": "Displacement (cc)",
+      "color": "Color",
+      "vin": "VIN (chassis number)",
+      "propietario": "Owner"
+    },
+    "form": {
+      "titulo_nuevo": "New motorcycle",
+      "titulo_editar": "Edit motorcycle",
+      "placa_ayuda": "ABC12D, ABC12 or 123ABC (motor tricycle). Uppercased automatically.",
+      "vin_ayuda": "17 characters, without I, O or Q.",
+      "propietario_ayuda": "Search by name, document or phone. Active customers only.",
+      "buscar_cliente": "Search customer…"
+    },
+    "propietario": {
+      "titulo": "Change owner",
+      "descripcion": "The motorcycle goes to the new owner and keeps its full service history.",
+      "nuevo": "New owner",
+      "resumen": "will go from {{anterior}} to {{nuevo}}.",
+      "confirmar": "Confirm change",
+      "cambiado": "Motorcycle {{placa}} now belongs to {{nombre}}",
+      "ayuda": "If the motorcycle was sold, change its owner: its history stays with the motorcycle."
+    },
+    "detalle": {
+      "miga": "Details",
+      "subtitulo": "Owned by {{propietario}}",
+      "ficha": "Specifications",
+      "ver_cliente": "View customer details",
+      "no_encontrada": "Motorcycle not found",
+      "no_encontrada_texto": "The link may be wrong or you may not have access.",
+      "volver": "Back to motorcycles"
+    },
+    "historial": {
+      "titulo": "History",
+      "vacio_titulo": "No services recorded",
+      "vacio_texto": "This motorcycle's work orders will show up here, with their services, parts and totals.",
+      "error": "History couldn't be loaded"
     }
   }
 }

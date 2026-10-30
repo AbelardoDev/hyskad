@@ -56,6 +56,7 @@ const NO_TEXTO = 3;
 
 function pares(t) {
   const soft = (color) => mezclar(t[color], 0.12, t.surface);
+  const softBg = (color) => mezclar(t[color], 0.12, t.bg);
   return [
     ['fg / bg', t.fg, t.bg, TEXTO],
     ['fg / surface', t.fg, t.surface, TEXTO],
@@ -77,11 +78,20 @@ function pares(t) {
     ['accent-ink / accent-soft', t['accent-ink'], soft('accent-tone'), TEXTO],
     ['primary-ink / primary-soft', t['primary-ink'], soft('primary'), TEXTO],
     ['neutral-ink / surface-2', t['neutral-ink'], t['surface-2'], TEXTO],
+    // Los badges también se usan directamente sobre el fondo de la página
+    ['success-ink / success-soft sobre bg', t['success-ink'], softBg('success'), TEXTO],
+    ['warning-ink / warning-soft sobre bg', t['warning-ink'], softBg('warning'), TEXTO],
+    ['danger-ink / danger-soft sobre bg', t['danger-ink'], softBg('danger'), TEXTO],
+    ['info-ink / info-soft sobre bg', t['info-ink'], softBg('info'), TEXTO],
+    ['accent-ink / accent-soft sobre bg', t['accent-ink'], softBg('accent-tone'), TEXTO],
+    ['primary-ink / primary-soft sobre bg', t['primary-ink'], softBg('primary'), TEXTO],
     ['border-strong / surface (bordes de controles)', t['border-strong'], t.surface, NO_TEXTO],
     ['border-strong / bg (bordes de controles)', t['border-strong'], t.bg, NO_TEXTO],
     ['ring / bg (foco)', t.ring, t.bg, NO_TEXTO],
     ['ring / surface (foco)', t.ring, t.surface, NO_TEXTO],
     ['danger / surface (borde de error)', t.danger, t.surface, NO_TEXTO],
+    ['placa-fg / placa-bg', t['placa-fg'], t['placa-bg'], TEXTO],
+    ['placa-borde / surface (borde de la placa)', t['placa-borde'], t.surface, NO_TEXTO],
   ];
 }
 

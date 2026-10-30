@@ -60,3 +60,114 @@ export function igualA(otro: () => AbstractControl | null | undefined): Validato
     return control.value === referencia.value ? null : { noCoincide: true };
   };
 }
+
+// ── Documentos, placas y teléfonos (espejo de `shared.validation` del backend) ──────────────
+
+export const TIPOS_DOCUMENTO = ['CC', 'TI', 'CE', 'PA', 'PPT', 'NIT'] as const;
+export type TipoDocumento = (typeof TIPOS_DOCUMENTO)[number];
+
+/** RN-38. El NIT son 9 dígitos + DV. Igual que `DocumentoValidoValidator.FORMATOS`. */
+const FORMATOS_DOCUMENTO: Record<TipoDocumento, RegExp> = {
+  CC: /^\d{5,10}$/,
+  TI: /^\d{10,11}$/,
+  CE: /^[A-Z0-9]{3,12}$/,
+  PA: /^[A-Z0-9]{5,15}$/,
+  PPT: /^\d{6,10}$/,
+  NIT: /^\d{10}$/,
+};
+
+const PESOS_NIT = [3, 7, 13, 17, 19, 23, 29, 37, 41, 43, 47, 53, 59, 67, 71];
+
+/** Documento en mayúsculas sin espacios, puntos ni guiones: `900.123.456-8` → `9001234568`. */
+export function normalizarDocumento(numero: string): string {
+  return numero.replace(/[\s.-]/g, '').toUpperCase();
+}
+
+/**
+ * Dígito de verificación DIAN (RN-39): módulo 11 con pesos primos de derecha a izquierda; si el
+ * residuo es 0 o 1 el DV es el residuo, si no, 11 − residuo. `null` si no son de 1 a 15 dígitos.
+ */
+export function digitoVerificacionNit(nit: string): number | null {
+  if (!/^\d{1,15}$/.test(nit)) return null;
+  const suma = [...nit].reverse().reduce((total, d, i) => total + Number(d) * PESOS_NIT[i], 0);
+  const residuo = suma % 11;
+  return residuo < 2 ? residuo : 11 - residuo;
+}
+
+export function documentoValido(tipo: TipoDocumento, numero: string): boolean {
+  const normalizado = normalizarDocumento(numero);
+  if (!FORMATOS_DOCUMENTO[tipo].test(normalizado)) return false;
+  if (tipo !== 'NIT') return true;
+  return digitoVerificacionNit(normalizado.slice(0, 9)) === Number(normalizado[9]);
+}
+
+/** Como se guarda y se muestra: el NIT con guion antes del DV (`900123456-8`). */
+export function documentoParaMostrar(tipo: TipoDocumento, numero: string): string {
+  const normalizado = normalizarDocumento(numero);
+  return tipo === 'NIT' && normalizado.length > 1
+    ? `${normalizado.slice(0, -1)}-${normalizado.slice(-1)}`
+    : normalizado;
+}
+
+/**
+ * Número de documento válido para el tipo que dé `tipo()`: `{ nitInvalido: true }` o
+ * `{ documentoInvalido: true }` (los mismos códigos del backend). Revalidar al cambiar el tipo.
+ */
+export function documentoSegunTipo(tipo: () => TipoDocumento | '' | null): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const valor: unknown = control.value;
+    const actual = tipo();
+    if (typeof valor !== 'string' || valor.trim() === '' || !actual) return null;
+    if (documentoValido(actual, valor)) return null;
+    return actual === 'NIT' ? { nitInvalido: true } : { documentoInvalido: true };
+  };
+}
+
+/**
+ * RN-41: formatos de placa, espejo de `PlacaColombianaValidator`. Si el taller pide otro formato,
+ * se cambia aquí y allá.
+ */
+export const FORMATOS_PLACA = [
+  /^[A-Z]{3}[0-9]{2}[A-Z]$/, // moto actual: ABC12D
+  /^[A-Z]{3}[0-9]{2}$/, // moto antigua: ABC12
+  /^[0-9]{3}[A-Z]{3}$/, // motocarro: 123ABC
+] as const;
+
+/** Placa en mayúsculas, sin espacios ni guiones: `abc-12 d` → `ABC12D`. */
+export function normalizarPlaca(placa: string): string {
+  return placa.replace(/[\s-]/g, '').toUpperCase();
+}
+
+export function placaValida(placa: string): boolean {
+  const normalizada = normalizarPlaca(placa);
+  return FORMATOS_PLACA.some((formato) => formato.test(normalizada));
+}
+
+/** `{ placaInvalida: true }` si no cumple ningún formato (vacía la deja a `required`). */
+export const placaColombiana: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const valor: unknown = control.value;
+  if (typeof valor !== 'string' || valor.trim() === '') return null;
+  return placaValida(valor) ? null : { placaInvalida: true };
+};
+
+/** Teléfono solo con dígitos, sin el indicativo `+57`: `+57 300 123-4567` → `3001234567`. */
+export function normalizarTelefono(telefono: string): string {
+  const digitos = telefono.replace(/[\s().-]/g, '');
+  return digitos.startsWith('+57') ? digitos.slice(3) : digitos;
+}
+
+/** Celular (`3…`) o fijo con indicativo (`60…`) de 10 dígitos, como `@TelefonoColombiano`. */
+export const telefonoColombiano: ValidatorFn = (
+  control: AbstractControl,
+): ValidationErrors | null => {
+  const valor: unknown = control.value;
+  if (typeof valor !== 'string' || valor.trim() === '') return null;
+  return /^(3\d{9}|60\d{8})$/.test(normalizarTelefono(valor)) ? null : { telefonoInvalido: true };
+};
+
+/** RN-42: 17 caracteres alfanuméricos sin I, O ni Q: `{ vinInvalido: true }`. */
+export const vinValido: ValidatorFn = (control: AbstractControl): ValidationErrors | null => {
+  const valor: unknown = control.value;
+  if (typeof valor !== 'string' || valor.trim() === '') return null;
+  return /^[A-HJ-NPR-Z0-9]{17}$/i.test(valor.trim()) ? null : { vinInvalido: true };
+};

@@ -3,18 +3,10 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Permiso, Rol } from '../../core/auth/permisos';
+import { Pagina } from '../../core/http/pagina';
 import { Idioma } from '../../core/i18n/language.service';
 
 const API = '/api/v1/usuarios';
-
-/** `PageResponse<T>` del backend. */
-export interface Pagina<T> {
-  content: T[];
-  page: number;
-  size: number;
-  totalElements: number;
-  totalPages: number;
-}
 
 /** Usuario en la administración (`UsuarioResponse`). Nunca trae la contraseña. */
 export interface Usuario {

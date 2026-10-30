@@ -7,7 +7,7 @@
 | Fase | Nombre | Estado | PR | Notas |
 |---|---|---|---|---|
 | F00 | Preparación del entorno | ✅ Terminada | — | Entorno verificado 2026-10-29 |
-| F01 | Monorepo, infraestructura local y CI | 🟦 En curso | | |
+| F01 | Monorepo, infraestructura local y CI | ✅ Terminada | #1 | Repo público AbelardoDev/hyskad; `main` protegida por el CI |
 | F02 | Base del backend | ⬜ Pendiente | | |
 | F03 | Autenticación, usuarios y permisos (backend) | ⬜ Pendiente | | |
 | F04A | Sistema de diseño, tema, i18n y layout | ⬜ Pendiente | | |
@@ -28,11 +28,11 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F01 🟦 (implementación y verificación local terminadas; falta publicar en GitHub, PR, CI y merge)
-- **Rama:** `feature/f01-monorepo-ci`
+- **Fase:** F01 ✅ (cerrada 2026-10-29, PR #1)
+- **Rama:** `main`
 - **Hecho:** repo git con `main` (commit inicial). Backend Spring Boot 4.1.2 (Java 25) con MapStruct 1.6.3, springdoc 3.2.0, Bucket4j 8.21.0, ArchUnit 1.5.1, Testcontainers MySQL 8.4 y JaCoCo 0.8.16 (regla 70 % en `application`/`domain`); perfiles dev/test/prod; `PingController` temporal. Frontend Angular 22.1 (zoneless y Vitest por defecto) con Tailwind v4 (PostCSS), Transloco es/en, ESLint + Prettier, proxy `/api`, marca en `public/brand`. E2E Playwright (3 navegadores). Compose dev (MySQL + Mailpit), `.env.example`, CI, dependabot y plantilla de PR. Verificación local: `mvnw verify` (3 pruebas), lint, test (2), build y E2E (3/3) en verde; ping de punta a punta probado.
-- **Siguiente paso concreto:** crear el repo en GitHub (`gh repo create hyskad --public --source=. --push`), push de la rama, PR, esperar el CI, proteger `main` y merge squash.
-- **Bloqueos o dudas:** la creación del repo público necesita aprobación explícita del usuario. El token de `gh` necesita el scope `workflow`. Hay un `mysqld` local ocupando el 3306 (la verificación se hizo con `DB_HOST_PORT=3307`).
+- **Siguiente paso concreto:** iniciar F02 con `/fase F02`.
+- **Bloqueos o dudas:** hay un `mysqld` local ocupando el 3306 (pendiente de que el usuario decida si lo detiene o usa `DB_HOST_PORT=3307`). `gh` no está en el PATH: usar `C:\Program Files\GitHub CLI\gh.exe`.
 
 ## Decisiones tomadas durante el desarrollo
 

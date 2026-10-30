@@ -1,0 +1,22 @@
+# En producción todo valor sensible llega por variables de entorno, sin valores por defecto.
+spring:
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+server:
+  forward-headers-strategy: framework
+
+logging:
+  level:
+    root: INFO
+
+springdoc:
+  api-docs:
+    enabled: false
+  swagger-ui:
+    enabled: false

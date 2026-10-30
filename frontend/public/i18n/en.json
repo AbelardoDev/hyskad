@@ -1,0 +1,9 @@
+{
+  "ping": {
+    "descripcion": "Server connection test",
+    "probar": "Test ping",
+    "cargando": "Contacting the server…",
+    "respuesta": "Server response: {{ mensaje }}",
+    "error": "Could not connect to the server"
+  }
+}

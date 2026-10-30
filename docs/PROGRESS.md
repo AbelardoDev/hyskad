@@ -15,7 +15,7 @@
 | F05 | Clientes y motocicletas | ✅ Terminada | #11 | Plantilla CRUD en ARCHITECTURE §6.1; capturas en `docs/capturas/f05` |
 | F06 | Catálogo de productos e inventario | ✅ Terminada | #12 | Contrato de `InventarioService` en su Javadoc; capturas en `docs/capturas/f06` |
 | F07 | Proveedores y compras | ✅ Terminada | #13 | `CalculadoraTotales` (RN-04) lista para ventas y órdenes; capturas en `docs/capturas/f07` |
-| F08 | Ventas y comprobantes | 🟦 En curso | | |
+| F08 | Ventas y comprobantes | ✅ Terminada | #14 | POS con teclado (F2/Enter/F9); comprobante carta/tirilla fuera del shell; capturas en `docs/capturas/f08` |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ⬜ Pendiente | | |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ⬜ Pendiente | | |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ⬜ Pendiente | | |
@@ -28,11 +28,16 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
+- **Fase:** F08 ✅ (cerrada 2026-10-30, PR #14)
+- **Rama:** `feature/f08-ventas` → `main`
+- **Hecho:** módulo `ventas`. Migración V6 (`venta` con `iva_porcentaje`, `monto_recibido` y datos de anulación; `venta_detalle` con precio y costo congelados). Registro en una sola transacción: ítems validados con errores por fila (`items[i].productoId`), precio tomado siempre del catálogo (un `precioUnitario` enviado da 400 `PROPIEDAD_DESCONOCIDA`), descuento ≤ subtotal, referencia obligatoria salvo efectivo, monto recibido ≥ total, numeración `V-000001`, totales con `CalculadoraTotales` y salida por ítem vía `InventarioService` (orden de id, `PESSIMISTIC_WRITE`). Anulación con motivo (RN-21, `VENTAS_ANULAR`) que devuelve el stock y publica `VentaAnulada`; comprobante con datos del taller y leyenda "Documento interno. No es factura electrónica."; lista con filtros y `GET /ventas/resumen`. Frontend: punto de venta operable solo con teclado (F2 busca, Enter agrega, flechas, Esc, F9 cobra, popover de atajos), carrito con tope del disponible, cliente opcional con alta rápida, métodos de pago con referencia y cambio en vivo, confirmación y pantalla de éxito; en móvil el carrito es una hoja inferior. Lista con resumen del periodo y "Solo mis ventas", detalle con anulación, comprobante carta/tirilla imprimible fuera del layout. Pruebas: backend 161 unitarias y 185 IT (incluida la concurrencia CP-31); frontend 244 unitarias (mismos casos de redondeo que el backend); 63 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f08/` (y `comprobante-carta.pdf` impreso).
+- **Siguiente paso concreto:** iniciar F09A con `/fase F09A` (órdenes; implementar `ConsultaOrdenesActivas` y repetir CP-19).
+- **Bloqueos o dudas:** ninguno.
+
+### Sesión anterior (F07)
 - **Fase:** F07 ✅ (cerrada 2026-10-30, PR #13)
 - **Rama:** `feature/f07-compras` → `main`
 - **Hecho:** módulos `proveedores` (CRUD con NIT y DV, según la plantilla) y `compras`. Migración V5; registro de compra en una sola transacción (proveedor activo, fecha no futura, factura no repetida, ítems validados con errores por fila, numeración `C-000001`, totales con el IVA vigente y una entrada por ítem vía `InventarioService`); anulación con motivo (RN-17) que deja el promedio igual; filtros y auditoría. `shared.dinero.CalculadoraTotales` (RN-04) y `GET /configuracion/iva`. Frontend: proveedores (lista, drawer, ficha con sus compras), nueva compra con tabla editable (producto con stock y costo visibles, aviso de costo ±30 %, totales en vivo, confirmación), lista y detalle de compras con anulación; `hk-campos-documento` compartido con clientes. Pruebas: backend 153 unitarias y 175 IT; frontend 231 unitarias; 56 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f07/`.
-- **Siguiente paso concreto:** iniciar F08 con `/fase F08` (ventas: usa `CalculadoraTotales` y `registrarSalidaVenta`; decidir la deuda RN-15 vs. RN-21).
-- **Bloqueos o dudas:** ninguno.
 
 ### Sesión anterior (F06)
 - **Fase:** F06 ✅ (cerrada 2026-10-30, PR #12)
@@ -52,6 +57,13 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-10-30 · F08 · La devolución por anulación de venta se permite aunque el producto esté inactivo (excepción a RN-15), aprobado por el usuario · RN-21 obliga a restituir el stock; desactivar un producto no puede impedir anular una venta. Resuelve la deuda RN-15 vs. RN-21.
+- 2026-10-30 · F08 · La venta no acepta precios del cliente: el precio sale del catálogo y un `precioUnitario` en el cuerpo da 400 `PROPIEDAD_DESCONOCIDA` · RN-04 y CP-32; un rechazo explícito es más claro que ignorarlo en silencio.
+- 2026-10-30 · F08 · La venta guarda `iva_porcentaje` y `monto_recibido` (el cambio se calcula) · el comprobante debe reproducir la venta aunque cambie el IVA vigente.
+- 2026-10-30 · F08 · El comprobante vive en `/ventas/:id/comprobante` fuera del shell (sin menú), con formato carta o tirilla 80 mm y `@page` por formato · se imprime o guarda como PDF desde el navegador, sin librerías nuevas.
+- 2026-10-30 · F08 · `GET /ventas/resumen` (cantidad y total de ventas pagadas con los mismos filtros) y filtro "Solo mis ventas" · la lista muestra el cierre del día sin traer todas las páginas.
+- 2026-10-30 · F08 · `configuracion-api.service.ts` compartido (IVA) para compras y ventas; `hoyEnBogota` pasa a `core/utils/formato.ts` · ya lo usan dos features.
+- 2026-10-30 · F08 · La prueba del layout que activaba el ítem del menú usa `/ordenes` en vez de `/ventas` · `/ventas` ya tiene rutas reales.
 - 2026-10-30 · F07 · Un producto inactivo, repetido o inexistente en una compra responde 400 `VALIDACION` con `errors[]` por ítem (`items[i].productoId`), aprobado por el usuario · el prompt pide 400 y así el formulario marca la fila; el 409 del inventario queda de respaldo en la misma transacción.
 - 2026-10-30 · F07 · Los costos de compra se ingresan sin IVA; el IVA (vigente, RN-03) se suma al total y el costo promedio usa el costo sin IVA, aprobado por el usuario · RN-02 registra precios sin IVA.
 - 2026-10-30 · F07 · `FACTURA_DUPLICADA` (409) si el mismo proveedor ya tiene una compra registrada con ese número de factura; anulada la primera, se puede volver a registrar, aprobado por el usuario · evita meter el stock dos veces.
@@ -145,7 +157,7 @@ pm-cache-hk`.
 - RN-44: `SinOrdenesActivas` (en `clientes.application`) siempre responde `false`. En F09A `taller` implementa `ConsultaOrdenesActivas`, se borra la implementación provisional y se repite CP-19 con órdenes reales.
 - `GET /motocicletas/{id}/historial` devuelve `[]` con la estructura final (`HistorialServicio`); se llena en F09C (CP-21).
 - El texto de autorización de datos (RN-45) está en las traducciones; hacerlo configurable en F11.
-- Presupuesto del bundle inicial: aviso subido a 900 kB en F06 (hoy 821 kB). Si vuelve a acercarse, cambiar el registro de íconos (p. ej. SVG por URL) en vez de seguir subiéndolo.
-- RN-15 vs. RN-21: anular una venta de un producto que se desactivó después dará `PRODUCTO_INACTIVO` en la devolución. Revisar en F08 si la devolución debe permitirse con el producto inactivo.
+- Presupuesto del bundle inicial: aviso subido a 900 kB en F06 (hoy 843 kB). Si vuelve a acercarse, cambiar el registro de íconos (p. ej. SVG por URL) en vez de seguir subiéndolo.
+- `VentaAnulada` se publica pero nadie lo escucha hasta F10 (auditoría y notificaciones).
 - `StockBajoDetectado` se publica pero nadie lo escucha hasta F10 (notificaciones); la configuración `stock.alerta.habilitada` se aplicará allí.
 - El filtro por usuario de `GET /inventario/movimientos` existe en la API pero no en la pantalla (almacén no puede listar usuarios).

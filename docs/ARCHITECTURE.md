@@ -202,10 +202,39 @@ Solo estos, cada uno con un problema real que resolver. Cualquier otro requiere 
 | **Specification** (JPA `Specification`) | Búsquedas y filtros (RF29) | Combina filtros opcionales sin escribir una consulta por cada combinación. |
 | **DTO + Mapper** | Todos los módulos | Desacopla el contrato de la API del modelo de persistencia y evita exponer datos sensibles. |
 | **Repository** | Spring Data | Lo provee el framework. |
-| **Inversión de dependencias** (interfaz en el módulo que pregunta, implementación en el que sabe) | `motocicletas.ConsultaOrdenesActivas` implementada por `taller` | `taller` depende de `clientes`/`motocicletas`; para que estos consulten si hay órdenes activas (RN-44) sin crear un ciclo de dependencias. |
+| **Inversión de dependencias** (interfaz en el módulo que pregunta, implementación en el que sabe) | `clientes.application.ConsultaOrdenesActivas` implementada por `taller` (F09A); hasta entonces `SinOrdenesActivas` responde `false` | `taller` depende de `clientes`/`motocicletas`; para que estos consulten si hay órdenes activas (RN-44) sin crear un ciclo de dependencias. Vive en `clientes` (no en `motocicletas`) porque la usan los dos módulos y `motocicletas` ya depende de `clientes`. |
 | **Strategy** *(solo si llega a hacer falta)* | — | No se usa de entrada. Se evaluaría si aparece un segundo cálculo de impuestos o un segundo canal de notificación con lógica distinta. |
 
 Lo que **no** se hace: interfaces `XService` + `XServiceImpl` con una sola implementación, fábricas genéricas, capas "manager", herencia profunda de entidades.
+
+## 6.1 Plantilla de módulo CRUD
+
+Patrón fijado en F05 con `clientes` y `motocicletas`; los módulos siguientes (proveedores, catálogo, servicios…) lo copian.
+
+**Backend** (`com.hyskad.<modulo>`):
+
+| Capa | Clases | Reglas |
+|---|---|---|
+| `domain` | Entidad (`extends BaseEntity`, `@Getter`, constructor protegido para JPA) + `record Datos<Entidad>` con los valores ya normalizados | La entidad se crea y se actualiza con ese record (`actualizar(datos)`) y expone métodos de negocio (`cambiarEstado`, `cambiarPropietario`). Sin setters sueltos. Campos derivados de solo lectura con `@Formula` (p. ej. `nombreCompleto`, conteos de otra tabla sin depender del otro módulo) |
+| `persistence` | `<Entidad>Repository extends JpaRepository, JpaSpecificationExecutor` + `<Entidad>Specifications` | `filtrar(...)` = `Specification.allOf(...)` de filtros opcionales; texto parcial con `Patrones.contiene()` (escapa `%` y `_`). `@EntityGraph` en las consultas cuya respuesta incluye una relación (open-in-view está apagado) |
+| `application` | `<Entidad>Service` + comandos de entrada (`record` con Bean Validation: `Guardar<Entidad>` o `Crear…`/`Actualizar…`) | El servicio normaliza (`Normalizador`), verifica unicidad (`ConflictException` con un `ErrorCode` propio, p. ej. `PLACA_DUPLICADA`), guarda y audita (`AuditoriaService.registrar`) con los **nombres** de los campos cambiados, nunca datos personales. `obtener(id)` lanza `NotFoundException`. Cambio de estado idempotente |
+| `web` | `<Entidad>Controller`, `<Entidad>Mapper` (MapStruct) y `dto/` (`<Entidad>Response` y, si el listado debe mostrar menos, `<Entidad>ResumenResponse`) | `GET` paginado con `@PageableDefault` y filtros como `@RequestParam` opcionales → `PageResponse`; `GET /{id}`; `POST` (201 + `Location`); `PUT /{id}`; `PATCH /{id}/estado` con `shared.web.CambioEstado`. `@PreAuthorize` por método: `<X>_VER` para leer, `<X>_GESTIONAR` para escribir |
+
+Pruebas mínimas: IT del controller con permisos por rol (401 sin token, 403 por rol), creación con normalización y auditoría, duplicados (409), validaciones (400 con `errors[]`), búsqueda/filtros paginados y 404; unitarias de la entidad si tiene reglas. Datos de desarrollo en `db/dev-data/R__<modulo>_dev.sql` con `INSERT IGNORE`.
+
+**Frontend** (`features/<modulo>/`):
+
+| Archivo | Contenido |
+|---|---|
+| `<modulo>-api.service.ts` | Interfaces del contrato (resumen, detalle, datos de guardado, filtros) y métodos `listar/obtener/crear/actualizar/cambiarEstado`; acepta un `HttpContext` opcional (`erroresManejados()`, `conFormulario(form)`) |
+| `<modulo>-page.ts` | `hk-page-header` con la acción principal bajo `*hkTienePermiso`, `hk-filter-bar` + `hk-select` de estado, `hk-table` con `rxResource` sobre una signal de filtros, orden por columna, paginación, filas clicables hacia el detalle y estados de carga, vacío y error |
+| `<entidad>-detalle-page.ts` | `id` por `input()` (binding de rutas), `rxResource` del recurso, skeleton, estado de error con "Volver", acciones de editar y activar/desactivar con `ConfirmacionService` |
+| `<entidad>-form-drawer.ts` | Formulario reactivo tipado en `hk-drawer`, validadores espejo del backend (`core/utils/validadores.ts`), `enfocarPrimerError`, errores del servidor marcados con `marcarErroresServidor`; cierra devolviendo lo guardado |
+| `<modulo>.routes.ts` | `''` (lista) y `':id'` (detalle, `data.miga`), cargados en diferido; el `canMatch` con `permisoGuard` va en `app.routes.ts` |
+
+Textos en `es.json`/`en.json` bajo la clave del módulo; códigos de error nuevos en `errors.*` y errores de validación locales en `validacion.*`. E2E del flujo principal + axe de lista, formulario y detalle en claro y oscuro.
+
+> Íconos: `@lucide/angular` es un único módulo, así que cualquier ícono nuevo (aunque solo lo use una ruta diferida) suma ~4 kB al bundle inicial. Antes de registrar uno nuevo en `shared/ui/iconos.ts`, reutilizar uno existente.
 
 ## 7. Tiempo real y notificaciones (RF30, IC5)
 

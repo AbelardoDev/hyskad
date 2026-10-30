@@ -12,7 +12,7 @@
 | F03 | Autenticación, usuarios y permisos (backend) | ✅ Terminada | #8 | Usuarios dev en el README |
 | F04A | Sistema de diseño, tema, i18n y layout | ✅ Terminada | #9 | Galería en /dev/ui (solo dev) |
 | F04B | Sesión, guards y administración de usuarios (frontend) | ✅ Terminada | #10 | Job `e2e` en el CI; capturas en `docs/capturas/f04b` |
-| F05 | Clientes y motocicletas | 🟦 En curso | | |
+| F05 | Clientes y motocicletas | ✅ Terminada | #11 | Plantilla CRUD en ARCHITECTURE §6.1; capturas en `docs/capturas/f05` |
 | F06 | Catálogo de productos e inventario | ⬜ Pendiente | | |
 | F07 | Proveedores y compras | ⬜ Pendiente | | |
 | F08 | Ventas y comprobantes | ⬜ Pendiente | | |
@@ -28,15 +28,31 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
+- **Fase:** F05 ✅ (cerrada 2026-10-30, PR #11)
+- **Rama:** `feature/f05-clientes-motos` → `main`
+- **Hecho:** módulos `clientes` y `motocicletas` (backend y frontend). Migración V3, servicios con RN-38 a RN-45 (normalización de documento, teléfono, placa y VIN; NIT con DV; razón social con NIT; documento, placa y VIN únicos; cambio de propietario a un cliente activo; RN-44 vía `ConsultaOrdenesActivas`), búsqueda con `Specification`, auditoría sin datos personales y datos dev (10 clientes, 15 motos). Frontend: lista de clientes (tarjetas en móvil), drawer según el tipo de documento con DV en vivo y modal de la política de datos, ficha del cliente con sus motos y "Agregar moto", lista de motos con búsqueda por placa normalizada, ficha de la moto con cambio de propietario y pestaña Historial (vacía hasta F09C), `hk-placa` y validadores espejo en `core/utils/validadores.ts`. Pruebas: backend 135 unitarias y 133 IT; frontend 203 unitarias; 41 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f05/` (claro/oscuro, 1440/768/375 y en inglés).
+- **Siguiente paso concreto:** iniciar F06 con `/fase F06`. Decidir antes el presupuesto del bundle inicial (ver deuda técnica).
+- **Bloqueos o dudas:** ninguno.
+
+### Sesión anterior
 - **Fase:** F04B ✅ (cerrada 2026-10-30, PR #10)
 - **Rama:** `feature/f04b-sesion-usuarios` → `main`
 - **Hecho:** sesión en el frontend (`AuthService` con access token solo en memoria, restauración con `/auth/refresh` al arrancar tras un splash, renovación 60 s antes de vencer, interceptor con un único refresh compartido y reintento, interceptor de errores → toast por `code` y `errors[]` marcados en el formulario). Guards `authGuard` (incluye cambio obligatorio de contraseña), `invitadoGuard`, `sesionGuard`, `permisoGuard` (`canMatch`) y página 403; directiva `*hkTienePermiso`; menú, drawer y barra inferior filtrados por permiso. Pantallas: login dividido (429 con cuenta regresiva), olvidé/restablecer contraseña con medidor de fortaleza, cambio obligatorio, Mi perfil (idioma guardado en la cuenta) y Usuarios (tabla con búsqueda y filtros, drawer crear/editar, activar/desactivar, permisos por módulo). Backend: perfil `e2e` con `POST /api/v1/test/reset` y arreglo del deadlock en logins simultáneos. CI: job `e2e` (MySQL + Mailpit + Nginx en `docker-compose.e2e.yml`, backend con perfil e2e, Playwright en Chromium, reporte como artefacto si falla). Pruebas: 148 unitarias, 32 E2E + axe (estables en 3 repeticiones). Capturas en `docs/capturas/f04b/` (claro/oscuro, escritorio/móvil); revisado también 768 px y en inglés.
-- **Siguiente paso concreto:** iniciar F05 con `/fase F05`. Revisar los PRs de dependabot abiertos.
-- **Bloqueos o dudas:** ninguno.
 
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-10-30 · F05 · `ConsultaOrdenesActivas` vive en `clientes.application` (el prompt decía `motocicletas`), aprobado por el usuario · `motocicletas` depende de `clientes`; si `ClienteService` usara una interfaz de `motocicletas` habría un ciclo que ArchUnit prohíbe.
+- 2026-10-30 · F05 · Desactivar un cliente no desactiva sus motos; a un cliente inactivo no se le asignan motos (`CLIENTE_INACTIVO`, al crear o al cambiar de dueño), aprobado por el usuario · RN-44 solo habla de órdenes activas.
+- 2026-10-30 · F05 · Teléfono del cliente obligatorio y colombiano de 10 dígitos (`@TelefonoColombiano`: celular `3…` o fijo `60…`, se guarda sin `+57` ni separadores); email, dirección y ciudad opcionales · el prompt pide teléfono de 10 dígitos y el taller necesita un contacto.
+- 2026-10-30 · F05 · Con NIT el usuario escribe 9 dígitos y el DV se calcula en vivo; si escribe los 10, se valida el DV escrito · RN-39 y prompt ("DV calculado en vivo").
+- 2026-10-30 · F05 · La fecha de autorización de datos se fija al autorizar, se conserva al editar y se borra si se retira · RN-45 guarda la decisión y la fecha; no hay regla para el retiro.
+- 2026-10-30 · F05 · `cantidadMotos` y `nombreCompleto` del cliente con `@Formula` (subconsulta SQL) · `clientes` no puede depender de `motocicletas`, y así se ordena y busca por nombre sin columna duplicada.
+- 2026-10-30 · F05 · El texto de la política de datos sale de las traducciones (es/en) · RN-45 lo pide configurable; la pantalla de configuración llega en F11.
+- 2026-10-30 · F05 · `CambioEstado` (`PATCH .../estado`) y `Patrones.contiene` pasan a `shared` y los usa también `usuarios` · tres módulos con el mismo record y el mismo escape de `LIKE`.
+- 2026-10-30 · F05 · La lista de clientes no tiene menú de acciones por fila: la fila abre la ficha, donde están editar y activar/desactivar · un botón dentro de una fila clicable es un control interactivo anidado (axe/ESLint).
+- 2026-10-30 · F05 · `success-ink` claro `#047857` → `#04724F`, y `contrast:check` valida los badges también sobre `bg` · el badge "Activa" de la ficha de la moto (sobre el fondo de página) daba 4,47:1.
+- 2026-10-30 · F05 · Sin íconos nuevos: se reutilizan los registrados · `@lucide/angular` es un solo módulo y esbuild lo deja entero en el bundle inicial aunque el ícono solo lo use una ruta diferida (se probó registrarlos por ruta: no reduce nada).
 - 2026-10-30 · F04B · El enlace de recuperación usa la ruta `/restablecer?token=` (la que ya arma el backend desde F03) · no cambiar el contrato del correo.
 - 2026-10-30 · F04B · Con sesión iniciada, el idioma elegido se guarda en la cuenta (`PUT /auth/me/preferencias`) y al recuperar la sesión manda el de la cuenta · el idioma es una preferencia del usuario (RF de perfil), no del navegador.
 - 2026-10-30 · F04B · CP-09 se cubre con la acción "Nueva venta" (`*hkTienePermiso="'VENTAS_CREAR'"`) y la ruta `/ventas/nueva` con `permisoGuard`, aprobado por el usuario · el módulo de ventas llega en F08.
@@ -95,3 +111,7 @@ pm-cache-hk`.
 - Las E2E corren en el CI solo en Chromium (los tres navegadores en F12). Bajo carga paralela del servidor de desarrollo, Firefox puede exceder el timeout de 30 s (en serie pasan).
 - La campana de notificaciones muestra un estado vacío hasta F10.
 - Detrás de Nginx (F13) el rate limit verá la IP del proxy: configurar `server.forward-headers-strategy` y confiar solo en el proxy propio.
+- RN-44: `SinOrdenesActivas` (en `clientes.application`) siempre responde `false`. En F09A `taller` implementa `ConsultaOrdenesActivas`, se borra la implementación provisional y se repite CP-19 con órdenes reales.
+- `GET /motocicletas/{id}/historial` devuelve `[]` con la estructura final (`HistorialServicio`); se llena en F09C (CP-21).
+- El texto de autorización de datos (RN-45) está en las traducciones; hacerlo configurable en F11.
+- Presupuesto del bundle inicial: 799,3 kB de 800 kB (aviso). Cualquier ícono o API nueva de `@angular/forms`/CDK lo supera; decidir en F06 si se sube el aviso o se cambia cómo se registran los íconos.

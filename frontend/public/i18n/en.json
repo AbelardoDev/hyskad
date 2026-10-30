@@ -1,5 +1,149 @@
 {
   "app": {
-    "nombre": "HYSKAD"
+    "nombre": "HYSKAD",
+    "eslogan": "Motorcycle parts store and workshop"
+  },
+  "comun": {
+    "cancelar": "Cancel",
+    "cargando": "Loading…",
+    "cerrar": "Close",
+    "confirmar": "Confirm",
+    "guardar": "Save",
+    "opcional": "optional",
+    "proximamente": "Coming soon",
+    "volver_inicio": "Back to home"
+  },
+  "menu": {
+    "grupos": {
+      "general": "General",
+      "taller": "Workshop",
+      "comercial": "Sales & stock",
+      "administracion": "Administration"
+    },
+    "dashboard": "Home",
+    "ordenes": "Work orders",
+    "clientes": "Customers",
+    "motocicletas": "Motorcycles",
+    "servicios": "Services",
+    "ventas": "Sales",
+    "inventario": "Inventory",
+    "compras": "Purchases",
+    "proveedores": "Suppliers",
+    "reportes": "Reports",
+    "usuarios": "Users",
+    "configuracion": "Settings",
+    "perfil": "My profile",
+    "dev_ui": "UI kit",
+    "ordenes_corto": "Orders"
+  },
+  "layout": {
+    "saltar_contenido": "Skip to content",
+    "navegacion_principal": "Main navigation",
+    "navegacion_inferior": "Quick access",
+    "abrir_menu": "Open menu",
+    "cerrar_menu": "Close menu",
+    "colapsar_menu": "Collapse menu",
+    "expandir_menu": "Expand menu",
+    "migas": "Breadcrumb",
+    "buscar": "Search…",
+    "buscar_etiqueta": "Search customers, plates, orders or products",
+    "buscar_proximamente": "Global search is coming soon",
+    "buscar_proximamente_texto": "You will be able to find customers, motorcycles by plate, orders, products and quick actions from here, with Ctrl + K.",
+    "idioma": "Language",
+    "tema": "Theme",
+    "tema_system": "System",
+    "tema_light": "Light",
+    "tema_dark": "Dark",
+    "notificaciones": "Notifications",
+    "sin_notificaciones": "You have no notifications",
+    "sin_notificaciones_texto": "Workshop alerts will show up here in real time.",
+    "menu_usuario": "User menu",
+    "usuario_invitado": "User",
+    "sin_sesion": "Not signed in",
+    "perfil": "My profile",
+    "cambiar_password": "Change password",
+    "cerrar_sesion": "Sign out"
+  },
+  "idiomas": {
+    "es": "Español",
+    "en": "English"
+  },
+  "proximamente": {
+    "titulo": "{{modulo}} is coming soon",
+    "texto": "We are building this module. Meanwhile, feel free to explore the rest of HYSKAD."
+  },
+  "no_encontrada": {
+    "codigo": "Error 404",
+    "titulo": "This page went off the road",
+    "texto": "The address you are looking for does not exist or has moved. Check the link or go back home."
+  },
+  "estados": {
+    "orden": {
+      "RECIBIDA": "Received",
+      "EN_DIAGNOSTICO": "Diagnosing",
+      "PENDIENTE_APROBACION": "Awaiting approval",
+      "EN_REPARACION": "In repair",
+      "FINALIZADA": "Finished",
+      "ENTREGADA": "Delivered",
+      "CANCELADA": "Cancelled"
+    }
+  },
+  "ui": {
+    "input": {
+      "mostrar_password": "Show password",
+      "ocultar_password": "Hide password"
+    },
+    "combobox": {
+      "sin_resultados": "No results"
+    },
+    "tabla": {
+      "vacio": "No records",
+      "seleccionar_todo": "Select all rows",
+      "seleccionar_fila": "Select row"
+    },
+    "paginacion": {
+      "etiqueta": "Pagination",
+      "rango": "{{desde}}–{{hasta}} of {{total}}",
+      "anterior": "Previous page",
+      "siguiente": "Next page",
+      "pagina": "Page {{n}}"
+    },
+    "filtros": {
+      "buscar": "Search…",
+      "activos": "Active filters",
+      "quitar": "Remove filter {{filtro}}",
+      "limpiar": "Clear filters"
+    },
+    "confirmar": {
+      "motivo": "Reason",
+      "motivo_ayuda": "Write at least {{min}} characters. It will be kept in the history."
+    },
+    "stat": {
+      "vs_anterior": "vs. previous period"
+    },
+    "stepper": {
+      "completado": "completed",
+      "actual": "current step",
+      "pendiente": "pending",
+      "cancelado": "cancelled"
+    }
+  },
+  "validacion": {
+    "required": "This field is required",
+    "requiredTrue": "You must check this box",
+    "email": "Enter a valid email",
+    "minlength": "Enter at least {{requiredLength}} characters",
+    "maxlength": "Enter at most {{requiredLength}} characters",
+    "min": "The minimum value is {{min}}",
+    "max": "The maximum value is {{max}}",
+    "pattern": "The format is not valid"
+  },
+  "errors": {
+    "DESCONOCIDO": "Something went wrong. Please try again.",
+    "VALIDACION": "Check the form data",
+    "PASSWORD_DEBIL": "The password must have at least 8 characters, with letters and numbers",
+    "PLACA_INVALIDA": "The plate format is not valid",
+    "DOCUMENTO_INVALIDO": "The document number is not valid",
+    "NIT_INVALIDO": "The NIT is not valid"
   }
 }

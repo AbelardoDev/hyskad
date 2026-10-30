@@ -96,13 +96,17 @@
   --danger: #dc2626;
   --info: #0284c7;
   --accent-tone: #38bdf8;
-  --success-ink: #047857;
+  --success-ink: #04724f;
   --warning-ink: #a14f05;
   --danger-ink: #b91c1c;
   --info-ink: #0369a1;
   --accent-ink: #0e6a8a;
   --primary-ink: #1a46b5;
   --neutral-ink: #4a5878;
+  /* hk-placa: fondo amarillo suave con texto y borde oscuros, como la placa física (§7) */
+  --placa-bg: #fdf1b8;
+  --placa-fg: #1c1a0e;
+  --placa-borde: #2e2a17;
   color-scheme: light;
 }
 
@@ -134,6 +138,9 @@
   --accent-ink: #38bdf8;
   --primary-ink: #8cbcff;
   --neutral-ink: #a9b8d6;
+  --placa-bg: #ecd775;
+  --placa-fg: #1c1a0e;
+  --placa-borde: #ecd775;
   color-scheme: dark;
 }
 
@@ -170,6 +177,9 @@
   --color-accent-ink: var(--accent-ink);
   --color-primary-ink: var(--primary-ink);
   --color-neutral-ink: var(--neutral-ink);
+  --color-placa: var(--placa-bg);
+  --color-placa-fg: var(--placa-fg);
+  --color-placa-borde: var(--placa-borde);
 }
 
 /* Clases compartidas por los controles del kit (shared/ui). */

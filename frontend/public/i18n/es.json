@@ -12,7 +12,27 @@
     "opcional": "opcional",
     "proximamente": "Próximamente",
     "volver_inicio": "Volver al inicio",
-    "reintentar": "Reintentar"
+    "reintentar": "Reintentar",
+    "entendido": "Entendido",
+    "editar": "Editar",
+    "activar": "Activar",
+    "desactivar": "Desactivar",
+    "sin_dato": "Sin registrar",
+    "error_texto": "Revisa tu conexión e inténtalo de nuevo.",
+    "estado": {
+      "titulo": "Estado",
+      "activo": "Activo",
+      "inactivo": "Inactivo",
+      "activa": "Activa",
+      "inactiva": "Inactiva"
+    },
+    "filtros": {
+      "todos_estados": "Todos los estados",
+      "activos": "Activos",
+      "inactivos": "Inactivos",
+      "activos_f": "Activas",
+      "inactivos_f": "Inactivas"
+    }
   },
   "menu": {
     "grupos": {
@@ -153,7 +173,12 @@
     "max": "El valor máximo es {{max}}",
     "pattern": "El formato no es válido",
     "passwordDebil": "Usa al menos 8 caracteres, con letras y números",
-    "noCoincide": "Las contraseñas no coinciden"
+    "noCoincide": "Las contraseñas no coinciden",
+    "nitInvalido": "El NIT no es válido: revisa el número y el dígito de verificación",
+    "documentoInvalido": "El número no corresponde al tipo de documento",
+    "placaInvalida": "Formatos válidos: ABC12D, ABC12 o 123ABC (motocarro)",
+    "telefonoInvalido": "Escribe un celular o un fijo de 10 dígitos",
+    "vinInvalido": "El VIN tiene 17 letras y números, sin I, O ni Q"
   },
   "errors": {
     "DESCONOCIDO": "Ocurrió un error inesperado. Intenta de nuevo.",
@@ -193,7 +218,16 @@
     "IDIOMA_INVALIDO": "El idioma no es válido",
     "PERMISO_REPETIDO": "Hay un permiso repetido",
     "PROPIEDAD_DESCONOCIDA": "Se envió un dato desconocido",
-    "TIPO_INVALIDO": "Un dato tiene un formato inválido"
+    "TIPO_INVALIDO": "Un dato tiene un formato inválido",
+    "DOCUMENTO_DUPLICADO": "Ya existe un cliente con ese documento",
+    "PLACA_DUPLICADA": "Ya existe una moto con esa placa",
+    "VIN_DUPLICADO": "Ya existe una moto con ese VIN",
+    "VIN_INVALIDO": "El VIN tiene 17 letras y números, sin I, O ni Q",
+    "CLIENTE_INACTIVO": "El cliente está inactivo: actívalo antes de asignarle una moto",
+    "ORDENES_ACTIVAS": "Tiene órdenes de trabajo activas; ciérralas antes de desactivarlo",
+    "MIN": "El valor es menor que el permitido",
+    "MAX": "El valor es mayor que el permitido",
+    "POSITIVE": "El valor debe ser mayor que cero"
   },
   "roles": {
     "ADMIN": "Administrador",
@@ -375,6 +409,149 @@
         "inventario": "Inventario y compras",
         "administracion": "Administración"
       }
+    }
+  },
+  "clientes": {
+    "titulo": "Clientes",
+    "subtitulo": "Personas y empresas que traen sus motos al taller",
+    "nuevo": "Nuevo cliente",
+    "buscar": "Buscar por nombre, documento, teléfono o correo…",
+    "vacio_titulo": "No hay clientes que coincidan",
+    "vacio_texto": "Prueba con otra búsqueda o registra un cliente nuevo.",
+    "error_titulo": "No se pudieron cargar los clientes",
+    "creado": "Cliente {{nombre}} registrado",
+    "actualizado": "Cambios de {{nombre}} guardados",
+    "activado": "{{nombre}} está activo de nuevo",
+    "desactivado": "{{nombre}} fue desactivado",
+    "confirmar_activar": {
+      "titulo": "¿Activar cliente?",
+      "mensaje": "{{nombre}} volverá a aparecer al registrar motos y órdenes."
+    },
+    "confirmar_desactivar": {
+      "titulo": "¿Desactivar cliente?",
+      "mensaje": "{{nombre}} no se podrá elegir para nuevas motos ni órdenes. Sus datos y su historial se conservan."
+    },
+    "tipos": {
+      "CC": "Cédula de ciudadanía (CC)",
+      "TI": "Tarjeta de identidad (TI)",
+      "CE": "Cédula de extranjería (CE)",
+      "PA": "Pasaporte (PA)",
+      "PPT": "Permiso por protección temporal (PPT)",
+      "NIT": "NIT (empresa)"
+    },
+    "campos": {
+      "nombre": "Nombre o razón social",
+      "documento": "Documento",
+      "tipo_documento": "Tipo de documento",
+      "numero_documento": "Número de documento",
+      "nit": "NIT (sin dígito de verificación)",
+      "nombres": "Nombres",
+      "apellidos": "Apellidos",
+      "razon_social": "Razón social",
+      "telefono": "Teléfono",
+      "email": "Correo electrónico",
+      "direccion": "Dirección",
+      "ciudad": "Ciudad",
+      "motos": "Motos"
+    },
+    "form": {
+      "titulo_nuevo": "Nuevo cliente",
+      "titulo_editar": "Editar cliente",
+      "documento_ayuda": "Sin puntos ni espacios; se limpian solos.",
+      "nit_ayuda": "Los 9 dígitos; el dígito de verificación se calcula solo.",
+      "dv": "DV",
+      "dv_accesible": "Dígito de verificación: {{dv}}",
+      "telefono_ayuda": "Celular (3…) o fijo con indicativo (60…), 10 dígitos.",
+      "datos_personales": "Tratamiento de datos personales",
+      "autoriza": "El cliente autoriza el tratamiento de sus datos personales",
+      "autoriza_ayuda": "Sin autorización no se le enviarán correos.",
+      "autorizado_el": "Autorizó el tratamiento de datos el {{fecha}}."
+    },
+    "politica": {
+      "ver": "Ver política",
+      "titulo": "Autorización de tratamiento de datos personales",
+      "p1": "En cumplimiento de la Ley 1581 de 2012 y sus decretos reglamentarios, el cliente autoriza al taller para recolectar, almacenar, usar y actualizar sus datos personales (identificación, contacto y datos de sus vehículos).",
+      "p2": "Los datos se usan solo para prestar los servicios de venta y mantenimiento, registrar el historial de cada moto, avisarle del estado de sus órdenes y enviarle comprobantes y presupuestos.",
+      "p3": "El titular puede conocer, actualizar, rectificar y pedir la supresión de sus datos, y revocar esta autorización en cualquier momento, solicitándolo en el taller.",
+      "p4": "Si el cliente no autoriza, se le seguirá atendiendo, pero no recibirá correos del sistema."
+    },
+    "detalle": {
+      "miga": "Ficha",
+      "datos": "Datos de contacto",
+      "motos": "Motocicletas",
+      "agregar_moto": "Agregar moto",
+      "sin_motos": "Todavía no tiene motos",
+      "sin_motos_texto": "Registra su primera moto para abrirle órdenes de trabajo.",
+      "autoriza": "Autoriza tratamiento de datos",
+      "no_autoriza": "Sin autorización de datos",
+      "sin_correos": "No autorizó el tratamiento de datos: no se le envían correos.",
+      "no_encontrado": "Cliente no encontrado",
+      "no_encontrado_texto": "Puede que el enlace esté mal o que no tengas acceso.",
+      "volver": "Volver a clientes"
+    }
+  },
+  "motos": {
+    "titulo": "Motocicletas",
+    "subtitulo": "Motos registradas y sus propietarios",
+    "nueva": "Nueva moto",
+    "buscar": "Buscar por placa…",
+    "vacio_titulo": "No hay motos que coincidan",
+    "vacio_texto": "Revisa la placa o registra una moto nueva.",
+    "error_titulo": "No se pudieron cargar las motos",
+    "creada": "Moto {{placa}} registrada",
+    "actualizada": "Cambios de la moto {{placa}} guardados",
+    "activada": "La moto {{placa}} está activa de nuevo",
+    "desactivada": "La moto {{placa}} fue desactivada",
+    "confirmar_activar": {
+      "titulo": "¿Activar moto?",
+      "mensaje": "La moto {{placa}} se podrá elegir otra vez para órdenes de trabajo."
+    },
+    "confirmar_desactivar": {
+      "titulo": "¿Desactivar moto?",
+      "mensaje": "La moto {{placa}} no se podrá elegir para nuevas órdenes. Su historial se conserva."
+    },
+    "campos": {
+      "placa": "Placa",
+      "moto": "Moto",
+      "marca": "Marca",
+      "modelo": "Modelo",
+      "anio": "Año",
+      "cilindrada": "Cilindrada (cc)",
+      "color": "Color",
+      "vin": "VIN (número de chasis)",
+      "propietario": "Propietario"
+    },
+    "form": {
+      "titulo_nuevo": "Nueva moto",
+      "titulo_editar": "Editar moto",
+      "placa_ayuda": "ABC12D, ABC12 o 123ABC (motocarro). Se pasa a mayúsculas sola.",
+      "vin_ayuda": "17 caracteres, sin I, O ni Q.",
+      "propietario_ayuda": "Busca por nombre, documento o teléfono. Solo clientes activos.",
+      "buscar_cliente": "Buscar cliente…"
+    },
+    "propietario": {
+      "titulo": "Cambiar propietario",
+      "descripcion": "La moto pasa al nuevo dueño y conserva todo su historial de servicios.",
+      "nuevo": "Nuevo propietario",
+      "resumen": "pasará de {{anterior}} a {{nuevo}}.",
+      "confirmar": "Confirmar cambio",
+      "cambiado": "La moto {{placa}} ahora es de {{nombre}}",
+      "ayuda": "Si la moto se vendió, cámbiala de dueño: su historial se queda con la moto."
+    },
+    "detalle": {
+      "miga": "Ficha",
+      "subtitulo": "De {{propietario}}",
+      "ficha": "Ficha técnica",
+      "ver_cliente": "Ver ficha del cliente",
+      "no_encontrada": "Moto no encontrada",
+      "no_encontrada_texto": "Puede que el enlace esté mal o que no tengas acceso.",
+      "volver": "Volver a motocicletas"
+    },
+    "historial": {
+      "titulo": "Historial",
+      "vacio_titulo": "Sin servicios registrados",
+      "vacio_texto": "Aquí aparecerán las órdenes de trabajo de esta moto, con sus servicios, repuestos y totales.",
+      "error": "No se pudo cargar el historial"
     }
   }
 }

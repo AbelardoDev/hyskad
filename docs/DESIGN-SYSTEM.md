@@ -52,7 +52,7 @@ Cada color de estado (y `primary` y `accent`) tiene su variante `-soft` (fondo d
 
 | Token `-ink` | Claro | Oscuro |
 |---|---|---|
-| `success-ink` | `#047857` | `#34D399` |
+| `success-ink` | `#04724F` | `#34D399` |
 | `warning-ink` | `#A14F05` | `#FBBF24` |
 | `danger-ink` | `#B91C1C` | `#F87171` |
 | `info-ink` | `#0369A1` | `#38BDF8` |
@@ -61,6 +61,8 @@ Cada color de estado (y `primary` y `accent`) tiene su variante `-soft` (fondo d
 | `neutral-ink` (badge neutro sobre `surface-2`) | `#4A5878` | `#A9B8D6` |
 
 > Ajustes de F04A verificados con `npm run contrast:check` (lee `styles.css`): el `ring` claro pasó de `#5698FF` (2,7:1 sobre `bg`) a `#2F74F5` (4,0:1); los bordes de controles usan `border-strong` (≥ 3:1) porque `border` es decorativo; los colores de estado en claro no alcanzan 4,5:1 sobre su `-soft`, por eso existen los `-ink`.
+
+> F05: los badges también se validan sobre `bg` (se usan fuera de tarjetas); `success-ink` claro pasó de `#047857` (4,47:1 sobre `bg`) a `#04724F`. La placa (`hk-placa`) usa sus propios tokens: `placa-bg` `#FDF1B8` / `#ECD775`, `placa-fg` `#1C1A0E` y `placa-borde` `#2E2A17` (claro; en oscuro el borde es el mismo amarillo).
 
 El **sidebar es oscuro en ambos temas** (identidad de marca). En modo claro va con un degradado navy sutil.
 

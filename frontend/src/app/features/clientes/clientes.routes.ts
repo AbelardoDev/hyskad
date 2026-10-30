@@ -1,7 +1,15 @@
 import { Routes } from '@angular/router';
 
-import { ProximamentePage } from '../../core/layout/paginas/proximamente-page';
-
 export const CLIENTES_ROUTES: Routes = [
-  { path: '', component: ProximamentePage, data: { icono: 'users-round' } },
+  {
+    path: '',
+    children: [
+      { path: '', loadComponent: () => import('./clientes-page').then((m) => m.ClientesPage) },
+      {
+        path: ':id',
+        data: { miga: 'clientes.detalle.miga' },
+        loadComponent: () => import('./cliente-detalle-page').then((m) => m.ClienteDetallePage),
+      },
+    ],
+  },
 ];

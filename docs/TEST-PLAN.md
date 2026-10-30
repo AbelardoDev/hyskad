@@ -93,14 +93,21 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 ### Clientes y motocicletas (F05)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
-| CP-14 | RF5 | Registrar cliente CC válido con autorización de datos | I, E | 201 y ficha visible | Pendiente |
-| CP-15 | RN-39 | NIT con dígito de verificación incorrecto | U, I | 400 `NIT_INVALIDO` | Pendiente (U backend aprobada en F02; I en F05) |
-| CP-16 | RN-40 | Documento duplicado | I | 409 | Pendiente |
-| CP-17 | RF7, RN-41 | Placas `ABC12D`, `abc-12d`, `ABC12`, `123ABC` válidas; `AB123`, `ABCD12` inválidas | U (back y front) | Normaliza y acepta/rechaza según patrón | Pendiente (U backend aprobada en F02; front en F05) |
-| CP-18 | RF7 | Placa duplicada | I | 409 `PLACA_DUPLICADA` | Pendiente |
-| CP-19 | RF6, RN-44 | Desactivar cliente con orden activa | I | 409 | Pendiente |
-| CP-20 | RF29 | Buscar clientes por nombre parcial, documento y teléfono | I | Resultados paginados correctos | Pendiente |
-| CP-21 | RF9 | Historial de una moto con 3 órdenes | I, E | Lista ordenada por fecha con servicios, repuestos y totales | Pendiente |
+| CP-14 | RF5 | Registrar cliente CC válido con autorización de datos | I, E | 201 y ficha visible | Aprobado (F05: I con CC; E con NIT y ficha visible) |
+| CP-15 | RN-39 | NIT con dígito de verificación incorrecto | U, I | 400 `NIT_INVALIDO` | Aprobado (U backend F02, U front e I en F05) |
+| CP-16 | RN-40 | Documento duplicado | I | 409 | Aprobado (F05, `DOCUMENTO_DUPLICADO`; el mismo número con otro tipo sí se admite) |
+| CP-17 | RF7, RN-41 | Placas `ABC12D`, `abc-12d`, `ABC12`, `123ABC` válidas; `AB123`, `ABCD12` inválidas | U (back y front) | Normaliza y acepta/rechaza según patrón | Aprobado (U backend F02, U front F05; también I) |
+| CP-18 | RF7 | Placa duplicada | I | 409 `PLACA_DUPLICADA` | Aprobado (F05, también escrita en minúsculas y al editar) |
+| CP-19 | RF6, RN-44 | Desactivar cliente con orden activa | I | 409 | Aprobado (F05, `ORDENES_ACTIVAS` con un doble de `ConsultaOrdenesActivas`; repetir con órdenes reales en F09A) |
+| CP-20 | RF29 | Buscar clientes por nombre parcial, documento y teléfono | I | Resultados paginados correctos | Aprobado (F05) |
+| CP-21 | RF9 | Historial de una moto con 3 órdenes | I, E | Lista ordenada por fecha con servicios, repuestos y totales | Pendiente (F09C; en F05 el endpoint responde `[]` con la estructura final) |
+| CP-88 | RF4, IS4 | Permisos de cada endpoint de clientes y motos | I | Vendedor gestiona; mecánico solo consulta (403 al escribir); almacén 403 en todo; sin token 401 | Aprobado (F05) |
+| CP-89 | RN-43 | Cambiar el propietario de una moto | I, E | La moto pasa al nuevo cliente con confirmación, se audita `MOTOCICLETA_PROPIETARIO_CAMBIADO` y deja de listarse en el anterior | Aprobado (F05) |
+| CP-90 | RF29, RN-41 | Buscar motos por placa parcial escrita en minúsculas y con guion | I, E | `abc-12` encuentra `ABC12D`; el buscador muestra la placa normalizada | Aprobado (F05) |
+| CP-91 | RN-45 | Autorización de datos al crear y editar | U, I | Se guarda la decisión y la fecha; editar conserva la fecha; retirarla la borra; sin autorización `puedeRecibirCorreos()` es falso | Aprobado (F05) |
+| CP-92 | RN-38, RN-39 | Formulario de cliente según el tipo de documento | U, E | NIT pide razón social y calcula el DV en vivo; CC pide nombres y apellidos; errores espejo del backend | Aprobado (F05) |
+| CP-93 | RN-43, RN-44 | Asignar una moto (crear o cambiar de dueño) a un cliente inactivo | I | 409 `CLIENTE_INACTIVO` | Aprobado (F05) |
+| CP-94 | RNF Acc. | axe en lista y drawer de clientes, ficha de cliente, lista de motos y ficha/historial de moto, en claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F05) |
 
 ### Inventario, proveedores y compras (F06–F07)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |

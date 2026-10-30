@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.hyskad.shared.web.CambioEstado;
 import com.hyskad.shared.web.PageResponse;
 import com.hyskad.usuarios.application.ActualizarPermisos;
 import com.hyskad.usuarios.application.ActualizarUsuario;
-import com.hyskad.usuarios.application.CambiarEstadoUsuario;
 import com.hyskad.usuarios.application.CrearUsuario;
 import com.hyskad.usuarios.application.PermisoDeUsuario;
 import com.hyskad.usuarios.application.UsuarioService;
@@ -71,7 +71,7 @@ public class UsuarioController {
     }
 
     @PatchMapping("/{id}/estado")
-    public UsuarioResponse cambiarEstado(@PathVariable Long id, @Valid @RequestBody CambiarEstadoUsuario datos) {
+    public UsuarioResponse cambiarEstado(@PathVariable Long id, @Valid @RequestBody CambioEstado datos) {
         return mapper.toResponse(service.cambiarEstado(id, datos.activo()));
     }
 

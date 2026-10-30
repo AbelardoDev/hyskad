@@ -1,8 +1,10 @@
 package com.hyskad.taller.application;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,6 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.hyskad.clientes.application.ClienteService;
 import com.hyskad.clientes.domain.Cliente;
+import com.hyskad.configuracion.application.ConfiguracionService;
+import com.hyskad.inventario.application.InventarioService;
+import com.hyskad.inventario.domain.Referencia;
 import com.hyskad.motocicletas.application.MotocicletaService;
 import com.hyskad.motocicletas.domain.Motocicleta;
 import com.hyskad.shared.audit.AuditoriaService;
@@ -39,12 +44,16 @@ import com.hyskad.taller.domain.DatosDiagnostico;
 import com.hyskad.taller.domain.DatosRecepcion;
 import com.hyskad.taller.domain.EstadoOrden;
 import com.hyskad.taller.domain.EstadoOrdenCambiado;
+import com.hyskad.taller.domain.EstadoPresupuesto;
 import com.hyskad.taller.domain.MecanicoAsignado;
 import com.hyskad.taller.domain.OrdenCreada;
+import com.hyskad.taller.domain.OrdenFinalizada;
+import com.hyskad.taller.domain.OrdenRepuesto;
 import com.hyskad.taller.domain.OrdenTrabajo;
 import com.hyskad.taller.domain.OrdenTrabajo.CambioMecanicos;
 import com.hyskad.taller.persistence.OrdenTrabajoRepository;
 import com.hyskad.taller.persistence.OrdenTrabajoSpecifications;
+import com.hyskad.taller.persistence.PresupuestoRepository;
 import com.hyskad.usuarios.application.UsuarioService;
 import com.hyskad.usuarios.domain.Permiso;
 import com.hyskad.usuarios.domain.Usuario;
@@ -64,22 +73,29 @@ public class OrdenTrabajoService {
     static final int MAX_MECANICOS = 10;
 
     private final OrdenTrabajoRepository repository;
+    private final PresupuestoRepository presupuestos;
     private final ClienteService clientes;
     private final MotocicletaService motocicletas;
     private final UsuarioService usuarios;
+    private final InventarioService inventario;
+    private final ConfiguracionService configuracion;
     private final ConsecutivoService consecutivos;
     private final AuditoriaService auditoria;
     private final UsuarioActual usuarioActual;
     private final ApplicationEventPublisher eventos;
     private final Clock clock;
 
-    public OrdenTrabajoService(OrdenTrabajoRepository repository, ClienteService clientes,
-            MotocicletaService motocicletas, UsuarioService usuarios, ConsecutivoService consecutivos,
+    public OrdenTrabajoService(OrdenTrabajoRepository repository, PresupuestoRepository presupuestos,
+            ClienteService clientes, MotocicletaService motocicletas, UsuarioService usuarios,
+            InventarioService inventario, ConfiguracionService configuracion, ConsecutivoService consecutivos,
             AuditoriaService auditoria, UsuarioActual usuarioActual, ApplicationEventPublisher eventos, Clock clock) {
         this.repository = repository;
+        this.presupuestos = presupuestos;
         this.clientes = clientes;
         this.motocicletas = motocicletas;
         this.usuarios = usuarios;
+        this.inventario = inventario;
+        this.configuracion = configuracion;
         this.consecutivos = consecutivos;
         this.auditoria = auditoria;
         this.usuarioActual = usuarioActual;
@@ -240,6 +256,10 @@ public class OrdenTrabajoService {
         if (regla.esAutomatica()) {
             throw OrdenTrabajo.transicionInvalida(desde, hasta, "AUTOMATICA");
         }
+        if (hasta == EstadoOrden.PENDIENTE_APROBACION) {
+            // Enviar el presupuesto lleva descuento y observaciones: POST /ordenes-trabajo/{id}/presupuestos
+            throw OrdenTrabajo.transicionInvalida(desde, hasta, "PRESUPUESTO_REQUERIDO");
+        }
         if (!usuarioActual.tienePermiso(regla.permiso().name())) {
             throw new AccessDeniedException("La transición requiere " + regla.permiso());
         }
@@ -251,23 +271,74 @@ public class OrdenTrabajoService {
         if (bloqueo.isPresent()) {
             throw OrdenTrabajo.transicionInvalida(desde, hasta, bloqueo.get());
         }
+        aplicarTransicion(orden, hasta, nota);
+    }
+
+    /**
+     * Aplica la transición con sus efectos, la deja en el historial y la audita. La usan las
+     * transiciones pedidas por el usuario y las automáticas de los presupuestos.
+     * <ul>
+     * <li>Cancelar libera todas las reservas y reemplaza el presupuesto pendiente (RN-29, RN-31).</li>
+     * <li>Volver a diagnóstico reemplaza el presupuesto pendiente y quita el descuento: lo fija el
+     * próximo presupuesto (RN-32).</li>
+     * <li>Finalizar saca del inventario lo reservado ({@code SALIDA_ORDEN}), en orden de producto
+     * para no cruzar bloqueos, y congela el costo de cada repuesto. Si uno falla no sale nada.</li>
+     * </ul>
+     */
+    void aplicarTransicion(OrdenTrabajo orden, EstadoOrden hasta, String nota) {
+        EstadoOrden desde = orden.getEstado();
         Long usuarioId = usuarioActual.id().orElse(null);
-        orden.transicionarA(hasta, usuarioId, nota, Instant.now(clock));
-        auditoria.registrar("ORDEN_TRANSICION", ENTIDAD, id, Map.of("numero", orden.getNumero(),
+        Instant ahora = Instant.now(clock);
+        orden.transicionarA(hasta, usuarioId, nota, ahora);
+        Referencia referencia = referencia(orden);
+        if (hasta == EstadoOrden.CANCELADA) {
+            repuestosEnOrden(orden).forEach(r -> inventario.liberarReserva(r.getProducto().getId(), r.getCantidad(),
+                    referencia));
+            reemplazarPendiente(orden, usuarioId, ahora);
+        }
+        if (hasta == EstadoOrden.EN_DIAGNOSTICO && desde != EstadoOrden.RECIBIDA) {
+            reemplazarPendiente(orden, usuarioId, ahora);
+            orden.aplicarDescuento(BigDecimal.ZERO, configuracion.getIvaPorcentaje());
+        }
+        if (hasta == EstadoOrden.FINALIZADA) {
+            repuestosEnOrden(orden).forEach(r -> r.congelarCosto(inventario.consumirReserva(r.getProducto().getId(),
+                    r.getCantidad(), referencia)));
+            orden.finalizar(ahora);
+            eventos.publishEvent(new OrdenFinalizada(orden.getId(), orden.getNumero(), orden.getCliente().getId(),
+                    orden.getTotal()));
+        }
+        auditoria.registrar("ORDEN_TRANSICION", ENTIDAD, orden.getId(), Map.of("numero", orden.getNumero(),
                 "desde", desde.name(), "hasta", hasta.name()));
-        eventos.publishEvent(new EstadoOrdenCambiado(id, orden.getNumero(), desde, hasta, usuarioId, nota));
+        eventos.publishEvent(new EstadoOrdenCambiado(orden.getId(), orden.getNumero(), desde, hasta, usuarioId, nota));
+    }
+
+    static Referencia referencia(OrdenTrabajo orden) {
+        return new Referencia(Referencia.TipoReferencia.ORDEN_TRABAJO, orden.getId(), orden.getNumero());
+    }
+
+    private static List<OrdenRepuesto> repuestosEnOrden(OrdenTrabajo orden) {
+        return orden.getRepuestos().stream().sorted(Comparator.comparing(r -> r.getProducto().getId())).toList();
+    }
+
+    private void reemplazarPendiente(OrdenTrabajo orden, Long usuarioId, Instant ahora) {
+        presupuestos.findFirstByOrdenIdAndEstado(orden.getId(), EstadoPresupuesto.PENDIENTE)
+                .ifPresent(p -> {
+                    p.reemplazar(usuarioId, ahora);
+                    auditoria.registrar("PRESUPUESTO_REEMPLAZADO", PresupuestoService.ENTIDAD, p.getId(),
+                            Map.of("numero", p.getNumero()));
+                });
     }
 
     /**
      * Condición de negocio que aún no se cumple para llegar a {@code destino}, si hay alguna.
-     * Los ítems (y el presupuesto que se genera con ellos) llegan en F09B y el pago en F09C: hasta
-     * entonces ninguna orden los tiene, así que esas transiciones quedan bloqueadas.
+     * El pago llega en F09C: hasta entonces ninguna orden puede entregarse.
      */
     static Optional<String> bloqueo(OrdenTrabajo orden, EstadoOrden destino) {
         return Optional.ofNullable(switch (destino) {
             case EN_DIAGNOSTICO -> orden.getEstado() == EstadoOrden.RECIBIDA && orden.getMecanicos().isEmpty()
                     ? "SIN_MECANICOS" : null;
-            case PENDIENTE_APROBACION -> orden.tieneDiagnostico() ? "SIN_ITEMS" : "SIN_DIAGNOSTICO";
+            case PENDIENTE_APROBACION -> !orden.tieneDiagnostico() ? "SIN_DIAGNOSTICO"
+                    : orden.tieneItems() ? null : "SIN_ITEMS";
             case ENTREGADA -> "SIN_PAGO";
             default -> null;
         });
@@ -285,15 +356,16 @@ public class OrdenTrabajoService {
             }
         }
         boolean diagnosticable = estado == EstadoOrden.EN_DIAGNOSTICO || estado == EstadoOrden.EN_REPARACION;
+        boolean trabaja = permisos.contains(Permiso.ORDENES_TRABAJAR.name());
         return new AccionesPermitidas(orden.esActiva() && permisos.contains(Permiso.ORDENES_CREAR.name()),
-                orden.esActiva() && permisos.contains(Permiso.ORDENES_ASIGNAR.name()),
-                diagnosticable && permisos.contains(Permiso.ORDENES_TRABAJAR.name()), List.copyOf(transiciones));
+                orden.esActiva() && permisos.contains(Permiso.ORDENES_ASIGNAR.name()), diagnosticable && trabaja,
+                estado == EstadoOrden.EN_DIAGNOSTICO && trabaja,
+                permisos.contains(Permiso.PRESUPUESTOS_GESTIONAR.name()), List.copyOf(transiciones));
     }
 
     /** Carga la orden para modificarla: visible para el usuario y en la versión que él leyó. */
-    private OrdenTrabajo paraModificar(Long id, long version) {
-        OrdenTrabajo orden = repository.paraModificar(id).orElseThrow(() -> new NotFoundException(ENTIDAD, id));
-        exigirVisible(orden);
+    OrdenTrabajo paraModificar(Long id, long version) {
+        OrdenTrabajo orden = paraModificar(id);
         if (orden.getVersion() != version) {
             throw new ConflictException(ErrorCode.CONFLICTO_CONCURRENCIA,
                     "Otro usuario modificó la orden. Recargue e intente de nuevo", Map.of("version", orden.getVersion()));
@@ -301,8 +373,18 @@ public class OrdenTrabajoService {
         return orden;
     }
 
+    /**
+     * Carga la orden visible para el usuario sin comparar versión (decisiones sobre un presupuesto):
+     * igual sube de versión al confirmar, así que dos operaciones simultáneas no pasan ambas.
+     */
+    OrdenTrabajo paraModificar(Long id) {
+        OrdenTrabajo orden = repository.paraModificar(id).orElseThrow(() -> new NotFoundException(ENTIDAD, id));
+        exigirVisible(orden);
+        return orden;
+    }
+
     /** RN-27: 404 (no 403) para no revelar que la orden existe. */
-    private void exigirVisible(OrdenTrabajo orden) {
+    void exigirVisible(OrdenTrabajo orden) {
         if (!puedeVerTodas() && !orden.estaAsignado(usuarioActual.idRequerido())) {
             throw new NotFoundException(ENTIDAD, orden.getId());
         }
@@ -362,6 +444,8 @@ public class OrdenTrabajoService {
     private static void cargar(OrdenTrabajo orden) {
         orden.getMecanicos().size();
         orden.getHistorial().size();
+        orden.getServicios().size();
+        orden.getRepuestos().forEach(r -> r.getProducto().getCodigo());
     }
 
     private static Specification<OrdenTrabajo> especificacion(FiltroOrdenes f) {

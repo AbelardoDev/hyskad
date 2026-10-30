@@ -17,7 +17,7 @@
 | F07 | Proveedores y compras | ✅ Terminada | #13 | `CalculadoraTotales` (RN-04) lista para ventas y órdenes; capturas en `docs/capturas/f07` |
 | F08 | Ventas y comprobantes | ✅ Terminada | #14 | POS con teclado (F2/Enter/F9); comprobante carta/tirilla fuera del shell; capturas en `docs/capturas/f08` |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ✅ Terminada | #15 | Diagrama de estados en ARCHITECTURE §6.2 (verificado por `DiagramaEstadosTest`); capturas en `docs/capturas/f09a` |
-| F09B | Órdenes: servicios, repuestos y presupuestos | ⬜ Pendiente | | |
+| F09B | Órdenes: servicios, repuestos y presupuestos | 🟦 En curso | | |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ⬜ Pendiente | | |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ⬜ Pendiente | | |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ⬜ Pendiente | | |

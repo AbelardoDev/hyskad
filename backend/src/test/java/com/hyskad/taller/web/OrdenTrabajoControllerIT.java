@@ -247,14 +247,17 @@ class OrdenTrabajoControllerIT {
         orden = asignar(orden, mecanico.id());
         transicion(orden, "CANCELADA", "No puedo", mecanicoBearer).andExpect(status().isForbidden());
         orden = ok(transicion(orden, "EN_DIAGNOSTICO", null, mecanicoBearer));
-        transicion(orden, "PENDIENTE_APROBACION", null, vendedor)
+        // Pasar a PENDIENTE_APROBACION es enviar un presupuesto: exige diagnóstico y al menos un ítem
+        presupuesto(orden)
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.motivo").value("SIN_DIAGNOSTICO"));
         orden = diagnosticar(orden, null);
-        // Sin ítems no hay presupuesto que enviar (los ítems llegan en F09B)
-        transicion(orden, "PENDIENTE_APROBACION", null, vendedor)
+        presupuesto(orden)
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.motivo").value("SIN_ITEMS"));
+        transicion(orden, "PENDIENTE_APROBACION", null, vendedor)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.motivo").value("PRESUPUESTO_REQUERIDO"));
         transicion(orden, "RECIBIDA", null, admin)
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("TRANSICION_INVALIDA"));
@@ -482,6 +485,11 @@ class OrdenTrabajoControllerIT {
                 {"version":%d,"estado":"%s"}""".formatted(version(orden), estado) : """
                 {"version":%d,"estado":"%s","nota":"%s"}""".formatted(version(orden), estado, nota);
         return mvc.perform(con(post(BASE + "/" + id(orden) + "/transiciones"), bearer).content(cuerpo));
+    }
+
+    private ResultActions presupuesto(JsonNode orden) throws Exception {
+        return mvc.perform(con(post(BASE + "/" + id(orden) + "/presupuestos"), vendedor).content("""
+                {"version":%d,"descuento":0}""".formatted(version(orden))));
     }
 
     private ResultActions acciones(JsonNode orden, String bearer) throws Exception {

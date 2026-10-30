@@ -12,6 +12,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.SortDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +28,9 @@ import com.hyskad.taller.application.ActualizarRecepcion;
 import com.hyskad.taller.application.AsignarMecanicos;
 import com.hyskad.taller.application.CrearOrden;
 import com.hyskad.taller.application.FiltroOrdenes;
+import com.hyskad.taller.application.GuardarRepuestoOrden;
+import com.hyskad.taller.application.GuardarServicioOrden;
+import com.hyskad.taller.application.ItemsOrdenService;
 import com.hyskad.taller.application.OrdenTrabajoService;
 import com.hyskad.taller.application.OrdenTrabajoService.InfoRecepcion;
 import com.hyskad.taller.application.RegistrarDiagnostico;
@@ -51,11 +55,15 @@ public class OrdenTrabajoController {
 
     private static final String VER = "hasAnyAuthority('ORDENES_VER_TODAS', 'ORDENES_VER_ASIGNADAS')";
 
+    private static final String TRABAJAR = "hasAuthority('ORDENES_TRABAJAR')";
+
     private final OrdenTrabajoService service;
+    private final ItemsOrdenService items;
     private final OrdenesWeb web;
 
-    public OrdenTrabajoController(OrdenTrabajoService service, OrdenesWeb web) {
+    public OrdenTrabajoController(OrdenTrabajoService service, ItemsOrdenService items, OrdenesWeb web) {
         this.service = service;
+        this.items = items;
         this.web = web;
     }
 
@@ -123,7 +131,7 @@ public class OrdenTrabajoController {
     }
 
     @PutMapping("/{id}/diagnostico")
-    @PreAuthorize("hasAuthority('ORDENES_TRABAJAR')")
+    @PreAuthorize(TRABAJAR)
     public OrdenResponse registrarDiagnostico(@PathVariable Long id, @Valid @RequestBody RegistrarDiagnostico datos) {
         service.registrarDiagnostico(id, datos);
         return obtener(id);
@@ -133,6 +141,55 @@ public class OrdenTrabajoController {
     @PreAuthorize(VER)
     public OrdenResponse transicionar(@PathVariable Long id, @Valid @RequestBody SolicitarTransicion datos) {
         service.transicionar(id, datos);
+        return obtener(id);
+    }
+
+    // Ítems (RN-28 a RN-30): solo en diagnóstico; el mecánico, en sus órdenes. Devuelven la orden
+    // con los totales recalculados.
+
+    @PostMapping("/{id}/servicios")
+    @PreAuthorize(TRABAJAR)
+    public OrdenResponse agregarServicio(@PathVariable Long id, @Valid @RequestBody GuardarServicioOrden datos) {
+        items.agregarServicio(id, datos);
+        return obtener(id);
+    }
+
+    @PutMapping("/{id}/servicios/{itemId}")
+    @PreAuthorize(TRABAJAR)
+    public OrdenResponse actualizarServicio(@PathVariable Long id, @PathVariable Long itemId,
+            @Valid @RequestBody GuardarServicioOrden datos) {
+        items.actualizarServicio(id, itemId, datos);
+        return obtener(id);
+    }
+
+    @DeleteMapping("/{id}/servicios/{itemId}")
+    @PreAuthorize(TRABAJAR)
+    public OrdenResponse quitarServicio(@PathVariable Long id, @PathVariable Long itemId,
+            @RequestParam long version) {
+        items.quitarServicio(id, itemId, version);
+        return obtener(id);
+    }
+
+    @PostMapping("/{id}/repuestos")
+    @PreAuthorize(TRABAJAR)
+    public OrdenResponse agregarRepuesto(@PathVariable Long id, @Valid @RequestBody GuardarRepuestoOrden datos) {
+        items.agregarRepuesto(id, datos);
+        return obtener(id);
+    }
+
+    @PutMapping("/{id}/repuestos/{itemId}")
+    @PreAuthorize(TRABAJAR)
+    public OrdenResponse cambiarCantidadRepuesto(@PathVariable Long id, @PathVariable Long itemId,
+            @Valid @RequestBody GuardarRepuestoOrden datos) {
+        items.cambiarCantidadRepuesto(id, itemId, datos);
+        return obtener(id);
+    }
+
+    @DeleteMapping("/{id}/repuestos/{itemId}")
+    @PreAuthorize(TRABAJAR)
+    public OrdenResponse quitarRepuesto(@PathVariable Long id, @PathVariable Long itemId,
+            @RequestParam long version) {
+        items.quitarRepuesto(id, itemId, version);
         return obtener(id);
     }
 

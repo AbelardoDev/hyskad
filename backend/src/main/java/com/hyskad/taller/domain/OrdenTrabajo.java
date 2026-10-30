@@ -1,5 +1,6 @@
 package com.hyskad.taller.domain;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,10 +15,15 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import com.hyskad.catalogo.domain.Producto;
 import com.hyskad.clientes.domain.Cliente;
 import com.hyskad.motocicletas.domain.Motocicleta;
+import com.hyskad.servicios.domain.Servicio;
+import com.hyskad.shared.dinero.CalculadoraTotales;
+import com.hyskad.shared.dinero.CalculadoraTotales.Totales;
 import com.hyskad.shared.error.ConflictException;
 import com.hyskad.shared.error.ErrorCode;
+import com.hyskad.shared.error.NotFoundException;
 import com.hyskad.shared.persistence.BaseEntity;
 
 import jakarta.persistence.CascadeType;
@@ -87,6 +93,24 @@ public class OrdenTrabajo extends BaseEntity {
     @Column(name = "kilometraje_inspeccion")
     private Integer kilometrajeInspeccion;
 
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal subtotal = BigDecimal.ZERO;
+
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal descuento = BigDecimal.ZERO;
+
+    @Column(name = "iva_porcentaje", nullable = false, precision = 5, scale = 2)
+    private BigDecimal ivaPorcentaje = BigDecimal.ZERO;
+
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal impuesto = BigDecimal.ZERO;
+
+    @Column(nullable = false, precision = 15, scale = 2)
+    private BigDecimal total = BigDecimal.ZERO;
+
+    @Column(name = "fecha_finalizacion")
+    private Instant fechaFinalizacion;
+
     @Version
     private long version;
 
@@ -98,6 +122,16 @@ public class OrdenTrabajo extends BaseEntity {
     @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL)
     @OrderBy("fecha, id")
     private List<OrdenEstadoHistorial> historial = new ArrayList<>();
+
+    @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id")
+    @BatchSize(size = 50)
+    private List<OrdenServicio> servicios = new ArrayList<>();
+
+    @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy("id")
+    @BatchSize(size = 50)
+    private List<OrdenRepuesto> repuestos = new ArrayList<>();
 
     public OrdenTrabajo(String numero, Cliente cliente, Motocicleta motocicleta, int kilometrajeIngreso,
             DatosRecepcion recepcion, Long usuarioId, Instant ahora) {
@@ -165,6 +199,109 @@ public class OrdenTrabajo extends BaseEntity {
         this.estado = nuevo;
     }
 
+    /** RN-30: servicio del catálogo ({@code servicio} no nulo) o mano de obra libre. */
+    public OrdenServicio agregarServicio(Servicio servicio, DatosServicioOrden datos, Long usuarioId, Instant ahora) {
+        exigirEditableItems();
+        OrdenServicio item = new OrdenServicio(this, servicio, datos, usuarioId, ahora);
+        servicios.add(item);
+        recalcular(ivaPorcentaje);
+        return item;
+    }
+
+    public OrdenServicio actualizarServicio(Long itemId, DatosServicioOrden datos) {
+        exigirEditableItems();
+        OrdenServicio item = servicio(itemId);
+        item.actualizar(datos);
+        recalcular(ivaPorcentaje);
+        return item;
+    }
+
+    public OrdenServicio quitarServicio(Long itemId) {
+        exigirEditableItems();
+        OrdenServicio item = servicio(itemId);
+        servicios.remove(item);
+        recalcular(ivaPorcentaje);
+        return item;
+    }
+
+    /**
+     * RN-29: agrega el repuesto al precio vigente del producto o, si ya está en la orden, suma la
+     * cantidad al mismo ítem (conserva el precio con que se agregó). Quien llama reserva la cantidad.
+     */
+    public OrdenRepuesto agregarRepuesto(Producto producto, BigDecimal cantidad, Long usuarioId, Instant ahora) {
+        exigirEditableItems();
+        OrdenRepuesto existente = repuestos.stream()
+                .filter(r -> Objects.equals(r.getProducto().getId(), producto.getId())).findFirst().orElse(null);
+        if (existente != null) {
+            existente.cambiarCantidad(existente.getCantidad().add(cantidad));
+            recalcular(ivaPorcentaje);
+            return existente;
+        }
+        OrdenRepuesto item = new OrdenRepuesto(this, producto, cantidad, usuarioId, ahora);
+        repuestos.add(item);
+        recalcular(ivaPorcentaje);
+        return item;
+    }
+
+    /** Cambia la cantidad y devuelve la diferencia (positiva: hay que reservar más; negativa: liberar). */
+    public BigDecimal cambiarCantidadRepuesto(Long itemId, BigDecimal cantidad) {
+        exigirEditableItems();
+        OrdenRepuesto item = repuesto(itemId);
+        BigDecimal diferencia = cantidad.subtract(item.getCantidad());
+        item.cambiarCantidad(cantidad);
+        recalcular(ivaPorcentaje);
+        return diferencia;
+    }
+
+    /** Quita el repuesto; quien llama libera su reserva. */
+    public OrdenRepuesto quitarRepuesto(Long itemId) {
+        exigirEditableItems();
+        OrdenRepuesto item = repuesto(itemId);
+        repuestos.remove(item);
+        recalcular(ivaPorcentaje);
+        return item;
+    }
+
+    /** RN-32: el descuento lo fija el presupuesto; de 0 al subtotal (lo valida quien llama). */
+    public void aplicarDescuento(BigDecimal descuento, BigDecimal ivaVigente) {
+        this.descuento = descuento;
+        recalcular(ivaVigente);
+    }
+
+    /**
+     * RF24: totales con {@link CalculadoraTotales} (RN-04). Mientras no haya presupuesto la orden usa
+     * el IVA vigente; el presupuesto lo congela. Si quitar ítems deja el subtotal bajo el descuento,
+     * el descuento baja hasta el subtotal.
+     */
+    public void recalcular(BigDecimal iva) {
+        this.ivaPorcentaje = iva;
+        List<BigDecimal> lineas = new ArrayList<>();
+        servicios.forEach(s -> lineas.add(s.getPrecio()));
+        repuestos.forEach(r -> lineas.add(r.getSubtotal()));
+        BigDecimal suma = lineas.stream().reduce(BigDecimal.ZERO, BigDecimal::add);
+        Totales totales = CalculadoraTotales.calcular(lineas, descuento.min(suma), iva);
+        this.subtotal = totales.subtotal();
+        this.descuento = totales.descuento();
+        this.impuesto = totales.impuesto();
+        this.total = totales.total();
+    }
+
+    public void finalizar(Instant ahora) {
+        this.fechaFinalizacion = ahora;
+    }
+
+    public boolean tieneItems() {
+        return !servicios.isEmpty() || !repuestos.isEmpty();
+    }
+
+    public List<OrdenServicio> getServicios() {
+        return Collections.unmodifiableList(servicios);
+    }
+
+    public List<OrdenRepuesto> getRepuestos() {
+        return Collections.unmodifiableList(repuestos);
+    }
+
     public static ConflictException transicionInvalida(EstadoOrden desde, EstadoOrden hasta, String motivo) {
         return new ConflictException(ErrorCode.TRANSICION_INVALIDA,
                 "La orden no puede pasar de " + desde + " a " + hasta,
@@ -196,6 +333,24 @@ public class OrdenTrabajo extends BaseEntity {
         this.motivoIngreso = recepcion.motivoIngreso();
         this.descripcionProblema = recepcion.descripcionProblema();
         this.observaciones = recepcion.observaciones();
+    }
+
+    /** RN-28: los ítems solo se agregan, editan o quitan en diagnóstico. */
+    private void exigirEditableItems() {
+        if (estado != EstadoOrden.EN_DIAGNOSTICO) {
+            throw new ConflictException(ErrorCode.ORDEN_ESTADO_INVALIDO,
+                    "Los ítems solo se modifican en diagnóstico", Map.of("estado", estado.name()));
+        }
+    }
+
+    private OrdenServicio servicio(Long itemId) {
+        return servicios.stream().filter(s -> Objects.equals(s.getId(), itemId)).findFirst()
+                .orElseThrow(() -> new NotFoundException("orden_servicio", itemId));
+    }
+
+    private OrdenRepuesto repuesto(Long itemId) {
+        return repuestos.stream().filter(r -> Objects.equals(r.getId(), itemId)).findFirst()
+                .orElseThrow(() -> new NotFoundException("orden_repuesto", itemId));
     }
 
     private void exigirActiva() {

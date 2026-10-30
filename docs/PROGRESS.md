@@ -11,7 +11,7 @@
 | F02 | Base del backend | ✅ Terminada | #7 | Swagger en /api/docs (dev) |
 | F03 | Autenticación, usuarios y permisos (backend) | ✅ Terminada | #8 | Usuarios dev en el README |
 | F04A | Sistema de diseño, tema, i18n y layout | ✅ Terminada | #9 | Galería en /dev/ui (solo dev) |
-| F04B | Sesión, guards y administración de usuarios (frontend) | 🟦 En curso | | |
+| F04B | Sesión, guards y administración de usuarios (frontend) | ✅ Terminada | #10 | Job `e2e` en el CI; capturas en `docs/capturas/f04b` |
 | F05 | Clientes y motocicletas | ⬜ Pendiente | | |
 | F06 | Catálogo de productos e inventario | ⬜ Pendiente | | |
 | F07 | Proveedores y compras | ⬜ Pendiente | | |
@@ -28,7 +28,7 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F04B (cierre 2026-10-30)
+- **Fase:** F04B ✅ (cerrada 2026-10-30, PR #10)
 - **Rama:** `feature/f04b-sesion-usuarios` → `main`
 - **Hecho:** sesión en el frontend (`AuthService` con access token solo en memoria, restauración con `/auth/refresh` al arrancar tras un splash, renovación 60 s antes de vencer, interceptor con un único refresh compartido y reintento, interceptor de errores → toast por `code` y `errors[]` marcados en el formulario). Guards `authGuard` (incluye cambio obligatorio de contraseña), `invitadoGuard`, `sesionGuard`, `permisoGuard` (`canMatch`) y página 403; directiva `*hkTienePermiso`; menú, drawer y barra inferior filtrados por permiso. Pantallas: login dividido (429 con cuenta regresiva), olvidé/restablecer contraseña con medidor de fortaleza, cambio obligatorio, Mi perfil (idioma guardado en la cuenta) y Usuarios (tabla con búsqueda y filtros, drawer crear/editar, activar/desactivar, permisos por módulo). Backend: perfil `e2e` con `POST /api/v1/test/reset` y arreglo del deadlock en logins simultáneos. CI: job `e2e` (MySQL + Mailpit + Nginx en `docker-compose.e2e.yml`, backend con perfil e2e, Playwright en Chromium, reporte como artefacto si falla). Pruebas: 148 unitarias, 32 E2E + axe (estables en 3 repeticiones). Capturas en `docs/capturas/f04b/` (claro/oscuro, escritorio/móvil); revisado también 768 px y en inglés.
 - **Siguiente paso concreto:** iniciar F05 con `/fase F05`. Revisar los PRs de dependabot abiertos.

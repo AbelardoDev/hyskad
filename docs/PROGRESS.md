@@ -16,7 +16,7 @@
 | F06 | Catálogo de productos e inventario | ✅ Terminada | #12 | Contrato de `InventarioService` en su Javadoc; capturas en `docs/capturas/f06` |
 | F07 | Proveedores y compras | ✅ Terminada | #13 | `CalculadoraTotales` (RN-04) lista para ventas y órdenes; capturas en `docs/capturas/f07` |
 | F08 | Ventas y comprobantes | ✅ Terminada | #14 | POS con teclado (F2/Enter/F9); comprobante carta/tirilla fuera del shell; capturas en `docs/capturas/f08` |
-| F09A | Órdenes: creación, asignación, estados y diagnóstico | 🟦 En curso | | |
+| F09A | Órdenes: creación, asignación, estados y diagnóstico | ✅ Terminada | #15 | Diagrama de estados en ARCHITECTURE §6.2 (verificado por `DiagramaEstadosTest`); capturas en `docs/capturas/f09a` |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ⬜ Pendiente | | |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ⬜ Pendiente | | |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ⬜ Pendiente | | |
@@ -28,11 +28,16 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
+- **Fase:** F09A ✅ (cerrada 2026-10-30, PR #15)
+- **Rama:** `feature/f09a-ordenes-base` → `main`
+- **Hecho:** módulos `servicios` (catálogo RF16 según la plantilla, 12 servicios de desarrollo) y `taller`. Migración V7 (`servicio`, `orden_trabajo` con `version` y un índice único sobre la moto mientras la orden está activa, `orden_mecanico`, `orden_estado_historial`). `EstadoOrden` declara transiciones, permiso y nota obligatoria; `OrdenTrabajo.transicionarA` valida y registra el historial; `OrdenTrabajoService` orquesta las condiciones (mecánicos, diagnóstico; ítems y pago bloqueados hasta F09B/C), recepción (RN-24, RN-25, `OT-000001`), mecánicos (RN-26), diagnóstico (RF14), seguridad por fila (RN-27, 404) y `accionesPermitidas` con `bloqueo`. Cada modificación recibe la `version` leída (409 si cambió; `OPTIMISTIC_FORCE_INCREMENT` para que asignar mecánicos también la suba). Eventos `OrdenCreada`, `MecanicoAsignado`, `EstadoOrdenCambiado` y auditoría. `taller` implementa `ConsultaOrdenesActivas` (se borró `SinOrdenesActivas`). Endpoints extra: `GET /ordenes-trabajo/recepcion` y `GET /usuarios/mecanicos`. Frontend: servicios (lista + drawer), recepción en 5 pasos con alta rápida de cliente y moto, última lectura de kilometraje y aviso de orden activa; tablero lista/kanban con filtros en la URL; "Mis órdenes" en tarjetas; detalle con línea de tiempo, acciones según `accionesPermitidas`, edición de recepción, modal de mecánicos y pestañas (ítems, presupuestos y pago deshabilitadas con "Disponible pronto"). Pruebas: backend 217 unitarias (CP-38 con 49 combinaciones y el diagrama Mermaid verificado contra el enum) y 206 IT; frontend 253 unitarias; 69 E2E + axe. Capturas en `docs/capturas/f09a/` (las del mecánico en inglés).
+- **Siguiente paso concreto:** iniciar F09B con `/fase F09B` (ítems, reservas y presupuestos; quitar los bloqueos `SIN_ITEMS` y conectar la transición automática a `EN_REPARACION`).
+- **Bloqueos o dudas:** ninguno.
+
+### Sesión anterior (F08)
 - **Fase:** F08 ✅ (cerrada 2026-10-30, PR #14)
 - **Rama:** `feature/f08-ventas` → `main`
 - **Hecho:** módulo `ventas`. Migración V6 (`venta` con `iva_porcentaje`, `monto_recibido` y datos de anulación; `venta_detalle` con precio y costo congelados). Registro en una sola transacción: ítems validados con errores por fila (`items[i].productoId`), precio tomado siempre del catálogo (un `precioUnitario` enviado da 400 `PROPIEDAD_DESCONOCIDA`), descuento ≤ subtotal, referencia obligatoria salvo efectivo, monto recibido ≥ total, numeración `V-000001`, totales con `CalculadoraTotales` y salida por ítem vía `InventarioService` (orden de id, `PESSIMISTIC_WRITE`). Anulación con motivo (RN-21, `VENTAS_ANULAR`) que devuelve el stock y publica `VentaAnulada`; comprobante con datos del taller y leyenda "Documento interno. No es factura electrónica."; lista con filtros y `GET /ventas/resumen`. Frontend: punto de venta operable solo con teclado (F2 busca, Enter agrega, flechas, Esc, F9 cobra, popover de atajos), carrito con tope del disponible, cliente opcional con alta rápida, métodos de pago con referencia y cambio en vivo, confirmación y pantalla de éxito; en móvil el carrito es una hoja inferior. Lista con resumen del periodo y "Solo mis ventas", detalle con anulación, comprobante carta/tirilla imprimible fuera del layout. Pruebas: backend 161 unitarias y 185 IT (incluida la concurrencia CP-31); frontend 244 unitarias (mismos casos de redondeo que el backend); 63 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f08/` (y `comprobante-carta.pdf` impreso).
-- **Siguiente paso concreto:** iniciar F09A con `/fase F09A` (órdenes; implementar `ConsultaOrdenesActivas` y repetir CP-19).
-- **Bloqueos o dudas:** ninguno.
 
 ### Sesión anterior (F07)
 - **Fase:** F07 ✅ (cerrada 2026-10-30, PR #13)
@@ -57,6 +62,17 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-10-30 · F09A · El diagnóstico se registra y corrige en `EN_DIAGNOSTICO` y `EN_REPARACION`, aprobado por el usuario · BUSINESS-RULES no lo fijaba; en reparación a veces hay que precisarlo sin devolver la orden.
+- 2026-10-30 · F09A · La actividad del mecánico asignado es opcional (máx. 200), aprobado por el usuario · con un solo mecánico casi nunca hace falta.
+- 2026-10-30 · F09A · "Último kilometraje registrado" (RN-25) = el mayor entre el de ingreso y el de inspección de las órdenes anteriores de la moto · la moto no guarda kilometraje; la inspección es la lectura más reciente.
+- 2026-10-30 · F09A · Toda modificación de la orden (recepción, mecánicos, diagnóstico, transición) recibe la `version` que leyó el cliente y responde 409 `CONFLICTO_CONCURRENCIA` si no coincide; se carga con `OPTIMISTIC_FORCE_INCREMENT` (sin `join fetch`, que extendería el bloqueo a cliente y moto sin versión) · asignar mecánicos no cambia columnas de la orden y aun así debe invalidar la versión.
+- 2026-10-30 · F09A · RN-24 también en BD: columna generada `motocicleta_activa_id` (NULL en estados finales) con índice único · dos recepciones simultáneas de la misma moto no pueden pasar ambas.
+- 2026-10-30 · F09A · Las transiciones automáticas (PENDIENTE_APROBACION → EN_REPARACION) responden `TRANSICION_INVALIDA` con `motivo: AUTOMATICA` si se piden por la API; las que dependen de F09B/C quedan con su condición (`SIN_ITEMS`, `SIN_PAGO`) · el prompt pide dejarlas preparadas con su validación.
+- 2026-10-30 · F09A · Las modificaciones devuelven el detalle releído en otra transacción (`GET` interno) · la versión nueva solo existe al confirmar; devolverla desde la misma transacción haría fallar la siguiente edición.
+- 2026-10-30 · F09A · `GET /ordenes-trabajo/recepcion?motocicletaId=` (ORDENES_CREAR) y `GET /usuarios/mecanicos` (ORDENES_ASIGNAR u ORDENES_VER_TODAS, solo id y nombre), aprobados en el plan · la recepción necesita la última lectura y la orden activa; el vendedor asigna mecánicos pero no puede listar usuarios.
+- 2026-10-30 · F09A · `GET /servicios` también con `ORDENES_TRABAJAR` · F09B agrega servicios a las órdenes desde ese catálogo.
+- 2026-10-30 · F09A · El diagrama Mermaid de ARCHITECTURE §6.2 lo verifica `DiagramaEstadosTest` (falla mostrando el diagrama nuevo si el enum cambia) · "generado a partir del enum real" sin código de producción para documentación.
+- 2026-10-30 · F09A · La prueba del shell (`layout.spec`) usa Inicio como página "Próximamente" · Órdenes ya hace peticiones.
 - 2026-10-30 · F08 · La devolución por anulación de venta se permite aunque el producto esté inactivo (excepción a RN-15), aprobado por el usuario · RN-21 obliga a restituir el stock; desactivar un producto no puede impedir anular una venta. Resuelve la deuda RN-15 vs. RN-21.
 - 2026-10-30 · F08 · La venta no acepta precios del cliente: el precio sale del catálogo y un `precioUnitario` en el cuerpo da 400 `PROPIEDAD_DESCONOCIDA` · RN-04 y CP-32; un rechazo explícito es más claro que ignorarlo en silencio.
 - 2026-10-30 · F08 · La venta guarda `iva_porcentaje` y `monto_recibido` (el cambio se calcula) · el comprobante debe reproducir la venta aunque cambie el IVA vigente.
@@ -154,10 +170,12 @@ pm-cache-hk`.
 - Las E2E corren en el CI solo en Chromium (los tres navegadores en F12). Bajo carga paralela del servidor de desarrollo, Firefox puede exceder el timeout de 30 s (en serie pasan).
 - La campana de notificaciones muestra un estado vacío hasta F10.
 - Detrás de Nginx (F13) el rate limit verá la IP del proxy: configurar `server.forward-headers-strategy` y confiar solo en el proxy propio.
-- RN-44: `SinOrdenesActivas` (en `clientes.application`) siempre responde `false`. En F09A `taller` implementa `ConsultaOrdenesActivas`, se borra la implementación provisional y se repite CP-19 con órdenes reales.
 - `GET /motocicletas/{id}/historial` devuelve `[]` con la estructura final (`HistorialServicio`); se llena en F09C (CP-21).
 - El texto de autorización de datos (RN-45) está en las traducciones; hacerlo configurable en F11.
 - Presupuesto del bundle inicial: aviso subido a 900 kB en F06 (hoy 843 kB). Si vuelve a acercarse, cambiar el registro de íconos (p. ej. SVG por URL) en vez de seguir subiéndolo.
 - `VentaAnulada` se publica pero nadie lo escucha hasta F10 (auditoría y notificaciones).
+- `OrdenCreada`, `MecanicoAsignado` y `EstadoOrdenCambiado` se publican pero nadie los escucha hasta F10 (notificaciones y correos).
+- Las acciones "Enviar presupuesto" y "Entregar" aparecen bloqueadas (`SIN_ITEMS`, `SIN_PAGO`) hasta F09B/F09C.
+- E2E del diagnóstico: una vez, con la suite completa en paralelo, el guardado tardó más de 5 s (sin errores en el backend); vigilar en el CI.
 - `StockBajoDetectado` se publica pero nadie lo escucha hasta F10 (notificaciones); la configuración `stock.alerta.habilitada` se aplicará allí.
 - El filtro por usuario de `GET /inventario/movimientos` existe en la API pero no en la pantalla (almacén no puede listar usuarios).

@@ -1,0 +1,11 @@
+[(#{comun.saludo(${nombre})})]
+
+[(#{orden-lista.cuerpo(${placa}, ${moto})})]
+
+[(#{comun.orden})]: [(${numero})]
+[(#{orden-lista.total})]: [(${total})]
+
+[(#{orden-lista.horario})]
+
+--
+[(${taller.nombre})] · NIT [(${taller.nit})] · [(${taller.direccion})] · [(${taller.telefono})]

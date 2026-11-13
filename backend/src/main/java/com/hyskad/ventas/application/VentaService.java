@@ -145,7 +145,8 @@ public class VentaService {
         venta.getDetalles().stream().sorted(Comparator.comparing(d -> d.getProducto().getId()))
                 .forEach(d -> inventario.registrarDevolucionVenta(d.getProducto().getId(), d.getCantidad(),
                         d.getCostoUnitario(), referencia));
-        auditoria.registrar("VENTA_ANULADA", ENTIDAD, id, Map.of("numero", venta.getNumero()));
+        auditoria.registrar("VENTA_ANULADA", ENTIDAD, id, Map.of("numero", venta.getNumero(), "total", venta.getTotal(),
+                "motivo", venta.getMotivoAnulacion()));
         eventos.publishEvent(new VentaAnulada(id, venta.getNumero(), venta.getTotal(), usuarioId));
         return venta;
     }

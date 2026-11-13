@@ -130,7 +130,8 @@ public class CompraService {
         compra.getDetalles().stream().sorted(Comparator.comparing(d -> d.getProducto().getId()))
                 .forEach(d -> inventario.registrarSalidaAnulacionCompra(d.getProducto().getId(), d.getCantidad(),
                         referencia));
-        auditoria.registrar("COMPRA_ANULADA", ENTIDAD, id, Map.of("numero", compra.getNumero()));
+        auditoria.registrar("COMPRA_ANULADA", ENTIDAD, id, Map.of("numero", compra.getNumero(), "total", compra.getTotal(),
+                "motivo", compra.getMotivoAnulacion()));
         return compra;
     }
 

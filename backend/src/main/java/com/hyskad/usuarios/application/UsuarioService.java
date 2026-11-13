@@ -70,6 +70,18 @@ public class UsuarioService {
         return repository.findAllById(ids).stream().collect(Collectors.toMap(Usuario::getId, Usuario::getNombre));
     }
 
+    /** Ids de los usuarios activos con alguno de los roles: destinatarios de notificaciones (§9). */
+    @Transactional(readOnly = true)
+    public List<Long> idsActivosConRol(Rol... roles) {
+        return repository.idsActivosConRol(List.of(roles));
+    }
+
+    /** De los ids dados, los de usuarios activos (un inactivo no recibe notificaciones). */
+    @Transactional(readOnly = true)
+    public List<Long> idsActivos(Collection<Long> ids) {
+        return ids.isEmpty() ? List.of() : repository.idsActivos(ids);
+    }
+
     /** Mecánicos activos por nombre, para asignarlos a órdenes (RN-26). */
     @Transactional(readOnly = true)
     public List<Usuario> mecanicosActivos() {

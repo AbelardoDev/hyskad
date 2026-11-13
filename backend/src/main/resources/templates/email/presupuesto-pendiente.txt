@@ -1,0 +1,15 @@
+[(#{comun.saludo(${nombre})})]
+
+[(#{presupuesto-pendiente.cuerpo(${presupuesto}, ${placa}, ${moto})})]
+
+[# th:each="linea : ${lineas}"]- [(${linea.descripcion})] × [(${linea.cantidad})]: [(${linea.subtotal})]
+[/]
+[(#{comun.subtotal})]: [(${subtotal})]
+[# th:if="${descuento != null}"][(#{comun.descuento})]: −[(${descuento})]
+[/][(#{comun.iva(${iva})})]: [(${impuesto})]
+[(#{comun.total})]: [(${total})]
+
+[(#{presupuesto-pendiente.aprobar(${numero})})]
+
+--
+[(${taller.nombre})] · NIT [(${taller.nit})] · [(${taller.direccion})] · [(${taller.telefono})]

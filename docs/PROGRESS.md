@@ -19,7 +19,7 @@
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ✅ Terminada | #15 | Diagrama de estados en ARCHITECTURE §6.2 (verificado por `DiagramaEstadosTest`); capturas en `docs/capturas/f09a` |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ✅ Terminada | #16 | Presupuesto imprimible en `/presupuestos/:id`; capturas en `docs/capturas/f09b` |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
-| F10 | Notificaciones en tiempo real, correos y auditoría | ⬜ Pendiente | | |
+| F10 | Notificaciones en tiempo real, correos y auditoría | 🟦 En curso | | |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ⬜ Pendiente | | |
 | F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ⬜ Pendiente | | |
 | F13 | Despliegue en VPS | ⬜ Pendiente | | |

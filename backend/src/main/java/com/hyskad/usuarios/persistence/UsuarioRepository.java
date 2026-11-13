@@ -1,5 +1,6 @@
 package com.hyskad.usuarios.persistence;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +25,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>, JpaSpec
     boolean existsByRol(Rol rol);
 
     List<Usuario> findByRolAndActivoTrueOrderByNombre(Rol rol);
+
+    @Query("select u.id from Usuario u where u.rol in :roles and u.activo = true")
+    List<Long> idsActivosConRol(Collection<Rol> roles);
+
+    @Query("select u.id from Usuario u where u.id in :ids and u.activo = true")
+    List<Long> idsActivos(Collection<Long> ids);
 
     /** Administradores activos bloqueados para verificar RN-47 sin carreras entre dos admins. */
     @Lock(LockModeType.PESSIMISTIC_WRITE)

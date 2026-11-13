@@ -35,6 +35,9 @@ public class SecurityConfig {
         "/api/v1/auth/password/olvide", "/api/v1/auth/password/restablecer"
     };
 
+    /** El stream SSE se autentica con un ticket de un solo uso, no con el JWT (EventSource no envía cabeceras). */
+    private static final String STREAM_NOTIFICACIONES = "/api/v1/notificaciones/stream";
+
     /** Solo con el perfil {@code e2e}: el controller de reinicio no existe en los demás. */
     private static final String RESET_E2E = "/api/v1/test/reset";
 
@@ -54,7 +57,8 @@ public class SecurityConfig {
                 .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(RUTAS_PUBLICAS).permitAll()
-                            .requestMatchers(HttpMethod.POST, AUTH_PUBLICAS).permitAll();
+                            .requestMatchers(HttpMethod.POST, AUTH_PUBLICAS).permitAll()
+                            .requestMatchers(HttpMethod.GET, STREAM_NOTIFICACIONES).permitAll();
                     if (e2e) {
                         auth.requestMatchers(HttpMethod.POST, RESET_E2E).permitAll();
                     }

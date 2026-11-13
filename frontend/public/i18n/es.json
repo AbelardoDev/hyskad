@@ -1015,7 +1015,6 @@
       "subtitulo": "Las motos que tienes asignadas",
       "vacio_titulo": "No tienes órdenes asignadas",
       "vacio_texto": "Cuando te asignen una moto aparecerá aquí.",
-      "abrir": "Abrir la orden {{numero}} de la placa {{placa}}",
       "grupos": {
         "por_diagnosticar": "Por diagnosticar",
         "esperando_aprobacion": "Esperando aprobación",

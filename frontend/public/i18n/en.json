@@ -1015,7 +1015,6 @@
       "subtitulo": "Motorcycles assigned to you",
       "vacio_titulo": "You have no assigned orders",
       "vacio_texto": "When a motorcycle is assigned to you it will show up here.",
-      "abrir": "Open order {{numero}} for plate {{placa}}",
       "grupos": {
         "por_diagnosticar": "To diagnose",
         "esperando_aprobacion": "Awaiting approval",

@@ -96,7 +96,7 @@ import { Orden, OrdenesApiService } from './ordenes-api.service';
     } @else {
       <div class="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
         <section
-          class="rounded-2xl bg-surface-2 p-5"
+          class="self-start rounded-2xl bg-surface-2 p-5"
           [attr.aria-label]="'taller.pago.resumen' | transloco"
         >
           <dl class="space-y-1 text-sm">

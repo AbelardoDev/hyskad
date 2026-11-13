@@ -106,9 +106,6 @@ export function agruparMisOrdenes(ordenes: readonly OrdenResumen[]): GrupoOrdene
                   <a
                     class="flex min-h-40 flex-col gap-3 rounded-2xl border border-border bg-surface p-4 shadow-card hk-foco transition-shadow hover:shadow-overlay active:bg-surface-2"
                     [routerLink]="['/ordenes', o.id]"
-                    [attr.aria-label]="
-                      'taller.mias.abrir' | transloco: { numero: o.numero, placa: o.placa }
-                    "
                   >
                     <span class="flex items-start justify-between gap-3">
                       <hk-placa tamano="lg" [placa]="o.placa" />

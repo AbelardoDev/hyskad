@@ -18,7 +18,7 @@
 | F08 | Ventas y comprobantes | ✅ Terminada | #14 | POS con teclado (F2/Enter/F9); comprobante carta/tirilla fuera del shell; capturas en `docs/capturas/f08` |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ✅ Terminada | #15 | Diagrama de estados en ARCHITECTURE §6.2 (verificado por `DiagramaEstadosTest`); capturas en `docs/capturas/f09a` |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ✅ Terminada | #16 | Presupuesto imprimible en `/presupuestos/:id`; capturas en `docs/capturas/f09b` |
-| F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #17 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
+| F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ⬜ Pendiente | | |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ⬜ Pendiente | | |
 | F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ⬜ Pendiente | | |
@@ -28,7 +28,7 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F09C ✅ (cerrada 2026-11-12, PR #17)
+- **Fase:** F09C ✅ (cerrada 2026-11-12, PR #22)
 - **Rama:** `feature/f09c-pago-entrega` → `main`
 - **Hecho:** migración V9 (`pago` único por orden con `monto_recibido`; `fecha_entrega`, `entregada_por` y `observaciones_entrega` en la orden; índice para cuentas pendientes). `PagoEntregaService`: pago total y único solo en `FINALIZADA` por el total exacto (`MONTO_INVALIDO`, `PAGO_DUPLICADO`, RN-20 para referencia y monto recibido) y entrega que exige el pago (`PAGO_REQUERIDO`), transiciona a `ENTREGADA` y publica `OrdenEntregada`; ambos auditados. `accionesPermitidas` con `registrarPago`/`registrarEntrega` y bloqueo `SIN_PAGO` real; la transición genérica a `ENTREGADA` responde `ENTREGA_REQUERIDA`. `GET /ordenes-trabajo/{id}/comprobante` (diagnóstico resumido a 300 caracteres, leyenda RN-06). Historial RF9 real vía `HistorialMotocicleta` (implementada por `taller`), paginado y sin canceladas salvo `incluirCanceladas`. Módulo `reportes` con `GET /reportes/cuentas-pendientes` (días de calendario en Bogotá y total adeudado). `MetodoPago` pasa a `shared.dinero`. Frontend: `hk-campos-pago` en el kit (lo usan el POS y la orden; textos en `pago.*`); pestaña "Pago y entrega" con resumen, cobro, entrega y pantalla de éxito (`?pestana=pago` la abre); comprobante imprimible; historial de la moto en línea de tiempo expandible con la progresión del kilometraje; cuentas pendientes con días por antigüedad y acceso directo al pago (`/reportes` redirige ahí hasta F11); "Mis órdenes" agrupada por estado con el motivo, acciones grandes fijas abajo en el celular y página de inicio de quien solo ve sus órdenes. Pruebas: backend 217 unitarias y 229 IT (apoyo `FlujoOrdenes`); frontend 268 unitarias; 78 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f09c/`.
 - **Siguiente paso concreto:** iniciar F10 con `/fase F10` (notificaciones en tiempo real, correos y auditoría; ya existen los eventos `OrdenEntregada`, `OrdenFinalizada`, etc.).

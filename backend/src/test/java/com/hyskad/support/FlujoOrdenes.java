@@ -34,11 +34,17 @@ public class FlujoOrdenes {
         this.json = json;
     }
 
-    /** Cliente nuevo y su moto; devuelve sus ids. */
+    /** Cliente nuevo (sin email, con autorización de datos) y su moto; devuelve sus ids. */
     public ClienteMoto clienteConMoto(String admin) throws Exception {
+        return clienteConMoto(admin, null, true);
+    }
+
+    /** Cliente nuevo con el email y la autorización de datos indicados (RN-45), y su moto. */
+    public ClienteMoto clienteConMoto(String admin, String email, boolean aceptaDatos) throws Exception {
         long cliente = idCreado(admin, "/api/v1/clientes", """
                 {"tipoDocumento":"CC","numeroDocumento":"%s","nombres":"Ana","apellidos":"Pagos",
-                 "telefono":"3001234567","aceptaTratamientoDatos":true}""".formatted(Identificadores.cedula()));
+                 "telefono":"3001234567","email":%s,"aceptaTratamientoDatos":%s}""".formatted(Identificadores.cedula(),
+                email == null ? "null" : "\"" + email + "\"", aceptaDatos));
         long moto = idCreado(admin, "/api/v1/motocicletas", """
                 {"clienteId":%d,"placa":"%s","marca":"Suzuki","modelo":"GN 125"}"""
                 .formatted(cliente, Identificadores.placa()));

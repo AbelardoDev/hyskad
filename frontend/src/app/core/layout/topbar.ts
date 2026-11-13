@@ -1,12 +1,4 @@
-import { CdkConnectedOverlay, CdkOverlayOrigin, ConnectedPosition } from '@angular/cdk/overlay';
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  inject,
-  output,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, output } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { translateSignal, TranslocoPipe } from '@jsverse/transloco';
 import { LucideDynamicIcon } from '@lucide/angular';
@@ -15,10 +7,10 @@ import { HkAvatar } from '../../shared/ui/avatar/avatar';
 import { HkIconButton } from '../../shared/ui/button/icon-button';
 import { DialogosService } from '../../shared/ui/dialog/dialogos.service';
 import { HkDropdownMenu, ItemMenu } from '../../shared/ui/dropdown-menu/dropdown-menu';
-import { HkEmptyState } from '../../shared/ui/empty-state/empty-state';
 import { HkTooltipDirective } from '../../shared/ui/tooltip/tooltip';
 import { AuthService } from '../auth/auth.service';
 import { IDIOMAS, LanguageService } from '../i18n/language.service';
+import { HkCampanaNotificaciones } from '../realtime/campana';
 import { PreferenciaTema, ThemeService } from '../theme/theme.service';
 import { BusquedaProximamente } from './busqueda-proximamente';
 import { LayoutService } from './layout.service';
@@ -31,10 +23,6 @@ const ICONO_TEMA: Record<PreferenciaTema, string> = {
 };
 const TEMAS: readonly PreferenciaTema[] = ['system', 'light', 'dark'];
 
-const POSICION_PANEL: ConnectedPosition[] = [
-  { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top', offsetY: 8 },
-];
-
 /**
  * Barra superior: menú, migas, buscador, idioma, tema, notificaciones y usuario.
  * Efecto vidrio (`bg-surface/80 backdrop-blur-md`) y fija arriba.
@@ -45,13 +33,11 @@ const POSICION_PANEL: ConnectedPosition[] = [
     RouterLink,
     TranslocoPipe,
     LucideDynamicIcon,
-    CdkConnectedOverlay,
-    CdkOverlayOrigin,
     HkIconButton,
     HkDropdownMenu,
     HkAvatar,
-    HkEmptyState,
     HkTooltipDirective,
+    HkCampanaNotificaciones,
   ],
   template: `
     <div class="flex h-16 items-center gap-2 px-4 md:px-6 lg:px-8">
@@ -143,42 +129,7 @@ const POSICION_PANEL: ConnectedPosition[] = [
         <svg [lucideIcon]="iconoTema()" class="size-5" aria-hidden="true" />
       </hk-dropdown-menu>
 
-      <!-- Notificaciones -->
-      <button
-        hk-icon-button
-        icono="bell"
-        cdkOverlayOrigin
-        #origenNotificaciones="cdkOverlayOrigin"
-        [etiqueta]="'layout.notificaciones' | transloco"
-        [attr.aria-expanded]="notificacionesAbiertas()"
-        aria-haspopup="dialog"
-        (click)="notificacionesAbiertas.set(!notificacionesAbiertas())"
-      ></button>
-      <ng-template
-        cdkConnectedOverlay
-        [cdkConnectedOverlayOrigin]="origenNotificaciones"
-        [cdkConnectedOverlayOpen]="notificacionesAbiertas()"
-        [cdkConnectedOverlayPositions]="posicionPanel"
-        (overlayOutsideClick)="notificacionesAbiertas.set(false)"
-        (overlayKeydown)="$event.key === 'Escape' && notificacionesAbiertas.set(false)"
-        (detach)="notificacionesAbiertas.set(false)"
-      >
-        <section
-          role="dialog"
-          class="w-[min(22rem,calc(100vw-2rem))] hk-overlay"
-          [attr.aria-label]="'layout.notificaciones' | transloco"
-        >
-          <header class="border-b border-border px-4 py-3">
-            <h2 class="text-sm font-semibold text-fg">{{ 'layout.notificaciones' | transloco }}</h2>
-          </header>
-          <hk-empty-state
-            compacto
-            icono="bell"
-            [titulo]="'layout.sin_notificaciones' | transloco"
-            [texto]="'layout.sin_notificaciones_texto' | transloco"
-          />
-        </section>
-      </ng-template>
+      <hk-campana-notificaciones />
 
       <!-- Usuario -->
       <hk-dropdown-menu
@@ -218,8 +169,6 @@ export class HkTopbar {
   readonly alternarMenu = output<void>();
 
   protected readonly usuario = this.auth.usuario;
-  protected readonly posicionPanel = POSICION_PANEL;
-  protected readonly notificacionesAbiertas = signal(false);
   protected readonly atajo = /Mac|iPhone|iPad/.test(globalThis.navigator?.platform ?? '')
     ? '⌘ K'
     : 'Ctrl K';

@@ -212,6 +212,7 @@ export class UsuariosPage {
     'usuarios.activar',
     'usuarios.desactivar',
   ]);
+  private readonly textoAuditoria = translateSignal('auditoria.ver_registro');
 
   protected readonly columnas = computed<ColumnaTabla[]>(() => {
     const [nombre, rol, estado, acceso, acciones] = this.textos();
@@ -284,6 +285,14 @@ export class UsuariosPage {
           : { id: 'activar', etiqueta: activar, icono: 'power', separadorAntes: true },
       );
     }
+    if (this.auth.tienePermiso('AUDITORIA_VER')) {
+      items.push({
+        id: 'auditoria',
+        etiqueta: this.textoAuditoria(),
+        icono: 'history',
+        separadorAntes: true,
+      });
+    }
     return items;
   }
 
@@ -291,6 +300,10 @@ export class UsuariosPage {
     if (accion === 'editar') this.abrirFormulario(usuario);
     else if (accion === 'permisos')
       void this.router.navigate(['/usuarios', usuario.id, 'permisos']);
+    else if (accion === 'auditoria')
+      void this.router.navigate(['/auditoria'], {
+        queryParams: { entidad: 'usuario', entidadId: usuario.id },
+      });
     else if (accion === 'activar' || accion === 'desactivar')
       void this.cambiarEstado(usuario, accion === 'activar');
   }

@@ -56,7 +56,8 @@
     "perfil": "My profile",
     "dev_ui": "UI kit",
     "ordenes_corto": "Orders",
-    "mis_ordenes": "My orders"
+    "mis_ordenes": "My orders",
+    "auditoria": "Audit log"
   },
   "layout": {
     "saltar_contenido": "Skip to content",
@@ -1258,6 +1259,99 @@
       "dias": "{{n}} d",
       "registrar_pago": "Register payment",
       "accion": "Action"
+    }
+  },
+  "notificaciones": {
+    "titulo": "Notifications",
+    "subtitulo": "What happened in the shop that concerns you",
+    "marcar_todas": "Mark all as read",
+    "ver_todas": "See all",
+    "no_leida": "Unread",
+    "campana_con": "Notifications, {{n}} unread",
+    "filtro": "Filter notifications",
+    "filtros": {
+      "todas": "All",
+      "no_leidas": "Unread"
+    },
+    "vacio_no_leidas": "You have no unread notifications",
+    "error": "Notifications could not be loaded",
+    "tipos": {
+      "ORDEN_CREADA": {
+        "titulo": "New order {{numero}}",
+        "mensaje": "Motorcycle {{placa}} was checked in."
+      },
+      "MECANICO_ASIGNADO": {
+        "titulo": "You were assigned order {{numero}}",
+        "mensaje": "Motorcycle {{placa}}."
+      },
+      "ESTADO_ORDEN_CAMBIADO": {
+        "titulo": "Order {{numero}}: {{estado}}",
+        "mensaje": "Motorcycle {{placa}} moved to {{estado}}."
+      },
+      "PRESUPUESTO_ENVIADO": {
+        "titulo": "Quote {{presupuesto}} sent",
+        "mensaje": "Order {{numero}} · motorcycle {{placa}}: awaiting the customer's decision."
+      },
+      "PRESUPUESTO_APROBADO": {
+        "titulo": "Quote {{presupuesto}} approved",
+        "mensaje": "Order {{numero}} · motorcycle {{placa}}: you can start the repair."
+      },
+      "PRESUPUESTO_RECHAZADO": {
+        "titulo": "Quote {{presupuesto}} rejected",
+        "mensaje": "Order {{numero}} · motorcycle {{placa}}: the order was cancelled."
+      },
+      "ORDEN_FINALIZADA": {
+        "titulo": "Order {{numero}} ready",
+        "mensaje": "Motorcycle {{placa}} is ready to charge and deliver."
+      },
+      "ORDEN_ENTREGADA": {
+        "titulo": "Order {{numero}} delivered",
+        "mensaje": "Motorcycle {{placa}} was delivered to the customer."
+      },
+      "STOCK_BAJO": {
+        "titulo": "Low stock: {{codigo}}",
+        "mensaje": "{{nombre}} has {{disponible}} available."
+      },
+      "VENTA_ANULADA": {
+        "titulo": "Sale {{numero}} voided",
+        "mensaje": "Its products' stock went back to inventory."
+      }
+    }
+  },
+  "auditoria": {
+    "titulo": "Audit log",
+    "subtitulo": "Who did what and when in the system",
+    "campos": {
+      "fecha": "Date",
+      "usuario": "User",
+      "accion": "Action",
+      "entidad": "Record",
+      "ip": "IP"
+    },
+    "todos_usuarios": "All users",
+    "todas_entidades": "All records",
+    "sistema": "System",
+    "detalle": "Details",
+    "sin_detalle": "This action stores no details.",
+    "error": "The audit log could not be loaded",
+    "vacio_titulo": "No audit records",
+    "vacio_texto": "Try other filters.",
+    "de_registro": "History of {{entidad}} #{{id}}",
+    "ver_todo": "See the whole audit log",
+    "ver_registro": "View audit log",
+    "entidades": {
+      "orden_trabajo": "Work order",
+      "presupuesto": "Quote",
+      "venta": "Sale",
+      "compra": "Purchase",
+      "producto": "Product",
+      "categoria": "Category",
+      "cliente": "Customer",
+      "motocicleta": "Motorcycle",
+      "proveedor": "Supplier",
+      "servicio": "Service",
+      "usuario": "User",
+      "notificacion": "Notification"
     }
   }
 }

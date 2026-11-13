@@ -1,0 +1,16 @@
+Hola, Ana Pérez:
+
+Este es el presupuesto P-000045 para tu moto ABC12D (Yamaha FZ 150):
+
+- Mantenimiento de frenos × 1: $ 45.000
+- Pastillas de freno × 2: $ 100.000
+
+Subtotal: $ 145.000
+Descuento: −$ 5.000
+IVA 19 %: $ 26.600
+Total: $ 166.600
+
+Para aprobarlo o resolver dudas, comunícate con el taller indicando la orden OT-000123.
+
+--
+Taller HYSKAD · NIT 900123456-8 · Calle 41 # 10-25, Montería · 6047891234

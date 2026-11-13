@@ -68,6 +68,16 @@ import { Venta, VentasApiService } from './ventas-api.service';
         >
           {{ 'ventas.comprobante' | transloco }}
         </a>
+        <a
+          *hkTienePermiso="'AUDITORIA_VER'"
+          hk-button
+          variante="secondary"
+          icono="history"
+          routerLink="/auditoria"
+          [queryParams]="{ entidad: 'venta', entidadId: v.id }"
+        >
+          {{ 'auditoria.ver_registro' | transloco }}
+        </a>
         @if (v.estado === 'PAGADA') {
           <button
             *hkTienePermiso="'VENTAS_ANULAR'"

@@ -126,8 +126,8 @@ class RecuperacionPasswordIT {
     void pedirUnEnlaceNuevoInvalidaElAnterior() throws Exception {
         Creado usuario = usuarios.crear(Rol.VENDEDOR);
         String primero = solicitarYLeerToken(usuario);
-        SMTP.reset();
         String segundo = solicitarYLeerToken(usuario);
+        assertThat(segundo).isNotEqualTo(primero);
 
         mvc.perform(restablecer(primero, "Restablecida2026")).andExpect(status().isBadRequest());
         mvc.perform(restablecer(segundo, "Restablecida2026")).andExpect(status().isNoContent());
@@ -151,10 +151,13 @@ class RecuperacionPasswordIT {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_PROBLEM_JSON));
     }
 
+    /** Pide el enlace y lee el token del correo nuevo (el último recibido, no el primero). */
     private String solicitarYLeerToken(Creado usuario) throws Exception {
+        int antes = SMTP.getReceivedMessages().length;
         olvide(usuario.email()).andExpect(status().isAccepted());
-        assertThat(SMTP.waitForIncomingEmail(ESPERA_MS, 1)).isTrue();
-        return token(SMTP.getReceivedMessages()[0]);
+        assertThat(SMTP.waitForIncomingEmail(ESPERA_MS, antes + 1)).isTrue();
+        MimeMessage[] recibidos = SMTP.getReceivedMessages();
+        return token(recibidos[recibidos.length - 1]);
     }
 
     private static String token(MimeMessage correo) {

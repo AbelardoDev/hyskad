@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{email/layout :: correo(~{::title}, ~{this :: contenido})}">
+<head><title th:text="#{orden-recibida.asunto}">Recibimos tu moto</title></head>
+<body>
+<div th:fragment="contenido">
+    <p style="margin:0 0 16px;font-size:18px;font-weight:bold;" th:text="#{comun.saludo(${nombre})}">Hola, Ana:</p>
+    <p th:text="#{orden-recibida.cuerpo(${placa}, ${moto})}">Recibimos tu moto en el taller.</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+           style="margin:20px 0;background:#EEF5FF;border-radius:8px;">
+        <tr>
+            <td style="padding:16px 20px;font-size:14px;">
+                <span style="color:#4A5878;" th:text="#{comun.orden}">Orden</span><br>
+                <strong style="font-size:20px;" th:text="${numero}">OT-000001</strong><br><br>
+                <span style="color:#4A5878;" th:text="#{comun.fecha-ingreso}">Fecha de ingreso</span><br>
+                <span th:text="${fecha}">12/11/2026 9:45 p. m.</span><br><br>
+                <span style="color:#4A5878;" th:text="#{comun.motivo}">Motivo</span><br>
+                <span th:text="${motivo}">Mantenimiento</span>
+            </td>
+        </tr>
+    </table>
+    <p th:text="#{orden-recibida.siguiente}">Te avisaremos cuando tengamos el presupuesto.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,13 @@
+[(#{comun.saludo(${nombre})})]
+
+[(#{orden-entregada.cuerpo(${placa}, ${moto}, ${fecha})})]
+
+[# th:each="linea : ${lineas}"]- [(${linea.descripcion})] × [(${linea.cantidad})]: [(${linea.subtotal})]
+[/]
+[(#{orden-entregada.total-pagado})]: [(${total})]
+[# th:if="${metodo != null}"][(#{comun.metodo})]: [(#{|metodo.${metodo}|})]
+[/]
+[(#{orden-entregada.gracias(${numero})})]
+
+--
+[(${taller.nombre})] · NIT [(${taller.nit})] · [(${taller.direccion})] · [(${taller.telefono})]

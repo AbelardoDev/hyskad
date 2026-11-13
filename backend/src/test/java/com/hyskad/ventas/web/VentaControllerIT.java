@@ -214,8 +214,10 @@ class VentaControllerIT {
                 .andExpect(jsonPath("$.anuladaPor.nombre").value("Prueba ADMIN"));
 
         assertThat(productos.obtener(p.getId()).getStockActual()).isEqualByComparingTo("16");
+        // Por producto y referencia: otras pruebas registran devoluciones con ids de venta ficticios
         assertThat(jdbc.queryForObject("select costo_unitario from movimiento_inventario where tipo = "
-                + "'DEVOLUCION_ANULACION_VENTA' and referencia_id = ?", BigDecimal.class, id))
+                + "'DEVOLUCION_ANULACION_VENTA' and referencia_id = ? and producto_id = ?", BigDecimal.class, id,
+                p.getId()))
                 .isEqualByComparingTo("1000");
         assertThat(eventos.stream(VentaAnulada.class)).singleElement()
                 .satisfies(e -> assertThat(e.ventaId()).isEqualTo(id));

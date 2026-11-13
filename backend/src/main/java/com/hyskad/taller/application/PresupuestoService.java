@@ -66,6 +66,21 @@ public class PresupuestoService {
         return repository.findByOrdenIdOrderByVersionDesc(ordenId);
     }
 
+    /**
+     * F10: el presupuesto congelado con la orden para el correo al cliente. Sin verificar quién
+     * consulta: lo usan listeners asíncronos sin sesión.
+     */
+    @Transactional(readOnly = true)
+    public OrdenParaAvisos paraAvisos(Long id) {
+        Presupuesto p = repository.findById(id).orElseThrow(() -> new NotFoundException(ENTIDAD, id));
+        OrdenParaAvisos orden = ordenes.paraAvisos(p.getOrden().getId());
+        return new OrdenParaAvisos(orden.id(), p.getNumero(), orden.estado(), orden.clienteId(), orden.placa(),
+                orden.moto(), orden.motivoIngreso(), orden.fechaIngreso(), orden.fechaEntrega(), orden.creadaPor(),
+                orden.mecanicos(), p.getItems().stream().map(i -> new OrdenParaAvisos.Linea(i.getDescripcion(),
+                        i.getCantidad(), i.getPrecioUnitario(), i.getSubtotal())).toList(),
+                p.getSubtotal(), p.getDescuento(), p.getIvaPorcentaje(), p.getImpuesto(), p.getTotal(), null);
+    }
+
     /** El presupuesto con los datos del taller, para imprimirlo. */
     @Transactional(readOnly = true)
     public Documento documento(Long id) {
@@ -108,7 +123,7 @@ public class PresupuestoService {
                 presupuesto.getNumero(), "ordenId", ordenId, "version", presupuesto.getVersion(),
                 "total", presupuesto.getTotal()));
         eventos.publishEvent(new PresupuestoEnviado(presupuesto.getId(), presupuesto.getNumero(), ordenId,
-                orden.getCliente().getId(), presupuesto.getTotal()));
+                orden.getCliente().getId(), presupuesto.getTotal(), usuarioId));
         return presupuesto;
     }
 

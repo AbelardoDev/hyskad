@@ -1,0 +1,12 @@
+[(#{comun.saludo(${nombre})})]
+
+[(#{orden-recibida.cuerpo(${placa}, ${moto})})]
+
+[(#{comun.orden})]: [(${numero})]
+[(#{comun.fecha-ingreso})]: [(${fecha})]
+[(#{comun.motivo})]: [(${motivo})]
+
+[(#{orden-recibida.siguiente})]
+
+--
+[(${taller.nombre})] · NIT [(${taller.nit})] · [(${taller.direccion})] · [(${taller.telefono})]

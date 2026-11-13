@@ -154,6 +154,27 @@ public class OrdenTrabajoService {
     }
 
     /**
+     * F10: la orden con lo que necesitan las notificaciones y los correos. Sin verificar quién
+     * consulta: lo usan listeners asíncronos, que corren sin sesión.
+     */
+    @Transactional(readOnly = true)
+    public OrdenParaAvisos paraAvisos(Long id) {
+        OrdenTrabajo o = repository.findById(id).orElseThrow(() -> new NotFoundException(ENTIDAD, id));
+        List<OrdenParaAvisos.Linea> lineas = new ArrayList<>();
+        o.getServicios().forEach(s -> lineas.add(new OrdenParaAvisos.Linea(s.getDescripcion(), BigDecimal.ONE,
+                s.getPrecio(), s.getPrecio())));
+        o.getRepuestos().forEach(r -> lineas.add(new OrdenParaAvisos.Linea(r.getProducto().getNombre(),
+                r.getCantidad(), r.getPrecioUnitario(), r.getSubtotal())));
+        return new OrdenParaAvisos(o.getId(), o.getNumero(), o.getEstado().name(), o.getCliente().getId(),
+                o.getMotocicleta().getPlaca(), o.getMotocicleta().getMarca() + " " + o.getMotocicleta().getModelo(),
+                o.getMotivoIngreso(), o.getFechaIngreso(), o.getFechaEntrega(), o.getCreatedBy(),
+                o.getMecanicos().stream().map(m -> m.getMecanicoId()).toList(), lineas, o.getSubtotal(),
+                o.getDescuento(), o.getIvaPorcentaje(), o.getImpuesto(), o.getTotal(),
+                o.getPago().map(p -> new OrdenParaAvisos.Pago(p.getMetodo().name(), p.getMonto(), p.getFecha()))
+                        .orElse(null));
+    }
+
+    /**
      * Lo que la recepción necesita saber de una moto antes de crear la orden: la última lectura de
      * kilometraje (RN-25) y su orden activa, si tiene (RN-24).
      */

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{email/layout :: correo(~{::title}, ~{this :: contenido})}">
+<head><title th:text="#{presupuesto-pendiente.asunto}">Tu presupuesto está listo</title></head>
+<body>
+<div th:fragment="contenido">
+    <p style="margin:0 0 16px;font-size:18px;font-weight:bold;" th:text="#{comun.saludo(${nombre})}">Hola, Ana:</p>
+    <p th:text="#{presupuesto-pendiente.cuerpo(${presupuesto}, ${placa}, ${moto})}">Este es el presupuesto.</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%"
+           style="margin:20px 0;border-collapse:collapse;font-size:14px;">
+        <tr style="color:#4A5878;text-align:left;">
+            <th style="padding:8px 0;border-bottom:1px solid #D9E8FF;font-weight:normal;" th:text="#{comun.descripcion}">Descripción</th>
+            <th style="padding:8px 0 8px 12px;border-bottom:1px solid #D9E8FF;font-weight:normal;text-align:right;" th:text="#{comun.cantidad}">Cant.</th>
+            <th style="padding:8px 0 8px 12px;border-bottom:1px solid #D9E8FF;font-weight:normal;text-align:right;" th:text="#{comun.subtotal}">Subtotal</th>
+        </tr>
+        <tr th:each="linea : ${lineas}">
+            <td style="padding:8px 0;border-bottom:1px solid #EEF5FF;" th:text="${linea.descripcion}">Cambio de aceite</td>
+            <td style="padding:8px 0 8px 12px;border-bottom:1px solid #EEF5FF;text-align:right;" th:text="${linea.cantidad}">1</td>
+            <td style="padding:8px 0 8px 12px;border-bottom:1px solid #EEF5FF;text-align:right;white-space:nowrap;" th:text="${linea.subtotal}">$ 45.000</td>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding:12px 0 2px;text-align:right;color:#4A5878;" th:text="#{comun.subtotal}">Subtotal</td>
+            <td style="padding:12px 0 2px 12px;text-align:right;white-space:nowrap;" th:text="${subtotal}">$ 45.000</td>
+        </tr>
+        <tr th:if="${descuento != null}">
+            <td colspan="2" style="padding:2px 0;text-align:right;color:#4A5878;" th:text="#{comun.descuento}">Descuento</td>
+            <td style="padding:2px 0 2px 12px;text-align:right;white-space:nowrap;" th:text="|−${descuento}|">−$ 0</td>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding:2px 0;text-align:right;color:#4A5878;" th:text="#{comun.iva(${iva})}">IVA 19 %</td>
+            <td style="padding:2px 0 2px 12px;text-align:right;white-space:nowrap;" th:text="${impuesto}">$ 8.550</td>
+        </tr>
+        <tr>
+            <td colspan="2" style="padding:10px 0 0;text-align:right;font-weight:bold;font-size:16px;" th:text="#{comun.total}">Total</td>
+            <td style="padding:10px 0 0 12px;text-align:right;font-weight:bold;font-size:16px;white-space:nowrap;color:#1D58E0;" th:text="${total}">$ 53.550</td>
+        </tr>
+    </table>
+    <p th:text="#{presupuesto-pendiente.aprobar(${numero})}">Responde a este correo o comunícate con el taller para aprobarlo.</p>
+</div>
+</body>
+</html>

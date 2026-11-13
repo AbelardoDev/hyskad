@@ -67,10 +67,13 @@ public class MotocicletaController {
         return mapper.toResponse(service.obtener(id));
     }
 
+    /** RF9: paginado por fecha de ingreso descendente (el orden es fijo); sin canceladas por defecto. */
     @GetMapping("/motocicletas/{id}/historial")
     @PreAuthorize("hasAuthority('MOTOS_VER')")
-    public List<HistorialServicio> historial(@PathVariable Long id) {
-        return service.historial(id);
+    public PageResponse<HistorialServicio> historial(@PathVariable Long id,
+            @RequestParam(defaultValue = "false") boolean incluirCanceladas,
+            @PageableDefault(size = 10) Pageable pagina) {
+        return PageResponse.of(service.historial(id, incluirCanceladas, pagina));
     }
 
     @PostMapping("/motocicletas")

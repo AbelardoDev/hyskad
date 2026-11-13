@@ -5,16 +5,19 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * Una orden de trabajo en el historial de la moto (RF9), con su forma definitiva. Se llena en
- * F09C, cuando exista el módulo {@code taller}; hasta entonces el historial siempre está vacío.
+ * Una orden de trabajo en el historial de la moto (RF9): fechas, kilometraje, diagnóstico,
+ * servicios, repuestos, total y mecánicos. {@code estado} es el nombre del estado de la orden
+ * (el enum vive en {@code taller}). Sin costos.
  */
-public record HistorialServicio(Long ordenId, String numero, Instant fechaIngreso, Instant fechaEntrega,
-        String estado, Integer kilometraje, String motivoIngreso, List<Servicio> servicios,
-        List<Repuesto> repuestos, BigDecimal total) {
+public record HistorialServicio(Long ordenId, String numero, String estado, Instant fechaIngreso,
+        Instant fechaFinalizacion, Instant fechaEntrega, int kilometrajeIngreso, Integer kilometrajeInspeccion,
+        String motivoIngreso, String diagnostico, List<Servicio> servicios, List<Repuesto> repuestos,
+        BigDecimal total, List<String> mecanicos) {
 
     public record Servicio(String descripcion, BigDecimal precio) {
     }
 
-    public record Repuesto(String codigo, String nombre, int cantidad, BigDecimal precioUnitario) {
+    public record Repuesto(String codigo, String nombre, BigDecimal cantidad, BigDecimal precioUnitario,
+            BigDecimal subtotal) {
     }
 }

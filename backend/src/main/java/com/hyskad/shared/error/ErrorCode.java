@@ -61,6 +61,9 @@ public enum ErrorCode {
     ORDEN_ESTADO_INVALIDO(HttpStatus.CONFLICT),
     PRESUPUESTO_NO_PENDIENTE(HttpStatus.CONFLICT),
     SERVICIO_INACTIVO(HttpStatus.CONFLICT),
+    MONTO_INVALIDO(HttpStatus.BAD_REQUEST),
+    PAGO_DUPLICADO(HttpStatus.CONFLICT),
+    PAGO_REQUERIDO(HttpStatus.CONFLICT),
     ERROR_INTERNO(HttpStatus.INTERNAL_SERVER_ERROR);
 
     private final HttpStatus status;

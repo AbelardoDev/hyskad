@@ -1,5 +1,7 @@
 package com.hyskad.taller.persistence;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -61,6 +63,26 @@ public interface OrdenTrabajoRepository
             where exists (select 1 from OrdenMecanico m where m.orden = o and m.id.mecanicoId = :mecanicoId)
             group by o.estado""")
     List<ConteoEstado> contarPorEstadoDelMecanico(Long mecanicoId);
+
+    /**
+     * RN-37: órdenes finalizadas sin pago, la más antigua primero. Filtros opcionales por cliente y
+     * por fecha de finalización ({@code desde} inclusivo, {@code hasta} exclusivo).
+     */
+    @EntityGraph(attributePaths = { "cliente", "motocicleta" })
+    @Query(value = "select o from OrdenTrabajo o where " + PENDIENTES_DE_PAGO
+            + " order by o.fechaFinalizacion asc, o.id asc",
+            countQuery = "select count(o) from OrdenTrabajo o where " + PENDIENTES_DE_PAGO)
+    Page<OrdenTrabajo> pendientesDePago(Long clienteId, Instant desde, Instant hasta, Pageable pagina);
+
+    @Query("select coalesce(sum(o.total), 0) from OrdenTrabajo o where " + PENDIENTES_DE_PAGO)
+    BigDecimal totalPendienteDePago(Long clienteId, Instant desde, Instant hasta);
+
+    String PENDIENTES_DE_PAGO = """
+            o.estado = com.hyskad.taller.domain.EstadoOrden.FINALIZADA
+            and not exists (select 1 from Pago p where p.orden = o)
+            and (:clienteId is null or o.cliente.id = :clienteId)
+            and (:desde is null or o.fechaFinalizacion >= :desde)
+            and (:hasta is null or o.fechaFinalizacion < :hasta)""";
 
     interface ConteoEstado {
 

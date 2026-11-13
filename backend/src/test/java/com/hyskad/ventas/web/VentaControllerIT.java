@@ -33,6 +33,7 @@ import com.hyskad.catalogo.application.ProductoService;
 import com.hyskad.catalogo.domain.Producto;
 import com.hyskad.inventario.application.InventarioService;
 import com.hyskad.inventario.domain.Referencia;
+import com.hyskad.shared.dinero.MetodoPago;
 import com.hyskad.shared.error.BusinessException;
 import com.hyskad.shared.error.ErrorCode;
 import com.hyskad.support.CatalogoDePrueba;
@@ -42,7 +43,6 @@ import com.hyskad.support.UsuariosDePrueba;
 import com.hyskad.usuarios.domain.Rol;
 import com.hyskad.ventas.application.RegistrarVenta;
 import com.hyskad.ventas.application.VentaService;
-import com.hyskad.ventas.domain.MetodoPago;
 import com.hyskad.ventas.domain.VentaAnulada;
 
 import tools.jackson.databind.ObjectMapper;

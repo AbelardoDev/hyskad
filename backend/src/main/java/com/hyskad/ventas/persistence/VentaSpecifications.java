@@ -4,9 +4,9 @@ import java.time.Instant;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import com.hyskad.shared.dinero.MetodoPago;
 import com.hyskad.shared.persistence.Patrones;
 import com.hyskad.ventas.domain.EstadoVenta;
-import com.hyskad.ventas.domain.MetodoPago;
 import com.hyskad.ventas.domain.Venta;
 
 /** Filtros opcionales del listado de ventas (RF29); un filtro nulo o vacío no restringe. */

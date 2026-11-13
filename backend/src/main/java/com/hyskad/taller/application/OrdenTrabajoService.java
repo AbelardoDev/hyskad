@@ -3,6 +3,7 @@ package com.hyskad.taller.application;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -116,6 +117,18 @@ public class OrdenTrabajoService {
     public Page<OrdenTrabajo> mias(FiltroOrdenes filtro, Pageable pagina) {
         return conMecanicos(repository.findAll(
                 especificacion(filtro).and(OrdenTrabajoSpecifications.asignadaA(usuarioActual.idRequerido())), pagina));
+    }
+
+    /**
+     * RN-37: cuentas pendientes, órdenes {@code FINALIZADA} sin pago, la más antigua primero. Los
+     * días del filtro son de calendario en Bogotá sobre la fecha de finalización (RN-53).
+     */
+    @Transactional(readOnly = true)
+    public PendientesDePago pendientesDePago(Long clienteId, LocalDate desde, LocalDate hasta, Pageable pagina) {
+        Instant inicio = desde == null ? null : desde.atStartOfDay(TiempoConfig.ZONA_NEGOCIO).toInstant();
+        Instant fin = hasta == null ? null : hasta.plusDays(1).atStartOfDay(TiempoConfig.ZONA_NEGOCIO).toInstant();
+        return new PendientesDePago(repository.pendientesDePago(clienteId, inicio, fin, pagina),
+                repository.totalPendienteDePago(clienteId, inicio, fin));
     }
 
     /** Conteo por estado de las órdenes visibles para el usuario, con todos los estados (en 0 si no hay). */
@@ -260,6 +273,10 @@ public class OrdenTrabajoService {
             // Enviar el presupuesto lleva descuento y observaciones: POST /ordenes-trabajo/{id}/presupuestos
             throw OrdenTrabajo.transicionInvalida(desde, hasta, "PRESUPUESTO_REQUERIDO");
         }
+        if (hasta == EstadoOrden.ENTREGADA) {
+            // La entrega guarda quién, cuándo y observaciones: POST /ordenes-trabajo/{id}/entrega
+            throw OrdenTrabajo.transicionInvalida(desde, hasta, "ENTREGA_REQUERIDA");
+        }
         if (!usuarioActual.tienePermiso(regla.permiso().name())) {
             throw new AccessDeniedException("La transición requiere " + regla.permiso());
         }
@@ -331,7 +348,6 @@ public class OrdenTrabajoService {
 
     /**
      * Condición de negocio que aún no se cumple para llegar a {@code destino}, si hay alguna.
-     * El pago llega en F09C: hasta entonces ninguna orden puede entregarse.
      */
     static Optional<String> bloqueo(OrdenTrabajo orden, EstadoOrden destino) {
         return Optional.ofNullable(switch (destino) {
@@ -339,7 +355,7 @@ public class OrdenTrabajoService {
                     ? "SIN_MECANICOS" : null;
             case PENDIENTE_APROBACION -> !orden.tieneDiagnostico() ? "SIN_DIAGNOSTICO"
                     : orden.tieneItems() ? null : "SIN_ITEMS";
-            case ENTREGADA -> "SIN_PAGO";
+            case ENTREGADA -> orden.tienePago() ? null : "SIN_PAGO";
             default -> null;
         });
     }
@@ -357,10 +373,14 @@ public class OrdenTrabajoService {
         }
         boolean diagnosticable = estado == EstadoOrden.EN_DIAGNOSTICO || estado == EstadoOrden.EN_REPARACION;
         boolean trabaja = permisos.contains(Permiso.ORDENES_TRABAJAR.name());
+        boolean finalizada = estado == EstadoOrden.FINALIZADA;
         return new AccionesPermitidas(orden.esActiva() && permisos.contains(Permiso.ORDENES_CREAR.name()),
                 orden.esActiva() && permisos.contains(Permiso.ORDENES_ASIGNAR.name()), diagnosticable && trabaja,
                 estado == EstadoOrden.EN_DIAGNOSTICO && trabaja,
-                permisos.contains(Permiso.PRESUPUESTOS_GESTIONAR.name()), List.copyOf(transiciones));
+                permisos.contains(Permiso.PRESUPUESTOS_GESTIONAR.name()),
+                finalizada && !orden.tienePago() && permisos.contains(Permiso.PAGOS_REGISTRAR.name()),
+                finalizada && orden.tienePago() && permisos.contains(Permiso.ENTREGAS_REGISTRAR.name()),
+                List.copyOf(transiciones));
     }
 
     /** Carga la orden para modificarla: visible para el usuario y en la versión que él leyó. */
@@ -446,6 +466,7 @@ public class OrdenTrabajoService {
         orden.getHistorial().size();
         orden.getServicios().size();
         orden.getRepuestos().forEach(r -> r.getProducto().getCodigo());
+        orden.getPago();
     }
 
     private static Specification<OrdenTrabajo> especificacion(FiltroOrdenes f) {
@@ -477,5 +498,9 @@ public class OrdenTrabajoService {
     }
 
     public record OrdenActiva(Long id, String numero, EstadoOrden estado) {
+    }
+
+    /** Una página de órdenes por cobrar y el total adeudado de todo el resultado filtrado. */
+    public record PendientesDePago(Page<OrdenTrabajo> ordenes, BigDecimal totalAdeudado) {
     }
 }

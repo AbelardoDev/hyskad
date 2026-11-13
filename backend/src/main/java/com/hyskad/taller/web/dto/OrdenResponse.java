@@ -5,6 +5,7 @@ import java.time.Instant;
 import java.util.List;
 
 import com.hyskad.catalogo.domain.Unidad;
+import com.hyskad.shared.dinero.MetodoPago;
 import com.hyskad.shared.validation.TipoDocumento;
 import com.hyskad.taller.application.AccionesPermitidas;
 import com.hyskad.taller.domain.EstadoOrden;
@@ -12,14 +13,24 @@ import com.hyskad.taller.domain.EstadoOrden;
 /**
  * Detalle de la orden con cliente, moto, mecánicos, historial de estados y lo que el usuario
  * actual puede hacer. {@code version} se devuelve en cada modificación (bloqueo optimista).
+ * {@code pago} y {@code entrega} son nulos hasta que se registran.
  */
 public record OrdenResponse(Long id, String numero, EstadoOrden estado, long version, Instant fechaIngreso,
         int kilometrajeIngreso, String motivoIngreso, String descripcionProblema, String observaciones,
         String diagnostico, String observacionesDiagnostico, Integer kilometrajeInspeccion, ClienteResumen cliente,
         MotoResumen motocicleta, List<Mecanico> mecanicos, List<Historial> historial, UsuarioResumen creadaPor,
         List<Servicio> servicios, List<Repuesto> repuestos, BigDecimal subtotal, BigDecimal descuento,
-        BigDecimal ivaPorcentaje, BigDecimal impuesto, BigDecimal total, Instant fechaFinalizacion,
-        AccionesPermitidas accionesPermitidas) {
+        BigDecimal ivaPorcentaje, BigDecimal impuesto, BigDecimal total, Instant fechaFinalizacion, Pago pago,
+        Entrega entrega, AccionesPermitidas accionesPermitidas) {
+
+    /** RN-35: pago único de la orden; {@code cambio} solo en efectivo con monto recibido. */
+    public record Pago(BigDecimal monto, MetodoPago metodo, String referencia, BigDecimal montoRecibido,
+            BigDecimal cambio, Instant fecha, UsuarioResumen usuario) {
+    }
+
+    /** RN-36: quién entregó la moto, cuándo y con qué observaciones. */
+    public record Entrega(Instant fecha, UsuarioResumen usuario, String observaciones) {
+    }
 
     /** Servicio de la orden; {@code servicioId} nulo es mano de obra libre. */
     public record Servicio(Long id, Long servicioId, String descripcion, BigDecimal precio, Integer tiempoMin,

@@ -14,7 +14,6 @@ import { LucideDynamicIcon } from '@lucide/angular';
 
 import { HkTienePermisoDirective } from '../../core/auth/tiene-permiso.directive';
 import { erroresManejados } from '../../core/http/contexto-http';
-import { CopPipe, FechaPipe } from '../../core/utils/formato.pipes';
 import { HkBadge } from '../../shared/ui/badge/badge';
 import { HkButton } from '../../shared/ui/button/button';
 import { HkCard } from '../../shared/ui/card/card';
@@ -27,6 +26,7 @@ import { HkSkeleton } from '../../shared/ui/skeleton/skeleton';
 import { HkTabs, Pestana } from '../../shared/ui/tabs/tabs';
 import { ToastService } from '../../shared/ui/toast/toast';
 import { CambiarPropietarioModal } from './cambiar-propietario-modal';
+import { HkHistorialMoto } from './historial-moto';
 import { Motocicleta, MotocicletasApiService } from './motocicletas-api.service';
 import { DatosFormMoto, MotoFormDrawer } from './moto-form-drawer';
 
@@ -37,8 +37,6 @@ import { DatosFormMoto, MotoFormDrawer } from './moto-form-drawer';
     RouterLink,
     TranslocoPipe,
     LucideDynamicIcon,
-    CopPipe,
-    FechaPipe,
     HkTienePermisoDirective,
     HkBadge,
     HkButton,
@@ -48,6 +46,7 @@ import { DatosFormMoto, MotoFormDrawer } from './moto-form-drawer';
     HkPlaca,
     HkSkeleton,
     HkTabs,
+    HkHistorialMoto,
   ],
   template: `
     @if (moto.error()) {
@@ -138,46 +137,7 @@ import { DatosFormMoto, MotoFormDrawer } from './moto-form-drawer';
           </div>
         } @else {
           <hk-card>
-            @if (historial.isLoading()) {
-              <hk-skeleton [lineas]="4" />
-            } @else if (historial.error()) {
-              <hk-empty-state
-                compacto
-                icono="circle-alert"
-                [titulo]="'motos.historial.error' | transloco"
-              >
-                <button
-                  hk-button
-                  variante="secondary"
-                  icono="rotate-ccw"
-                  (click)="historial.reload()"
-                >
-                  {{ 'comun.reintentar' | transloco }}
-                </button>
-              </hk-empty-state>
-            } @else {
-              @let ordenes = historial.value() ?? [];
-              @if (ordenes.length === 0) {
-                <hk-empty-state
-                  compacto
-                  icono="wrench"
-                  [titulo]="'motos.historial.vacio_titulo' | transloco"
-                  [texto]="'motos.historial.vacio_texto' | transloco"
-                />
-              } @else {
-                <ol class="divide-y divide-border">
-                  @for (orden of ordenes; track orden.ordenId) {
-                    <li class="flex flex-wrap items-center justify-between gap-2 py-3">
-                      <div>
-                        <p class="font-medium text-fg">{{ orden.numero }}</p>
-                        <p class="text-xs text-muted">{{ orden.fechaIngreso | fecha }}</p>
-                      </div>
-                      <p class="font-semibold text-fg tabular">{{ orden.total | cop }}</p>
-                    </li>
-                  }
-                </ol>
-              }
-            }
+            <hk-historial-moto [motocicletaId]="m.id" />
           </hk-card>
         }
       </hk-tabs>
@@ -203,10 +163,6 @@ export class MotoDetallePage {
   protected readonly moto = rxResource({
     params: () => this.id(),
     stream: ({ params }) => this.api.obtener(params, erroresManejados()),
-  });
-  protected readonly historial = rxResource({
-    params: () => (this.pestana() === 'historial' ? this.id() : undefined),
-    stream: ({ params }) => this.api.historial(params, erroresManejados()),
   });
 
   private readonly textosPestanas = translateSignal([

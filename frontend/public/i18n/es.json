@@ -55,7 +55,8 @@
     "configuracion": "Configuración",
     "perfil": "Mi perfil",
     "dev_ui": "Kit de interfaz",
-    "ordenes_corto": "Órdenes"
+    "ordenes_corto": "Órdenes",
+    "mis_ordenes": "Mis órdenes"
   },
   "layout": {
     "saltar_contenido": "Saltar al contenido",
@@ -269,7 +270,10 @@
     "NOTA_REQUERIDA": "Escribe el motivo",
     "PRESUPUESTO_NO_PENDIENTE": "El presupuesto ya no está pendiente",
     "SERVICIO_INACTIVO": "El servicio está inactivo",
-    "DECISION_INVALIDA": "La decisión debe ser aprobado o rechazado"
+    "DECISION_INVALIDA": "La decisión debe ser aprobado o rechazado",
+    "MONTO_INVALIDO": "El monto debe ser exactamente el total de la orden",
+    "PAGO_DUPLICADO": "La orden ya tiene un pago registrado",
+    "PAGO_REQUERIDO": "La orden no tiene pago registrado"
   },
   "roles": {
     "ADMIN": "Administrador",
@@ -310,6 +314,19 @@
     "titulo": "No tienes permiso para ver esta sección",
     "texto": "Si crees que deberías tener acceso, pídeselo a un administrador."
   },
+  "pago": {
+    "metodo": "Método de pago",
+    "metodos": {
+      "EFECTIVO": "Efectivo",
+      "TRANSFERENCIA": "Transferencia",
+      "TARJETA": "Tarjeta",
+      "OTRO": "Otro"
+    },
+    "recibido": "Recibido en efectivo",
+    "referencia": "Referencia del pago",
+    "cambio": "Cambio",
+    "falta": "Falta"
+  },
   "ventas": {
     "nueva": "Nueva venta",
     "subtitulo": "Ventas de mostrador y sus comprobantes",
@@ -335,12 +352,6 @@
       "PAGADA": "Pagada",
       "ANULADA": "Anulada"
     },
-    "metodos": {
-      "EFECTIVO": "Efectivo",
-      "TRANSFERENCIA": "Transferencia",
-      "TARJETA": "Tarjeta",
-      "OTRO": "Otro"
-    },
     "resumen": {
       "cantidad": "Ventas pagadas del periodo",
       "total": "Total vendido del periodo"
@@ -349,9 +360,6 @@
       "numero": "Número",
       "cliente": "Cliente",
       "vendedor": "Vendedor",
-      "metodo": "Método de pago",
-      "referencia": "Referencia del pago",
-      "recibido": "Recibido en efectivo",
       "descuento": "Descuento",
       "precio": "Precio unitario"
     },
@@ -379,8 +387,6 @@
       "cantidad_de": "Cantidad {{n}}",
       "quitar": "Quitar {{nombre}}",
       "consumidor_final": "Consumidor final (opcional)",
-      "cambio": "Cambio",
-      "falta": "Falta",
       "cobrar": "Cobrar",
       "atajos": "Atajos",
       "atajo_buscar": "Ir al buscador",
@@ -659,7 +665,11 @@
       "titulo": "Historial",
       "vacio_titulo": "Sin servicios registrados",
       "vacio_texto": "Aquí aparecerán las órdenes de trabajo de esta moto, con sus servicios, repuestos y totales.",
-      "error": "No se pudo cargar el historial"
+      "error": "No se pudo cargar el historial",
+      "incluir_canceladas": "Incluir canceladas",
+      "recorrido": "+{{km}} km desde la anterior",
+      "entregada": "entregada el {{fecha}}",
+      "ver_orden": "Ver la orden"
     }
   },
   "inventario": {
@@ -1004,7 +1014,14 @@
       "titulo": "Mis órdenes",
       "subtitulo": "Las motos que tienes asignadas",
       "vacio_titulo": "No tienes órdenes asignadas",
-      "vacio_texto": "Cuando te asignen una moto aparecerá aquí."
+      "vacio_texto": "Cuando te asignen una moto aparecerá aquí.",
+      "abrir": "Abrir la orden {{numero}} de la placa {{placa}}",
+      "grupos": {
+        "por_diagnosticar": "Por diagnosticar",
+        "esperando_aprobacion": "Esperando aprobación",
+        "en_reparacion": "En reparación",
+        "finalizadas": "Listas para entregar"
+      }
     },
     "recepcion": {
       "recibir": "Recibir moto",
@@ -1062,10 +1079,10 @@
         "pago": "Pago y entrega",
         "historial": "Historial"
       },
-      "pronto": "Disponible pronto",
       "recibida_por": "Recibida por",
       "editar_recepcion": "Editar recepción",
-      "recepcion_guardada": "Datos de recepción guardados"
+      "recepcion_guardada": "Datos de recepción guardados",
+      "acciones": "Acciones de la orden"
     },
     "acciones": {
       "recibir": "Recibir",
@@ -1082,7 +1099,7 @@
       "SIN_MECANICOS": "Asigna al menos un mecánico",
       "SIN_DIAGNOSTICO": "Registra primero el diagnóstico",
       "SIN_ITEMS": "Agrega al menos un servicio o repuesto",
-      "SIN_PAGO": "Registra primero el pago (disponible pronto)"
+      "SIN_PAGO": "Registra primero el pago"
     },
     "confirmar_transicion": {
       "titulo": "{{accion}} · {{numero}}",
@@ -1186,6 +1203,62 @@
       },
       "volver": "Volver a la orden",
       "no_encontrado": "Presupuesto no encontrado"
+    },
+    "comprobante": {
+      "titulo": "Comprobante de servicio",
+      "volver": "Volver a la orden",
+      "no_disponible": "Comprobante no disponible",
+      "no_disponible_texto": "El comprobante se genera cuando la orden tiene el pago registrado.",
+      "de": "Comprobante de la orden {{numero}}",
+      "ingreso": "Ingreso: {{fecha}}",
+      "entrega": "Entrega: {{fecha}}",
+      "kilometraje": "Kilometraje: {{km}} km"
+    },
+    "pago": {
+      "fecha": "Fecha del pago",
+      "entregada_titulo": "Orden {{numero}} entregada",
+      "entregada_por": "Entregada por {{nombre}} el {{fecha}}",
+      "imprimir_comprobante": "Imprimir comprobante",
+      "no_finalizada": "El pago se registra con la orden finalizada",
+      "no_finalizada_texto": "Total actual de la orden: {{total}}. Cuando el mecánico la finalice podrás cobrarla aquí.",
+      "resumen": "Resumen del cobro",
+      "total_pagar": "Total a pagar",
+      "pagado": "Pagado en {{metodo}} el {{fecha}}",
+      "registrar": "Registrar pago",
+      "cobrar": "Cobrar {{total}}",
+      "pendiente": "Pendiente de pago",
+      "pendiente_texto": "La orden está finalizada y espera el pago en caja.",
+      "entregar_titulo": "Entregar la moto",
+      "observaciones_entrega": "Observaciones de la entrega",
+      "entregar": "Registrar entrega",
+      "lista_entregar": "Lista para entregar",
+      "lista_entregar_texto": "La orden está pagada; la entrega la registra el vendedor o el administrador.",
+      "confirmar_titulo": "¿Registrar el pago de la orden {{numero}}?",
+      "confirmar_mensaje": "Se registrará un pago de {{total}} en {{metodo}}. El pago es único y no se puede modificar.",
+      "confirmar_entrega_titulo": "¿Entregar la orden {{numero}}?",
+      "confirmar_entrega_mensaje": "La moto {{placa}} se entrega a {{cliente}} y la orden queda cerrada.",
+      "entregada_toast": "Orden {{numero}} entregada",
+      "pagado_toast": "Pago de la orden {{numero}} registrado"
+    }
+  },
+  "reportes": {
+    "cuentas": {
+      "titulo": "Cuentas pendientes",
+      "subtitulo": "Órdenes finalizadas que aún no se han pagado",
+      "total_adeudado": "Total adeudado",
+      "cantidad": "Órdenes por cobrar",
+      "todos_clientes": "Todos los clientes",
+      "finalizada_desde": "Finalizada desde",
+      "finalizada_hasta": "Finalizada hasta",
+      "error": "No se pudieron cargar las cuentas pendientes",
+      "vacio_titulo": "No hay cuentas pendientes",
+      "vacio_texto": "Todas las órdenes finalizadas están pagadas.",
+      "orden": "Orden",
+      "finalizada": "Finalizada",
+      "dias_transcurridos": "Días transcurridos",
+      "dias": "{{n}} d",
+      "registrar_pago": "Registrar pago",
+      "accion": "Acción"
     }
   }
 }

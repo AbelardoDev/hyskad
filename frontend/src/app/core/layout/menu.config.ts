@@ -10,6 +10,10 @@ export interface ItemMenuNavegacion {
   ruta: string;
   /** Basta con tener uno de estos permisos para ver el ítem (`NavegacionService`). */
   permisos: readonly Permiso[];
+  /** Se oculta si el usuario tiene alguno de estos (p. ej. "Mis órdenes" para quien ve todas). */
+  excluirCon?: readonly Permiso[];
+  /** Si el usuario lo ve, es su página de inicio en vez del primer ítem (IU6: el mecánico). */
+  inicio?: boolean;
   /** Aparece en la barra inferior en móvil (máximo 4). */
   accesoRapido?: boolean;
   /** Número junto al ítem (p. ej. productos con stock bajo), de `ContadoresService`. */
@@ -38,6 +42,15 @@ export const MENU: readonly GrupoMenu[] = [
   {
     clave: 'menu.grupos.taller',
     items: [
+      {
+        clave: 'menu.mis_ordenes',
+        icono: 'clipboard-check',
+        ruta: '/ordenes/mias',
+        permisos: ['ORDENES_VER_ASIGNADAS'],
+        excluirCon: ['ORDENES_VER_TODAS'],
+        accesoRapido: true,
+        inicio: true,
+      },
       {
         clave: 'menu.ordenes',
         claveCorta: 'menu.ordenes_corto',

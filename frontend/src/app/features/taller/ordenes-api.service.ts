@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 
 import { Pagina } from '../../core/http/pagina';
 import { TipoDocumento } from '../../core/utils/validadores';
+import { MetodoPago } from '../../shared/ui/forms/campos-pago';
 import { EstadoOrden } from '../../shared/ui/badge/status-badge';
 
 const API = '/api/v1/ordenes-trabajo';
@@ -37,12 +38,14 @@ export interface OrdenResumen {
   placa: string;
   moto: string;
   cliente: string;
+  motivoIngreso: string;
   mecanicos: UsuarioResumen[];
 }
 
 /**
  * Transición que el usuario actual puede pedir. Con `bloqueo` existe pero aún no se cumple su
- * condición (`SIN_MECANICOS`, `SIN_DIAGNOSTICO`, `SIN_ITEMS`, `SIN_PAGO`).
+ * condición (`SIN_MECANICOS`, `SIN_DIAGNOSTICO`, `SIN_ITEMS`, `SIN_PAGO`). Entregar (ENTREGADA) se
+ * hace con `registrarEntrega`, no con la transición genérica.
  */
 export interface TransicionPermitida {
   estado: EstadoOrden;
@@ -59,6 +62,10 @@ export interface AccionesPermitidas {
   editarItems: boolean;
   /** Enviar, decidir y retirar presupuestos. */
   gestionarPresupuestos: boolean;
+  /** Registrar el pago: orden finalizada sin pago y permiso `PAGOS_REGISTRAR` (RN-35). */
+  registrarPago: boolean;
+  /** Registrar la entrega: orden pagada y permiso `ENTREGAS_REGISTRAR` (RN-36). */
+  registrarEntrega: boolean;
   transiciones: TransicionPermitida[];
 }
 
@@ -184,7 +191,71 @@ export interface Orden {
   impuesto: number;
   total: number;
   fechaFinalizacion: string | null;
+  pago: PagoOrden | null;
+  entrega: EntregaOrden | null;
   accionesPermitidas: AccionesPermitidas;
+}
+
+/** Pago único de la orden (RN-35); `cambio` solo en efectivo con monto recibido. */
+export interface PagoOrden {
+  monto: number;
+  metodo: MetodoPago;
+  referencia: string | null;
+  montoRecibido: number | null;
+  cambio: number | null;
+  fecha: string;
+  usuario: UsuarioResumen | null;
+}
+
+export interface EntregaOrden {
+  fecha: string;
+  usuario: UsuarioResumen | null;
+  observaciones: string | null;
+}
+
+export interface DatosPago {
+  monto: number;
+  metodo: MetodoPago;
+  referencia: string | null;
+  montoRecibido: number | null;
+}
+
+/** Comprobante imprimible de la orden (RF27). */
+export interface ComprobanteOrden {
+  taller: { nombre: string; nit: string; direccion: string; telefono: string };
+  numero: string;
+  estado: EstadoOrden;
+  fechaIngreso: string;
+  fechaFinalizacion: string | null;
+  fechaEntrega: string | null;
+  cliente: {
+    nombreCompleto: string;
+    tipoDocumento: TipoDocumento;
+    numeroDocumento: string;
+    telefono: string;
+  };
+  moto: { placa: string; marca: string; modelo: string; anio: number | null; color: string | null };
+  kilometrajeIngreso: number;
+  kilometrajeInspeccion: number | null;
+  motivoIngreso: string;
+  diagnostico: string | null;
+  mecanicos: string[];
+  servicios: { descripcion: string; precio: number }[];
+  repuestos: {
+    codigo: string;
+    nombre: string;
+    unidad: string;
+    cantidad: number;
+    precioUnitario: number;
+    subtotal: number;
+  }[];
+  subtotal: number;
+  descuento: number;
+  ivaPorcentaje: number;
+  impuesto: number;
+  total: number;
+  pago: PagoOrden;
+  leyenda: string;
 }
 
 export interface AsignacionMecanico {
@@ -401,6 +472,24 @@ export class OrdenesApiService {
 
   documentoPresupuesto(id: number, context?: HttpContext): Observable<DocumentoPresupuesto> {
     return this.http.get<DocumentoPresupuesto>(`/api/v1/presupuestos/${id}`, { context });
+  }
+
+  /** RN-35: pago total y único de la orden finalizada. */
+  registrarPago(ordenId: number, datos: DatosPago, context?: HttpContext): Observable<Orden> {
+    return this.http.post<Orden>(`${API}/${ordenId}/pago`, datos, { context });
+  }
+
+  /** RN-36: entrega de la orden pagada; la pasa a ENTREGADA. */
+  registrarEntrega(
+    ordenId: number,
+    observaciones: string | null,
+    context?: HttpContext,
+  ): Observable<Orden> {
+    return this.http.post<Orden>(`${API}/${ordenId}/entrega`, { observaciones }, { context });
+  }
+
+  comprobante(ordenId: number, context?: HttpContext): Observable<ComprobanteOrden> {
+    return this.http.get<ComprobanteOrden>(`${API}/${ordenId}/comprobante`, { context });
   }
 
   /** Mecánicos activos para asignar y filtrar (`GET /usuarios/mecanicos`). */

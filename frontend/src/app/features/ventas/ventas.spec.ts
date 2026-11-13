@@ -9,7 +9,8 @@ import { authInterceptor } from '../../core/auth/auth.interceptor';
 import { errorInterceptor } from '../../core/http/error.interceptor';
 import { ConfirmacionService } from '../../shared/ui/dialog/confirm-dialog';
 import { Producto } from '../inventario/inventario-api.service';
-import { cambioEfectivo, hastaDisponible, PuntoVentaPage } from './punto-venta-page';
+import { cambioEfectivo } from '../../shared/ui/forms/campos-pago';
+import { hastaDisponible, PuntoVentaPage } from './punto-venta-page';
 
 const producto = (id: number, nombre: string, precio: number, disponible: number): Producto => ({
   id,

@@ -3,6 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { Pagina } from '../../core/http/pagina';
+import { EstadoOrden } from '../../shared/ui/badge/status-badge';
 
 const API = '/api/v1/motocicletas';
 
@@ -36,18 +37,28 @@ export interface NuevaMotocicleta extends FichaMotocicleta {
   clienteId: number;
 }
 
-/** Una orden en el historial (`HistorialServicio`). Vacío hasta F09C. */
+/** Una orden en el historial de la moto (`HistorialServicio`, RF9). Sin costos. */
 export interface HistorialServicio {
   ordenId: number;
   numero: string;
+  estado: EstadoOrden;
   fechaIngreso: string;
+  fechaFinalizacion: string | null;
   fechaEntrega: string | null;
-  estado: string;
-  kilometraje: number | null;
-  motivoIngreso: string | null;
+  kilometrajeIngreso: number;
+  kilometrajeInspeccion: number | null;
+  motivoIngreso: string;
+  diagnostico: string | null;
   servicios: { descripcion: string; precio: number }[];
-  repuestos: { codigo: string; nombre: string; cantidad: number; precioUnitario: number }[];
+  repuestos: {
+    codigo: string;
+    nombre: string;
+    cantidad: number;
+    precioUnitario: number;
+    subtotal: number;
+  }[];
   total: number;
+  mecanicos: string[];
 }
 
 export interface FiltrosMotocicletas {
@@ -81,8 +92,17 @@ export class MotocicletasApiService {
     return this.http.get<Motocicleta>(`${API}/${id}`, { context });
   }
 
-  historial(id: number, context?: HttpContext): Observable<HistorialServicio[]> {
-    return this.http.get<HistorialServicio[]>(`${API}/${id}/historial`, { context });
+  /** RF9: la más reciente primero; las canceladas solo si se piden. */
+  historial(
+    id: number,
+    consulta: { incluirCanceladas: boolean; page: number; size: number },
+    context?: HttpContext,
+  ): Observable<Pagina<HistorialServicio>> {
+    const params = new HttpParams()
+      .set('incluirCanceladas', consulta.incluirCanceladas)
+      .set('page', consulta.page)
+      .set('size', consulta.size);
+    return this.http.get<Pagina<HistorialServicio>>(`${API}/${id}/historial`, { params, context });
   }
 
   crear(datos: NuevaMotocicleta, context?: HttpContext): Observable<Motocicleta> {

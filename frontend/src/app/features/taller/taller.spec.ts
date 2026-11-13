@@ -68,12 +68,16 @@ function orden(cambios: Partial<Orden> = {}): Orden {
     impuesto: 0,
     total: 0,
     fechaFinalizacion: null,
+    pago: null,
+    entrega: null,
     accionesPermitidas: {
       editar: true,
       asignarMecanicos: true,
       registrarDiagnostico: false,
       editarItems: false,
       gestionarPresupuestos: false,
+      registrarPago: false,
+      registrarEntrega: false,
       transiciones: [
         { estado: 'EN_DIAGNOSTICO', requiereNota: false, bloqueo: 'SIN_MECANICOS' },
         { estado: 'CANCELADA', requiereNota: true, bloqueo: null },
@@ -91,6 +95,7 @@ const resumen = (id: number, estado: OrdenResumen['estado']): OrdenResumen => ({
   placa: 'ABC12D',
   moto: 'Yamaha FZ 150',
   cliente: 'Carlos Pérez',
+  motivoIngreso: 'Mantenimiento',
   mecanicos: [{ id: 4, nombre: 'Mario Mecánico' }],
 });
 
@@ -151,7 +156,7 @@ describe('OrdenDetallePage', () => {
     expect(pestanas.find((p) => texto(p).startsWith('Servicios y repuestos'))?.disabled).toBe(
       false,
     );
-    expect(pestanas.find((p) => texto(p).startsWith('Pago y entrega'))?.disabled).toBe(true);
+    expect(pestanas.find((p) => texto(p).startsWith('Pago y entrega'))?.disabled).toBe(false);
     expect(pestanas.find((p) => texto(p).startsWith('Diagnóstico'))?.disabled).toBe(false);
   });
 
@@ -183,6 +188,8 @@ describe('OrdenDetallePage', () => {
           registrarDiagnostico: false,
           editarItems: false,
           gestionarPresupuestos: false,
+          registrarPago: false,
+          registrarEntrega: false,
           transiciones: [],
         },
       }),
@@ -207,6 +214,8 @@ describe('HkDiagnosticoForm', () => {
           registrarDiagnostico: true,
           editarItems: false,
           gestionarPresupuestos: false,
+          registrarPago: false,
+          registrarEntrega: false,
           transiciones: [],
         },
       }),
@@ -343,6 +352,8 @@ function conItems(cambios: Partial<Orden> = {}): Orden {
       registrarDiagnostico: true,
       editarItems: true,
       gestionarPresupuestos: true,
+      registrarPago: false,
+      registrarEntrega: false,
       transiciones: [{ estado: 'PENDIENTE_APROBACION', requiereNota: false, bloqueo: null }],
     },
     ...cambios,

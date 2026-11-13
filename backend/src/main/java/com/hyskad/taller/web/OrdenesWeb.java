@@ -38,7 +38,7 @@ class OrdenesWeb {
                 .map(OrdenMecanico::getMecanicoId).collect(Collectors.toSet()));
         return ordenes.stream().map(o -> new OrdenResumenResponse(o.getId(), o.getNumero(), o.getEstado(),
                 o.getFechaIngreso(), o.getMotocicleta().getPlaca(), moto(o.getMotocicleta()),
-                o.getCliente().getNombreCompleto(), o.getMecanicos().stream()
+                o.getCliente().getNombreCompleto(), o.getMotivoIngreso(), o.getMecanicos().stream()
                         .map(m -> usuario(m.getMecanicoId(), nombres)).toList())).toList();
     }
 

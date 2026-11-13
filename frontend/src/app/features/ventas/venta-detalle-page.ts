@@ -149,9 +149,9 @@ import { Venta, VentasApiService } from './ventas-api.service';
                 <dd class="font-medium text-fg">{{ v.vendedor?.nombre ?? '—' }}</dd>
               </div>
               <div>
-                <dt class="text-xs text-muted">{{ 'ventas.campos.metodo' | transloco }}</dt>
+                <dt class="text-xs text-muted">{{ 'pago.metodo' | transloco }}</dt>
                 <dd class="font-medium text-fg">
-                  {{ 'ventas.metodos.' + v.metodoPago | transloco }}
+                  {{ 'pago.metodos.' + v.metodoPago | transloco }}
                   @if (v.referenciaPago) {
                     · {{ v.referenciaPago }}
                   }
@@ -159,9 +159,9 @@ import { Venta, VentasApiService } from './ventas-api.service';
               </div>
               @if (v.montoRecibido !== null) {
                 <div>
-                  <dt class="text-xs text-muted">{{ 'ventas.campos.recibido' | transloco }}</dt>
+                  <dt class="text-xs text-muted">{{ 'pago.recibido' | transloco }}</dt>
                   <dd class="font-medium text-fg tabular">
-                    {{ v.montoRecibido | cop }} · {{ 'ventas.pos.cambio' | transloco }}
+                    {{ v.montoRecibido | cop }} · {{ 'pago.cambio' | transloco }}
                     {{ v.cambio | cop }}
                   </dd>
                 </div>

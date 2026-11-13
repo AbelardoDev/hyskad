@@ -4,12 +4,12 @@ import { Observable } from 'rxjs';
 
 import { Pagina } from '../../core/http/pagina';
 import { TipoDocumento } from '../../core/utils/validadores';
+import { MetodoPago } from '../../shared/ui/forms/campos-pago';
 import { Unidad } from '../inventario/inventario-api.service';
 
 const API = '/api/v1/ventas';
 
-export const METODOS_PAGO = ['EFECTIVO', 'TRANSFERENCIA', 'TARJETA', 'OTRO'] as const;
-export type MetodoPago = (typeof METODOS_PAGO)[number];
+export { METODOS_PAGO, type MetodoPago } from '../../shared/ui/forms/campos-pago';
 export type EstadoVenta = 'PAGADA' | 'ANULADA';
 
 interface UsuarioVenta {

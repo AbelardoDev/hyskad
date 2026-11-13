@@ -41,6 +41,12 @@ import { HkCombobox } from '../../shared/ui/forms/combobox';
 import { enfocarPrimerError } from '../../shared/ui/forms/enfocar-error';
 import { HkFormField } from '../../shared/ui/forms/form-field';
 import { HkInput } from '../../shared/ui/forms/input';
+import {
+  cambioEfectivo,
+  exigirReferenciaSalvoEfectivo,
+  HkCamposPago,
+  MetodoPago,
+} from '../../shared/ui/forms/campos-pago';
 import { HkMoneyInput } from '../../shared/ui/forms/money-input';
 import { HkPageHeader } from '../../shared/ui/page-header/page-header';
 import { buscadorClientes } from '../clientes/buscador-clientes';
@@ -48,21 +54,9 @@ import { ClienteFormDrawer, DatosFormCliente } from '../clientes/cliente-form-dr
 import { Cliente } from '../clientes/clientes-api.service';
 import { ConfiguracionApiService } from '../configuracion/configuracion-api.service';
 import { InventarioApiService, Producto } from '../inventario/inventario-api.service';
-import {
-  MetodoPago,
-  METODOS_PAGO,
-  NuevaVenta,
-  Venta,
-  VentasApiService,
-} from './ventas-api.service';
+import { NuevaVenta, Venta, VentasApiService } from './ventas-api.service';
 
 const RESULTADOS = 8;
-const ICONOS_PAGO: Record<MetodoPago, string> = {
-  EFECTIVO: 'banknote',
-  TRANSFERENCIA: 'arrow-left-right',
-  TARJETA: 'credit-card',
-  OTRO: 'ellipsis',
-};
 
 /** No vender más de lo disponible (RN-19): `{ maxDisponible: { max } }`. */
 export function hastaDisponible(disponible: number): ValidatorFn {
@@ -70,11 +64,6 @@ export function hastaDisponible(disponible: number): ValidatorFn {
     const valor = typeof control.value === 'string' ? aCantidad(control.value) : null;
     return valor !== null && valor > disponible ? { maxDisponible: { max: disponible } } : null;
   };
-}
-
-/** Cambio en efectivo: lo recibido menos el total; `null` si no se ha escrito lo recibido. */
-export function cambioEfectivo(recibido: number | null, total: number): number | null {
-  return recibido === null ? null : Math.round((recibido - total) * 100) / 100;
 }
 
 interface Linea {
@@ -104,6 +93,7 @@ interface Linea {
     HkIconButton,
     HkInput,
     HkMoneyInput,
+    HkCamposPago,
     HkPageHeader,
   ],
   host: { '(document:keydown)': 'alTeclear($event)' },
@@ -123,7 +113,7 @@ interface Linea {
             <p class="text-3xl font-bold text-fg tabular">{{ v.total | cop }}</p>
             @if (v.cambio !== null) {
               <p class="text-lg text-muted">
-                {{ 'ventas.pos.cambio' | transloco }}
+                {{ 'pago.cambio' | transloco }}
                 <span class="font-display text-2xl font-bold text-success-ink tabular">{{
                   v.cambio | cop
                 }}</span>
@@ -384,61 +374,13 @@ interface Linea {
               </div>
             </dl>
 
-            <fieldset>
-              <legend class="mb-2 text-xs font-medium text-fg">
-                {{ 'ventas.campos.metodo' | transloco }}
-              </legend>
-              <div class="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-2">
-                @for (m of metodos; track m) {
-                  <label
-                    class="flex cursor-pointer flex-col items-center gap-1 rounded-xl border px-2 py-3 text-xs font-medium transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring"
-                    [class]="
-                      metodo() === m
-                        ? 'border-primary bg-primary-soft text-primary-ink'
-                        : 'border-border text-fg hover:bg-surface-2'
-                    "
-                  >
-                    <input class="sr-only" type="radio" formControlName="metodoPago" [value]="m" />
-                    <svg [lucideIcon]="iconosPago[m]" class="size-5" aria-hidden="true" />
-                    {{ 'ventas.metodos.' + m | transloco }}
-                  </label>
-                }
-              </div>
-            </fieldset>
-
-            @if (metodo() === 'EFECTIVO') {
-              <div>
-                <hk-form-field [etiqueta]="'ventas.campos.recibido' | transloco" [opcional]="true">
-                  <hk-money-input formControlName="montoRecibido" />
-                </hk-form-field>
-                @if (cambio(); as c) {
-                  <p
-                    class="mt-3 flex items-baseline justify-between rounded-xl px-4 py-3"
-                    role="status"
-                    [class]="
-                      c.valor >= 0
-                        ? 'bg-success-soft text-success-ink'
-                        : 'bg-danger-soft text-danger-ink'
-                    "
-                  >
-                    <span class="text-sm font-medium">
-                      {{ (c.valor >= 0 ? 'ventas.pos.cambio' : 'ventas.pos.falta') | transloco }}
-                    </span>
-                    <span class="font-display text-3xl font-bold tabular">{{
-                      c.absoluto | cop
-                    }}</span>
-                  </p>
-                }
-              </div>
-            } @else {
-              <hk-form-field [etiqueta]="'ventas.campos.referencia' | transloco">
-                <hk-input
-                  formControlName="referenciaPago"
-                  autocompletar="off"
-                  [maxCaracteres]="60"
-                />
-              </hk-form-field>
-            }
+            <hk-campos-pago
+              rejilla="grid-cols-2 sm:grid-cols-4 lg:grid-cols-2"
+              [metodo]="form.controls.metodoPago"
+              [referencia]="form.controls.referenciaPago"
+              [montoRecibido]="form.controls.montoRecibido"
+              [total]="totales().total"
+            />
 
             <button hk-button tipo="submit" icono="check" class="w-full" [cargando]="guardando()">
               {{ 'ventas.pos.cobrar' | transloco }}
@@ -463,8 +405,6 @@ export class PuntoVentaPage {
   private readonly injector = inject(Injector);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
-  protected readonly metodos = METODOS_PAGO;
-  protected readonly iconosPago = ICONOS_PAGO;
   protected readonly atajos = [
     { tecla: 'F2', clave: 'ventas.pos.atajo_buscar' },
     { tecla: 'Enter', clave: 'ventas.pos.atajo_agregar' },
@@ -548,13 +488,7 @@ export class PuntoVentaPage {
   });
 
   constructor() {
-    // RN-20: la referencia es obligatoria salvo en efectivo
-    this.form.controls.metodoPago.valueChanges.subscribe((metodo) => {
-      const referencia = this.form.controls.referenciaPago;
-      if (metodo === 'EFECTIVO') referencia.removeValidators(Validators.required);
-      else referencia.addValidators(Validators.required);
-      referencia.updateValueAndValidity();
-    });
+    exigirReferenciaSalvoEfectivo(this.form.controls.metodoPago, this.form.controls.referenciaPago);
   }
 
   protected buscar(texto: string | null): void {
@@ -680,7 +614,7 @@ export class PuntoVentaPage {
         {
           n: formatoCantidad(this.lineas().length, this.idioma.locale()),
           total,
-          metodo: this.transloco.translate(`ventas.metodos.${metodoPago.value}`),
+          metodo: this.transloco.translate(`pago.metodos.${metodoPago.value}`),
           cambio: cambio ? formatoCop(cambio.valor, this.idioma.locale()) : '',
         },
       ),

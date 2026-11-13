@@ -1,7 +1,11 @@
 import { Routes } from '@angular/router';
 
-import { ProximamentePage } from '../../core/layout/paginas/proximamente-page';
-
 export const REPORTES_ROUTES: Routes = [
-  { path: '', component: ProximamentePage, data: { icono: 'chart-column' } },
+  // Hasta F11 el único reporte es el de cuentas pendientes (RF26)
+  { path: '', pathMatch: 'full', redirectTo: 'cuentas-pendientes' },
+  {
+    path: 'cuentas-pendientes',
+    data: { miga: 'reportes.cuentas.titulo' },
+    loadComponent: () => import('./cuentas-pendientes-page').then((m) => m.CuentasPendientesPage),
+  },
 ];

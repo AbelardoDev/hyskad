@@ -55,7 +55,8 @@
     "configuracion": "Settings",
     "perfil": "My profile",
     "dev_ui": "UI kit",
-    "ordenes_corto": "Orders"
+    "ordenes_corto": "Orders",
+    "mis_ordenes": "My orders"
   },
   "layout": {
     "saltar_contenido": "Skip to content",
@@ -269,7 +270,10 @@
     "NOTA_REQUERIDA": "Write the reason",
     "PRESUPUESTO_NO_PENDIENTE": "The quote is no longer pending",
     "SERVICIO_INACTIVO": "The service is inactive",
-    "DECISION_INVALIDA": "The decision must be approved or rejected"
+    "DECISION_INVALIDA": "The decision must be approved or rejected",
+    "MONTO_INVALIDO": "The amount must be exactly the order total",
+    "PAGO_DUPLICADO": "The order already has a registered payment",
+    "PAGO_REQUERIDO": "The order has no registered payment"
   },
   "roles": {
     "ADMIN": "Administrator",
@@ -310,6 +314,19 @@
     "titulo": "You don't have permission to view this section",
     "texto": "If you think you should have access, ask an administrator."
   },
+  "pago": {
+    "metodo": "Payment method",
+    "metodos": {
+      "EFECTIVO": "Cash",
+      "TRANSFERENCIA": "Transfer",
+      "TARJETA": "Card",
+      "OTRO": "Other"
+    },
+    "recibido": "Cash received",
+    "referencia": "Payment reference",
+    "cambio": "Change",
+    "falta": "Missing"
+  },
   "ventas": {
     "nueva": "New sale",
     "subtitulo": "Counter sales and their receipts",
@@ -335,12 +352,6 @@
       "PAGADA": "Paid",
       "ANULADA": "Voided"
     },
-    "metodos": {
-      "EFECTIVO": "Cash",
-      "TRANSFERENCIA": "Transfer",
-      "TARJETA": "Card",
-      "OTRO": "Other"
-    },
     "resumen": {
       "cantidad": "Paid sales in the period",
       "total": "Total sold in the period"
@@ -349,9 +360,6 @@
       "numero": "Number",
       "cliente": "Customer",
       "vendedor": "Salesperson",
-      "metodo": "Payment method",
-      "referencia": "Payment reference",
-      "recibido": "Cash received",
       "descuento": "Discount",
       "precio": "Unit price"
     },
@@ -379,8 +387,6 @@
       "cantidad_de": "Quantity {{n}}",
       "quitar": "Remove {{nombre}}",
       "consumidor_final": "Walk-in customer (optional)",
-      "cambio": "Change",
-      "falta": "Missing",
       "cobrar": "Charge",
       "atajos": "Shortcuts",
       "atajo_buscar": "Go to search",
@@ -659,7 +665,11 @@
       "titulo": "History",
       "vacio_titulo": "No services recorded",
       "vacio_texto": "This motorcycle's work orders will show up here, with their services, parts and totals.",
-      "error": "History couldn't be loaded"
+      "error": "History couldn't be loaded",
+      "incluir_canceladas": "Include cancelled",
+      "recorrido": "+{{km}} km since the previous one",
+      "entregada": "delivered on {{fecha}}",
+      "ver_orden": "View order"
     }
   },
   "inventario": {
@@ -1004,7 +1014,14 @@
       "titulo": "My orders",
       "subtitulo": "Motorcycles assigned to you",
       "vacio_titulo": "You have no assigned orders",
-      "vacio_texto": "When a motorcycle is assigned to you it will show up here."
+      "vacio_texto": "When a motorcycle is assigned to you it will show up here.",
+      "abrir": "Open order {{numero}} for plate {{placa}}",
+      "grupos": {
+        "por_diagnosticar": "To diagnose",
+        "esperando_aprobacion": "Awaiting approval",
+        "en_reparacion": "In repair",
+        "finalizadas": "Ready for delivery"
+      }
     },
     "recepcion": {
       "recibir": "Check in motorcycle",
@@ -1062,10 +1079,10 @@
         "pago": "Payment and delivery",
         "historial": "History"
       },
-      "pronto": "Coming soon",
       "recibida_por": "Checked in by",
       "editar_recepcion": "Edit check-in",
-      "recepcion_guardada": "Check-in details saved"
+      "recepcion_guardada": "Check-in details saved",
+      "acciones": "Order actions"
     },
     "acciones": {
       "recibir": "Check in",
@@ -1082,7 +1099,7 @@
       "SIN_MECANICOS": "Assign at least one mechanic",
       "SIN_DIAGNOSTICO": "Record the diagnosis first",
       "SIN_ITEMS": "Add at least one service or part",
-      "SIN_PAGO": "Record the payment first (coming soon)"
+      "SIN_PAGO": "Register the payment first"
     },
     "confirmar_transicion": {
       "titulo": "{{accion}} · {{numero}}",
@@ -1186,6 +1203,62 @@
       },
       "volver": "Back to the order",
       "no_encontrado": "Quote not found"
+    },
+    "comprobante": {
+      "titulo": "Service receipt",
+      "volver": "Back to the order",
+      "no_disponible": "Receipt not available",
+      "no_disponible_texto": "The receipt is generated once the order payment is registered.",
+      "de": "Receipt for order {{numero}}",
+      "ingreso": "Check-in: {{fecha}}",
+      "entrega": "Delivery: {{fecha}}",
+      "kilometraje": "Mileage: {{km}} km"
+    },
+    "pago": {
+      "fecha": "Payment date",
+      "entregada_titulo": "Order {{numero}} delivered",
+      "entregada_por": "Delivered by {{nombre}} on {{fecha}}",
+      "imprimir_comprobante": "Print receipt",
+      "no_finalizada": "Payment is registered once the order is finished",
+      "no_finalizada_texto": "Current order total: {{total}}. When the mechanic finishes it you can charge it here.",
+      "resumen": "Charge summary",
+      "total_pagar": "Total due",
+      "pagado": "Paid by {{metodo}} on {{fecha}}",
+      "registrar": "Register payment",
+      "cobrar": "Charge {{total}}",
+      "pendiente": "Payment pending",
+      "pendiente_texto": "The order is finished and awaiting payment at the counter.",
+      "entregar_titulo": "Deliver the motorcycle",
+      "observaciones_entrega": "Delivery notes",
+      "entregar": "Register delivery",
+      "lista_entregar": "Ready for delivery",
+      "lista_entregar_texto": "The order is paid; delivery is registered by a salesperson or an administrator.",
+      "confirmar_titulo": "Register the payment for order {{numero}}?",
+      "confirmar_mensaje": "A payment of {{total}} by {{metodo}} will be registered. The payment is single and cannot be changed.",
+      "confirmar_entrega_titulo": "Deliver order {{numero}}?",
+      "confirmar_entrega_mensaje": "Motorcycle {{placa}} is delivered to {{cliente}} and the order is closed.",
+      "entregada_toast": "Order {{numero}} delivered",
+      "pagado_toast": "Payment for order {{numero}} registered"
+    }
+  },
+  "reportes": {
+    "cuentas": {
+      "titulo": "Accounts receivable",
+      "subtitulo": "Finished orders that have not been paid yet",
+      "total_adeudado": "Total owed",
+      "cantidad": "Orders to collect",
+      "todos_clientes": "All customers",
+      "finalizada_desde": "Finished from",
+      "finalizada_hasta": "Finished until",
+      "error": "Accounts receivable could not be loaded",
+      "vacio_titulo": "No accounts receivable",
+      "vacio_texto": "All finished orders are paid.",
+      "orden": "Order",
+      "finalizada": "Finished",
+      "dias_transcurridos": "Days elapsed",
+      "dias": "{{n}} d",
+      "registrar_pago": "Register payment",
+      "accion": "Action"
     }
   }
 }

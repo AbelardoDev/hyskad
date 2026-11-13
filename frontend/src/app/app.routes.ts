@@ -30,6 +30,14 @@ export const routes: Routes = [
       import('./features/taller/presupuesto-page').then((m) => m.PresupuestoPage),
   },
   {
+    path: 'ordenes/:id/comprobante',
+    canMatch: [permisoGuard('ORDENES_VER_TODAS', 'ORDENES_VER_ASIGNADAS')],
+    canActivate: [authGuard],
+    data: { miga: 'taller.comprobante.titulo' },
+    loadComponent: () =>
+      import('./features/taller/comprobante-orden-page').then((m) => m.ComprobanteOrdenPage),
+  },
+  {
     path: '',
     component: HkShell,
     canActivate: [authGuard],

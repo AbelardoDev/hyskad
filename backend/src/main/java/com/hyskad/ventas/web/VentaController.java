@@ -19,15 +19,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.hyskad.shared.dinero.MetodoPago;
 import com.hyskad.shared.web.PageResponse;
 import com.hyskad.ventas.application.AnularVenta;
 import com.hyskad.ventas.application.FiltroVentas;
 import com.hyskad.ventas.application.RegistrarVenta;
-import com.hyskad.ventas.application.VentaService;
 import com.hyskad.ventas.application.VentaService.Comprobante;
 import com.hyskad.ventas.application.VentaService.ResumenVentas;
+import com.hyskad.ventas.application.VentaService;
 import com.hyskad.ventas.domain.EstadoVenta;
-import com.hyskad.ventas.domain.MetodoPago;
 import com.hyskad.ventas.domain.Venta;
 import com.hyskad.ventas.web.dto.ComprobanteResponse;
 import com.hyskad.ventas.web.dto.VentaResponse;

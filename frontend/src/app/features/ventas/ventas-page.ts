@@ -108,7 +108,7 @@ const ESPERA_BUSQUEDA_MS = 300;
             (valorChange)="filtrar({ hasta: $event || null })"
           />
         </hk-form-field>
-        <hk-form-field [etiqueta]="'ventas.campos.metodo' | transloco">
+        <hk-form-field [etiqueta]="'pago.metodo' | transloco">
           <hk-select
             [opciones]="opcionesMetodo()"
             [placeholder]="'ventas.todos_metodos' | transloco"
@@ -167,7 +167,7 @@ const ESPERA_BUSQUEDA_MS = 300;
             </ng-template>
             <ng-template hkCelda="vendedor" let-v>{{ v.vendedor?.nombre ?? '—' }}</ng-template>
             <ng-template hkCelda="metodoPago" let-v>{{
-              'ventas.metodos.' + v.metodoPago | transloco
+              'pago.metodos.' + v.metodoPago | transloco
             }}</ng-template>
             <ng-template hkCelda="total" let-v>
               <span class="font-semibold tabular">{{ v.total | cop }}</span>
@@ -216,11 +216,11 @@ export class VentasPage {
     'ventas.campos.numero',
     'ventas.campos.cliente',
     'ventas.campos.vendedor',
-    'ventas.campos.metodo',
+    'pago.metodo',
     'compras.total',
     'comun.estado.titulo',
   ]);
-  private readonly textosMetodo = translateSignal(METODOS_PAGO.map((m) => `ventas.metodos.${m}`));
+  private readonly textosMetodo = translateSignal(METODOS_PAGO.map((m) => `pago.metodos.${m}`));
   private readonly textosEstado = translateSignal(ESTADOS.map((e) => `ventas.estados.${e}`));
   protected readonly columnas = computed<ColumnaTabla[]>(() => {
     const [numero, cliente, vendedor, metodo, total, estado] = this.textos();

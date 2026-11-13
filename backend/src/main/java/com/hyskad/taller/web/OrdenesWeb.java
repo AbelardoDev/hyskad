@@ -17,6 +17,7 @@ import com.hyskad.taller.domain.OrdenMecanico;
 import com.hyskad.taller.domain.OrdenRepuesto;
 import com.hyskad.taller.domain.OrdenServicio;
 import com.hyskad.taller.domain.OrdenTrabajo;
+import com.hyskad.taller.domain.Pago;
 import com.hyskad.taller.web.dto.OrdenResponse;
 import com.hyskad.taller.web.dto.OrdenResumenResponse;
 import com.hyskad.taller.web.dto.UsuarioResumen;
@@ -37,7 +38,7 @@ class OrdenesWeb {
                 .map(OrdenMecanico::getMecanicoId).collect(Collectors.toSet()));
         return ordenes.stream().map(o -> new OrdenResumenResponse(o.getId(), o.getNumero(), o.getEstado(),
                 o.getFechaIngreso(), o.getMotocicleta().getPlaca(), moto(o.getMotocicleta()),
-                o.getCliente().getNombreCompleto(), o.getMecanicos().stream()
+                o.getCliente().getNombreCompleto(), o.getMotivoIngreso(), o.getMecanicos().stream()
                         .map(m -> usuario(m.getMecanicoId(), nombres)).toList())).toList();
     }
 
@@ -46,7 +47,8 @@ class OrdenesWeb {
         Map<Long, String> nombres = usuarios.nombres(Stream.concat(Stream.concat(
                 o.getMecanicos().stream().map(OrdenMecanico::getMecanicoId),
                 o.getHistorial().stream().map(OrdenEstadoHistorial::getUsuarioId)),
-                Stream.concat(o.getServicios().stream().map(OrdenServicio::getMecanicoId), Stream.of(o.getCreatedBy())))
+                Stream.concat(o.getServicios().stream().map(OrdenServicio::getMecanicoId), Stream.of(o.getCreatedBy(),
+                        o.getEntregadaPor(), o.getPago().map(Pago::getUsuarioId).orElse(null))))
                 .filter(Objects::nonNull).collect(Collectors.toSet()));
         return new OrdenResponse(o.getId(), o.getNumero(), o.getEstado(), o.getVersion(), o.getFechaIngreso(),
                 o.getKilometrajeIngreso(), o.getMotivoIngreso(), o.getDescripcionProblema(), o.getObservaciones(),
@@ -59,7 +61,22 @@ class OrdenesWeb {
                 usuario(o.getCreatedBy(), nombres),
                 o.getServicios().stream().map(s -> servicio(s, nombres)).toList(),
                 o.getRepuestos().stream().map(OrdenesWeb::repuesto).toList(), o.getSubtotal(), o.getDescuento(),
-                o.getIvaPorcentaje(), o.getImpuesto(), o.getTotal(), o.getFechaFinalizacion(), detalle.acciones());
+                o.getIvaPorcentaje(), o.getImpuesto(), o.getTotal(), o.getFechaFinalizacion(),
+                o.getPago().map(p -> pago(p, nombres)).orElse(null), entrega(o, nombres), detalle.acciones());
+    }
+
+    Map<Long, String> nombres(Collection<Long> ids) {
+        return usuarios.nombres(ids.stream().filter(Objects::nonNull).collect(Collectors.toSet()));
+    }
+
+    static OrdenResponse.Pago pago(Pago p, Map<Long, String> nombres) {
+        return new OrdenResponse.Pago(p.getMonto(), p.getMetodo(), p.getReferencia(), p.getMontoRecibido(),
+                p.getCambio(), p.getFecha(), usuario(p.getUsuarioId(), nombres));
+    }
+
+    static OrdenResponse.Entrega entrega(OrdenTrabajo o, Map<Long, String> nombres) {
+        return o.getFechaEntrega() == null ? null : new OrdenResponse.Entrega(o.getFechaEntrega(),
+                usuario(o.getEntregadaPor(), nombres), o.getObservacionesEntrega());
     }
 
     private static OrdenResponse.Servicio servicio(OrdenServicio s, Map<Long, String> nombres) {
@@ -87,7 +104,7 @@ class OrdenesWeb {
                 m.getColor());
     }
 
-    private static UsuarioResumen usuario(Long id, Map<Long, String> nombres) {
+    static UsuarioResumen usuario(Long id, Map<Long, String> nombres) {
         return id == null ? null : new UsuarioResumen(id, nombres.get(id));
     }
 }

@@ -18,7 +18,7 @@
 | F08 | Ventas y comprobantes | ✅ Terminada | #14 | POS con teclado (F2/Enter/F9); comprobante carta/tirilla fuera del shell; capturas en `docs/capturas/f08` |
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ✅ Terminada | #15 | Diagrama de estados en ARCHITECTURE §6.2 (verificado por `DiagramaEstadosTest`); capturas en `docs/capturas/f09a` |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ✅ Terminada | #16 | Presupuesto imprimible en `/presupuestos/:id`; capturas en `docs/capturas/f09b` |
-| F09C | Órdenes: pago, entrega, historial y vista del mecánico | ⬜ Pendiente | | |
+| F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ⬜ Pendiente | | |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ⬜ Pendiente | | |
 | F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ⬜ Pendiente | | |
@@ -28,11 +28,17 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
+- **Fase:** F09C ✅ (cerrada 2026-11-12, PR #22)
+- **Rama:** `feature/f09c-pago-entrega` → `main`
+- **Hecho:** migración V9 (`pago` único por orden con `monto_recibido`; `fecha_entrega`, `entregada_por` y `observaciones_entrega` en la orden; índice para cuentas pendientes). `PagoEntregaService`: pago total y único solo en `FINALIZADA` por el total exacto (`MONTO_INVALIDO`, `PAGO_DUPLICADO`, RN-20 para referencia y monto recibido) y entrega que exige el pago (`PAGO_REQUERIDO`), transiciona a `ENTREGADA` y publica `OrdenEntregada`; ambos auditados. `accionesPermitidas` con `registrarPago`/`registrarEntrega` y bloqueo `SIN_PAGO` real; la transición genérica a `ENTREGADA` responde `ENTREGA_REQUERIDA`. `GET /ordenes-trabajo/{id}/comprobante` (diagnóstico resumido a 300 caracteres, leyenda RN-06). Historial RF9 real vía `HistorialMotocicleta` (implementada por `taller`), paginado y sin canceladas salvo `incluirCanceladas`. Módulo `reportes` con `GET /reportes/cuentas-pendientes` (días de calendario en Bogotá y total adeudado). `MetodoPago` pasa a `shared.dinero`. Frontend: `hk-campos-pago` en el kit (lo usan el POS y la orden; textos en `pago.*`); pestaña "Pago y entrega" con resumen, cobro, entrega y pantalla de éxito (`?pestana=pago` la abre); comprobante imprimible; historial de la moto en línea de tiempo expandible con la progresión del kilometraje; cuentas pendientes con días por antigüedad y acceso directo al pago (`/reportes` redirige ahí hasta F11); "Mis órdenes" agrupada por estado con el motivo, acciones grandes fijas abajo en el celular y página de inicio de quien solo ve sus órdenes. Pruebas: backend 217 unitarias y 229 IT (apoyo `FlujoOrdenes`); frontend 268 unitarias; 78 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f09c/`.
+- **Siguiente paso concreto:** iniciar F10 con `/fase F10` (notificaciones en tiempo real, correos y auditoría; ya existen los eventos `OrdenEntregada`, `OrdenFinalizada`, etc.).
+- **Bloqueos o dudas:** ninguno. Pendiente menor: en la barra inferior del mecánico, estando en "Mis órdenes" también se resalta "Órdenes" (`routerLinkActive` por prefijo).
+
+### Sesión anterior (F09B)
+
 - **Fase:** F09B ✅ (cerrada 2026-10-30, PR #16)
 - **Rama:** `feature/f09b-items-presupuestos` → `main`
 - **Hecho:** migración V8 (`orden_servicio`, `orden_repuesto` con producto único por orden, `presupuesto` y `presupuesto_item` congelados, totales y `fecha_finalizacion` en la orden). `ItemsOrdenService`: servicios de catálogo (descripción, precio y tiempo sugeridos) o mano de obra libre con mecánico asignado opcional; repuestos que reservan, ajustan la reserva por la diferencia y la liberan, solo en diagnóstico (RN-28) y con `version`. Totales con `CalculadoraTotales` e IVA vigente. `PresupuestoService`: generar (exige diagnóstico e ítems, descuento ≤ subtotal, `P-000001` versión n+1, transición a `PENDIENTE_APROBACION`), decidir (aprobado → reparación; rechazado → cancelada liberando reservas), retirar y documento. `OrdenTrabajoService.aplicarTransicion` centraliza efectos: cancelar libera reservas y reemplaza el pendiente; volver a diagnóstico reemplaza el pendiente y quita el descuento; finalizar consume las reservas (todo o nada) y congela el costo. Eventos `PresupuestoEnviado`, `PresupuestoDecidido`, `OrdenFinalizada`. Frontend: pestaña de ítems editable en línea con panel de totales y modales (hoja inferior en el teléfono) para agregar servicio o repuesto con disponible, precio y aviso de mínimo; pestaña de presupuestos (enviar con vista previa, aprobar, rechazar con motivo, retirar) y presupuesto imprimible fuera del shell. Pruebas: backend 217 unitarias y 221 IT; frontend 256 unitarias; 71 E2E + axe. Capturas en `docs/capturas/f09b/`.
-- **Siguiente paso concreto:** iniciar F09C con `/fase F09C` (pago, entrega, historial de la moto y vista del mecánico; quitar el bloqueo `SIN_PAGO`).
-- **Bloqueos o dudas:** ninguno.
 
 ### Sesión anterior (F09A)
 - **Fase:** F09A ✅ (cerrada 2026-10-30, PR #15)
@@ -67,6 +73,17 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-11-12 · F09C · Se mantiene la ruta `/ordenes/mias` (el prompt decía `/taller/mis-ordenes`), aprobado por el usuario · no romper enlaces ni pruebas existentes.
+- 2026-11-12 · F09C · El historial de la moto lo sirve `taller` a través de `motocicletas.application.HistorialMotocicleta`, aprobado por el usuario · `taller` depende de `motocicletas`; consultarlo al revés crearía un ciclo.
+- 2026-11-12 · F09C · `GET /motocicletas/{id}/historial` pasa a `PageResponse` con orden fijo (fecha de ingreso descendente; ignora `sort`) · el prompt pide paginado y ordenado.
+- 2026-11-12 · F09C · Pago y entrega no reciben `version`: cargan la orden con `OPTIMISTIC_FORCE_INCREMENT` (como las decisiones de presupuesto) y `uq_pago_orden` impide el doble pago · el contrato del prompt no la incluye.
+- 2026-11-12 · F09C · Entregar solo con `POST /ordenes-trabajo/{id}/entrega`; la transición genérica responde `ENTREGA_REQUERIDA` y en el front el botón "Entregar" abre la pestaña de pago · la entrega guarda quién, cuándo y observaciones (RN-36).
+- 2026-11-12 · F09C · El comprobante de la orden exige pago registrado (409 `PAGO_REQUERIDO`) y se ve con los permisos de ver órdenes (el mecánico, solo las suyas) · antes del pago el documento es el presupuesto.
+- 2026-11-12 · F09C · El pago se mapea como colección `pagos` de `OrdenTrabajo` (a lo sumo uno) · un `@OneToOne` inverso no se carga en diferido y haría una consulta por orden en los listados.
+- 2026-11-12 · F09C · `MetodoPago` pasa a `shared.dinero` y los textos de pago a `pago.*` (i18n); `hk-campos-pago` vive en el kit · ya lo usan ventas y taller.
+- 2026-11-12 · F09C · Cuentas pendientes vive en el módulo `reportes` (ARCHITECTURE) con `REPORTES_VER`; días = días de calendario en Bogotá desde la finalización (RN-53); filtros de fecha sobre la fecha de finalización · RN-37.
+- 2026-11-12 · F09C · "Mis órdenes" agrupa también las finalizadas ("Listas para entregar") además de los tres grupos del prompt, y muestra el motivo (`motivoIngreso` en el resumen de la orden) · siguen asignadas y activas.
+- 2026-11-12 · F09C · Menú: `excluirCon` oculta "Mis órdenes" a quien ve todas las órdenes y `inicio` la hace página de inicio de quien la ve · IU6, sin lógica por nombre de rol.
 - 2026-10-30 · F09B · El descuento de la orden es el del último presupuesto (RN-32); al volver a diagnóstico (retiro o "requiere ajuste") vuelve a 0 hasta el siguiente presupuesto, aprobado por el usuario · el descuento se define al generar el presupuesto.
 - 2026-10-30 · F09B · Cancelar una orden con presupuesto pendiente lo deja `REEMPLAZADO`, no `RECHAZADO`, aprobado por el usuario · el cliente no decidió.
 - 2026-10-30 · F09B · El presupuesto congela el IVA vigente al generarse; la orden en diagnóstico usa el vigente, aprobado por el usuario · RN-31 y RN-03.

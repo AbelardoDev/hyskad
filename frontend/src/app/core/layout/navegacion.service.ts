@@ -14,7 +14,7 @@ export class NavegacionService {
   readonly grupos = computed<readonly GrupoMenu[]>(() =>
     MENU.map((g) => ({
       ...g,
-      items: g.items.filter((i) => this.auth.tieneAlguno(i.permisos)),
+      items: g.items.filter((i) => this.auth.tieneAlguno(i.permisos) && !this.excluido(i)),
     })).filter((g) => g.items.length > 0),
   );
 
@@ -27,9 +27,17 @@ export class NavegacionService {
     return [...rapidos, ...resto].slice(0, MAX_ACCESOS_RAPIDOS);
   });
 
-  /** Primera pantalla permitida (el dashboard para todos los roles por defecto); sin sesión, el login. */
+  private excluido(item: ItemMenuNavegacion): boolean {
+    return !!item.excluirCon?.some((p) => this.auth.tienePermiso(p));
+  }
+
+  /**
+   * El ítem marcado como `inicio` si el usuario lo ve ("Mis órdenes" del mecánico) o la primera
+   * pantalla permitida (el dashboard); sin sesión, el login.
+   */
   readonly rutaInicio = computed(() => {
     if (!this.auth.estaAutenticado()) return '/login';
-    return this.items()[0]?.ruta ?? '/perfil';
+    const items = this.items();
+    return (items.find((i) => i.inicio) ?? items[0])?.ruta ?? '/perfil';
   });
 }

@@ -37,13 +37,15 @@ public class MotocicletaService {
     private final MotocicletaRepository repository;
     private final ClienteService clientes;
     private final ConsultaOrdenesActivas ordenesActivas;
+    private final HistorialMotocicleta historial;
     private final AuditoriaService auditoria;
 
     public MotocicletaService(MotocicletaRepository repository, ClienteService clientes,
-            ConsultaOrdenesActivas ordenesActivas, AuditoriaService auditoria) {
+            ConsultaOrdenesActivas ordenesActivas, HistorialMotocicleta historial, AuditoriaService auditoria) {
         this.repository = repository;
         this.clientes = clientes;
         this.ordenesActivas = ordenesActivas;
+        this.historial = historial;
         this.auditoria = auditoria;
     }
 
@@ -130,11 +132,11 @@ public class MotocicletaService {
         return moto;
     }
 
-    /** RF9: órdenes de la moto, la más reciente primero. Vacío hasta que exista {@code taller} (F09C). */
+    /** RF9: órdenes de la moto, la más reciente primero; sin las canceladas salvo que se pidan. */
     @Transactional(readOnly = true)
-    public List<HistorialServicio> historial(Long id) {
+    public Page<HistorialServicio> historial(Long id, boolean incluirCanceladas, Pageable pagina) {
         obtener(id);
-        return List.of();
+        return historial.deMotocicleta(id, incluirCanceladas, pagina);
     }
 
     private static DatosMotocicleta normalizar(String placa, String marca, String modelo, Integer anio, String vin,

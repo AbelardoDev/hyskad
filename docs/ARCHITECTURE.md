@@ -112,7 +112,7 @@ Todas las tablas tienen `id BIGINT AUTO_INCREMENT`, `created_at`, `updated_at` y
 | `orden_estado_historial` | orden_id, estado_anterior, estado_nuevo, nota, usuario_id, fecha | Trazabilidad |
 | `presupuesto` | orden_id, numero (UQ), version, subtotal, descuento, impuesto, total, estado, fecha_envio, fecha_decision, decidido_por, observaciones | estado ∈ PENDIENTE, APROBADO, RECHAZADO, REEMPLAZADO |
 | `presupuesto_item` | presupuesto_id, tipo (SERVICIO/REPUESTO), descripcion, cantidad, precio_unitario, subtotal | Copia congelada de los ítems |
-| `pago` | orden_id (UQ), monto, metodo, referencia, fecha, usuario_id | Pago total único (RF25) |
+| `pago` | orden_id (UQ), monto, metodo, referencia, monto_recibido, fecha, usuario_id | Pago total único (RF25, RN-35); `monto_recibido` solo en efectivo. En JPA es una colección de `OrdenTrabajo` (a lo sumo un elemento) para cargarlo en diferido |
 
 ### Notificaciones
 | Tabla | Campos clave |
@@ -136,7 +136,7 @@ Endpoints principales (orientativos; cada fase los detalla):
 POST   /auth/login | /auth/refresh | /auth/logout      GET /auth/me
 POST   /auth/password/olvide | /auth/password/restablecer
 CRUD   /usuarios  (+ PATCH /{id}/estado, PUT /{id}/permisos)
-CRUD   /clientes, /motocicletas (+ GET /motocicletas/{id}/historial)
+CRUD   /clientes, /motocicletas (+ GET /motocicletas/{id}/historial?incluirCanceladas=, paginado)
 CRUD   /categorias, /productos   GET /productos/stock-bajo
 GET    /inventario/movimientos   POST /inventario/ajustes
 CRUD   /proveedores   POST/GET /compras (+ POST /{id}/anulacion)
@@ -202,7 +202,7 @@ Solo estos, cada uno con un problema real que resolver. Cualquier otro requiere 
 | **Specification** (JPA `Specification`) | Búsquedas y filtros (RF29) | Combina filtros opcionales sin escribir una consulta por cada combinación. |
 | **DTO + Mapper** | Todos los módulos | Desacopla el contrato de la API del modelo de persistencia y evita exponer datos sensibles. |
 | **Repository** | Spring Data | Lo provee el framework. |
-| **Inversión de dependencias** (interfaz en el módulo que pregunta, implementación en el que sabe) | `clientes.application.ConsultaOrdenesActivas` implementada por `taller.application.OrdenesActivasDelTaller` | `taller` depende de `clientes`/`motocicletas`; para que estos consulten si hay órdenes activas (RN-44) sin crear un ciclo de dependencias. Vive en `clientes` (no en `motocicletas`) porque la usan los dos módulos y `motocicletas` ya depende de `clientes`. |
+| **Inversión de dependencias** (interfaz en el módulo que pregunta, implementación en el que sabe) | `clientes.application.ConsultaOrdenesActivas` implementada por `taller.application.OrdenesActivasDelTaller`; `motocicletas.application.HistorialMotocicleta` implementada por `taller.application.HistorialMotoDelTaller` (RF9) | `taller` depende de `clientes`/`motocicletas`; para que estos consulten si hay órdenes activas (RN-44) sin crear un ciclo de dependencias. Vive en `clientes` (no en `motocicletas`) porque la usan los dos módulos y `motocicletas` ya depende de `clientes`. |
 | **Strategy** *(solo si llega a hacer falta)* | — | No se usa de entrada. Se evaluaría si aparece un segundo cálculo de impuestos o un segundo canal de notificación con lógica distinta. |
 
 Lo que **no** se hace: interfaces `XService` + `XServiceImpl` con una sola implementación, fábricas genéricas, capas "manager", herencia profunda de entidades.

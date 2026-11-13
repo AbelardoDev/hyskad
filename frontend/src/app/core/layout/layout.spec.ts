@@ -59,7 +59,7 @@ class Anfitrion {}
 beforeEach(() => localStorage.clear());
 
 describe('menú', () => {
-  it('cada ítem declara ícono, clave i18n, ruta y permiso; hay 4 accesos rápidos', () => {
+  it('cada ítem declara ícono, clave i18n, ruta y permiso; quien ve todo tiene 4 accesos rápidos', () => {
     const items = MENU.flatMap((g) => g.items);
     const transloco = TestBed.inject(TranslocoService);
 
@@ -69,7 +69,8 @@ describe('menú', () => {
       expect(item.permisos.length).toBeGreaterThan(0);
       expect(transloco.translate(item.clave)).not.toBe(item.clave);
     }
-    expect(ACCESOS_RAPIDOS).toHaveLength(4);
+    // "Mis órdenes" se oculta a quien ve todas las órdenes (excluirCon)
+    expect(ACCESOS_RAPIDOS.filter((i) => !i.excluirCon)).toHaveLength(4);
   });
 });
 
@@ -154,7 +155,9 @@ describe('HkShell', () => {
     await fixture.whenStable();
 
     const drawer = document.querySelector('.hk-drawer-izquierda hk-menu-movil')!;
-    expect(drawer.querySelectorAll('nav a').length).toBe(MENU.flatMap((g) => g.items).length);
+    expect(drawer.querySelectorAll('nav a').length).toBe(
+      MENU.flatMap((g) => g.items).filter((i) => !i.excluirCon).length,
+    );
     (drawer.querySelector('button[aria-label="Cerrar menú"]') as HTMLButtonElement).click();
   });
 
@@ -201,12 +204,13 @@ describe('HkShell', () => {
 
     expect(
       Array.from(el.querySelectorAll('hk-bottom-nav a')).map((a) => a.textContent?.trim()),
-    ).toEqual(['Inicio', 'Órdenes', 'Clientes', 'Motocicletas']);
+    ).toEqual(['Inicio', 'Mis órdenes', 'Órdenes', 'Clientes']);
     const enSidebar = Array.from(el.querySelectorAll('aside nav a')).map((a) =>
       a.getAttribute('href'),
     );
     expect(enSidebar).toEqual([
       '/dashboard',
+      '/ordenes/mias',
       '/ordenes',
       '/clientes',
       '/motocicletas',

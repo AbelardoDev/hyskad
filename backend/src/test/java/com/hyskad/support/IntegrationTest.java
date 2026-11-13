@@ -12,13 +12,13 @@ import org.springframework.test.context.ActiveProfiles;
 
 /**
  * Prueba de integración: contexto completo, perfil test, MySQL en Testcontainers, MockMvc y
- * {@link UsuariosDePrueba}.
+ * {@link UsuariosDePrueba} y {@link FlujoOrdenes}.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
-@Import({ TestcontainersConfiguration.class, UsuariosDePrueba.class, CatalogoDePrueba.class })
+@Import({ TestcontainersConfiguration.class, UsuariosDePrueba.class, CatalogoDePrueba.class, FlujoOrdenes.class })
 public @interface IntegrationTest {
 }

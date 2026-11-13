@@ -100,7 +100,7 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | CP-18 | RF7 | Placa duplicada | I | 409 `PLACA_DUPLICADA` | Aprobado (F05, también escrita en minúsculas y al editar) |
 | CP-19 | RF6, RN-44 | Desactivar cliente con orden activa | I | 409 | Aprobado (F05 con un doble; F09A con órdenes reales: cliente y moto 409 `ORDENES_ACTIVAS` y, cancelada la orden, se desactivan) |
 | CP-20 | RF29 | Buscar clientes por nombre parcial, documento y teléfono | I | Resultados paginados correctos | Aprobado (F05) |
-| CP-21 | RF9 | Historial de una moto con 3 órdenes | I, E | Lista ordenada por fecha con servicios, repuestos y totales | Pendiente (F09C; en F05 el endpoint responde `[]` con la estructura final) |
+| CP-21 | RF9 | Historial de una moto con 3 órdenes | I, E | Lista ordenada por fecha con servicios, repuestos y totales | Aprobado (F09C: `HistorialMotocicletaIT`, más reciente primero, sin canceladas salvo `incluirCanceladas`, paginado; E2E en CP-50) |
 | CP-88 | RF4, IS4 | Permisos de cada endpoint de clientes y motos | I | Vendedor gestiona; mecánico solo consulta (403 al escribir); almacén 403 en todo; sin token 401 | Aprobado (F05) |
 | CP-89 | RN-43 | Cambiar el propietario de una moto | I, E | La moto pasa al nuevo cliente con confirmación, se audita `MOTOCICLETA_PROPIETARIO_CAMBIADO` y deja de listarse en el anterior | Aprobado (F05) |
 | CP-90 | RF29, RN-41 | Buscar motos por placa parcial escrita en minúsculas y con guion | I, E | `abc-12` encuentra `ABC12D`; el buscador muestra la placa normalizada | Aprobado (F05) |
@@ -181,11 +181,11 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | CP-128 | RF15, RF19, RF22, RF23 | Diagnóstico → 1 servicio y 2 repuestos → enviar presupuesto → aprobar → finalizar → stock en Inventario | E | Total $232.050 en la orden y en el envío; existencias y reservado correctos en la ficha del producto | Aprobado (F09B) |
 | CP-129 | RF22 | Presupuesto imprimible | E | Documento fuera del menú con ítems, placa y leyenda; vuelve a la orden | Aprobado (F09B) |
 | CP-130 | RNF Acc. | axe en las pestañas de ítems y presupuestos, claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F09B) |
-| CP-47 | RF25, RN-35 | Pago con monto distinto al total | I | 400 `MONTO_INVALIDO` | Pendiente |
-| CP-48 | RF28, RN-36 | Entregar sin pago | I | 409 `PAGO_REQUERIDO` | Pendiente |
-| CP-49 | RF26 | Cuentas pendientes | I | Solo órdenes finalizadas sin pago con días transcurridos | Pendiente |
-| CP-50 | Flujo | Recepción → diagnóstico → presupuesto → aprobación → reparación → finalización → pago → entrega | E | Flujo completo sin errores con 3 roles distintos | Pendiente |
-| CP-51 | IU6 | Vista del mecánico en 375 px | E, M | Usable, sin scroll horizontal, botones ≥ 44 px | Pendiente |
+| CP-47 | RF25, RN-35 | Pago con monto distinto al total | I | 400 `MONTO_INVALIDO` | Aprobado (F09C: por debajo, por encima y 0; además pago fuera de `FINALIZADA` → 409 `ORDEN_ESTADO_INVALIDO` y segundo pago → 409 `PAGO_DUPLICADO`) |
+| CP-48 | RF28, RN-36 | Entregar sin pago | I | 409 `PAGO_REQUERIDO` | Aprobado (F09C: la transición genérica a `ENTREGADA` responde `ENTREGA_REQUERIDA`) |
+| CP-49 | RF26 | Cuentas pendientes | I | Solo órdenes finalizadas sin pago con días transcurridos | Aprobado (F09C: `CuentasPendientesIT`; excluye pagadas y entregadas, filtros por cliente y fechas, total adeudado) |
+| CP-50 | Flujo | Recepción → diagnóstico → presupuesto → aprobación → reparación → finalización → pago → entrega | E | Flujo completo sin errores con 3 roles distintos | Aprobado (F09C: vendedor recibe, mecánico en 375 px diagnostica y finaliza, otro vendedor presupuesta, cobra y entrega; comprobante e historial) |
+| CP-51 | IU6 | Vista del mecánico en 375 px | E, M | Usable, sin scroll horizontal, botones ≥ 44 px | Aprobado (F09C: E2E mide el ancho y el botón de acción ≥ 44 px en la mitad inferior; axe claro/oscuro; capturas en `docs/capturas/f09c`) |
 
 ### Notificaciones, auditoría, reportes y dashboard (F10–F11)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |

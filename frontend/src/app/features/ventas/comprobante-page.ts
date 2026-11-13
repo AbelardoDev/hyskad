@@ -258,9 +258,9 @@ export type FormatoComprobante = 'carta' | 'tirilla';
               <dd class="tabular">{{ c.venta.total | cop }}</dd>
             </div>
             <div class="flex justify-between gap-6 pt-2">
-              <dt class="text-muted">{{ 'ventas.campos.metodo' | transloco }}</dt>
+              <dt class="text-muted">{{ 'pago.metodo' | transloco }}</dt>
               <dd>
-                {{ 'ventas.metodos.' + c.venta.metodoPago | transloco }}
+                {{ 'pago.metodos.' + c.venta.metodoPago | transloco }}
                 @if (c.venta.referenciaPago) {
                   · {{ c.venta.referenciaPago }}
                 }
@@ -268,11 +268,11 @@ export type FormatoComprobante = 'carta' | 'tirilla';
             </div>
             @if (c.venta.montoRecibido !== null) {
               <div class="flex justify-between gap-6">
-                <dt class="text-muted">{{ 'ventas.campos.recibido' | transloco }}</dt>
+                <dt class="text-muted">{{ 'pago.recibido' | transloco }}</dt>
                 <dd class="tabular">{{ c.venta.montoRecibido | cop }}</dd>
               </div>
               <div class="flex justify-between gap-6">
-                <dt class="text-muted">{{ 'ventas.pos.cambio' | transloco }}</dt>
+                <dt class="text-muted">{{ 'pago.cambio' | transloco }}</dt>
                 <dd class="tabular">{{ c.venta.cambio | cop }}</dd>
               </div>
             }

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ import com.hyskad.motocicletas.domain.Motocicleta;
 import com.hyskad.servicios.domain.Servicio;
 import com.hyskad.shared.dinero.CalculadoraTotales;
 import com.hyskad.shared.dinero.CalculadoraTotales.Totales;
+import com.hyskad.shared.error.BusinessException;
 import com.hyskad.shared.error.ConflictException;
 import com.hyskad.shared.error.ErrorCode;
 import com.hyskad.shared.error.NotFoundException;
@@ -111,6 +113,15 @@ public class OrdenTrabajo extends BaseEntity {
     @Column(name = "fecha_finalizacion")
     private Instant fechaFinalizacion;
 
+    @Column(name = "fecha_entrega")
+    private Instant fechaEntrega;
+
+    @Column(name = "entregada_por")
+    private Long entregadaPor;
+
+    @Column(name = "observaciones_entrega", length = 1000)
+    private String observacionesEntrega;
+
     @Version
     private long version;
 
@@ -132,6 +143,14 @@ public class OrdenTrabajo extends BaseEntity {
     @OrderBy("id")
     @BatchSize(size = 50)
     private List<OrdenRepuesto> repuestos = new ArrayList<>();
+
+    /**
+     * RN-35: a lo sumo un pago ({@code uq_pago_orden}). Se mapea como colección porque un
+     * {@code @OneToOne} inverso no se carga en diferido y haría una consulta por orden en los listados.
+     */
+    @OneToMany(mappedBy = "orden", cascade = CascadeType.ALL)
+    @BatchSize(size = 50)
+    private List<Pago> pagos = new ArrayList<>();
 
     public OrdenTrabajo(String numero, Cliente cliente, Motocicleta motocicleta, int kilometrajeIngreso,
             DatosRecepcion recepcion, Long usuarioId, Instant ahora) {
@@ -288,6 +307,52 @@ public class OrdenTrabajo extends BaseEntity {
 
     public void finalizar(Instant ahora) {
         this.fechaFinalizacion = ahora;
+    }
+
+    /**
+     * RN-35: pago total y único, solo con la orden {@code FINALIZADA} y por exactamente su total.
+     * La referencia y el monto recibido los valida quien llama (RN-20).
+     */
+    public Pago registrarPago(DatosPago datos, Long usuarioId, Instant ahora) {
+        if (estado != EstadoOrden.FINALIZADA) {
+            throw new ConflictException(ErrorCode.ORDEN_ESTADO_INVALIDO,
+                    "El pago se registra con la orden finalizada", Map.of("estado", estado.name()));
+        }
+        if (tienePago()) {
+            throw new ConflictException(ErrorCode.PAGO_DUPLICADO, "La orden ya tiene un pago registrado");
+        }
+        if (datos.monto().compareTo(total) != 0) {
+            throw new BusinessException(ErrorCode.MONTO_INVALIDO, "El monto debe ser igual al total de la orden",
+                    Map.of("total", total));
+        }
+        Pago pago = new Pago(this, datos, usuarioId, ahora);
+        pagos.add(pago);
+        return pago;
+    }
+
+    /**
+     * RN-36: exige el pago y guarda quién entregó, cuándo y sus observaciones. La transición a
+     * {@code ENTREGADA} la aplica quien llama, después de esto.
+     */
+    public void registrarEntrega(Long usuarioId, String observaciones, Instant ahora) {
+        if (estado != EstadoOrden.FINALIZADA) {
+            throw new ConflictException(ErrorCode.ORDEN_ESTADO_INVALIDO,
+                    "Solo se entrega una orden finalizada", Map.of("estado", estado.name()));
+        }
+        if (!tienePago()) {
+            throw new ConflictException(ErrorCode.PAGO_REQUERIDO, "La orden no tiene pago registrado");
+        }
+        this.fechaEntrega = ahora;
+        this.entregadaPor = usuarioId;
+        this.observacionesEntrega = observaciones;
+    }
+
+    public boolean tienePago() {
+        return !pagos.isEmpty();
+    }
+
+    public Optional<Pago> getPago() {
+        return pagos.stream().findFirst();
     }
 
     public boolean tieneItems() {

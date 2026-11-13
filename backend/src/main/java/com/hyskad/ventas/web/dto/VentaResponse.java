@@ -5,9 +5,9 @@ import java.time.Instant;
 import java.util.List;
 
 import com.hyskad.catalogo.domain.Unidad;
+import com.hyskad.shared.dinero.MetodoPago;
 import com.hyskad.shared.validation.TipoDocumento;
 import com.hyskad.ventas.domain.EstadoVenta;
-import com.hyskad.ventas.domain.MetodoPago;
 
 /**
  * Venta con sus ítems a los precios congelados. Sin costos (son para reportes de utilidad). Sin

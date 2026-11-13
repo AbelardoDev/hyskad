@@ -49,6 +49,14 @@ public final class OrdenTrabajoSpecifications {
         };
     }
 
+    /** RF9: órdenes de la moto; las canceladas solo si se piden. */
+    public static Specification<OrdenTrabajo> deMotocicleta(Long motocicletaId, boolean incluirCanceladas) {
+        Specification<OrdenTrabajo> deLaMoto = (raiz, consulta, cb) ->
+                cb.equal(raiz.get("motocicleta").get("id"), motocicletaId);
+        return incluirCanceladas ? deLaMoto
+                : deLaMoto.and((raiz, consulta, cb) -> cb.notEqual(raiz.get("estado"), EstadoOrden.CANCELADA));
+    }
+
     static Specification<OrdenTrabajo> enEstados(Set<EstadoOrden> estados) {
         return estados == null || estados.isEmpty() ? Specification.unrestricted()
                 : (raiz, consulta, cb) -> raiz.get("estado").in(estados);

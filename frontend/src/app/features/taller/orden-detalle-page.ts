@@ -1,9 +1,11 @@
+import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   computed,
   inject,
   input,
+  linkedSignal,
   numberAttribute,
   signal,
 } from '@angular/core';
@@ -38,6 +40,7 @@ import { HkPresupuestosOrden } from './presupuestos-orden';
 import { MecanicosModal } from './mecanicos-modal';
 import { accionTransicion } from './orden-ui';
 import { Orden, OrdenesApiService, Presupuesto, TransicionPermitida } from './ordenes-api.service';
+import { HkPagoEntregaOrden } from './pago-entrega-orden';
 import { RecepcionFormDrawer } from './recepcion-form-drawer';
 
 /** El camino normal de una orden (la línea de tiempo); CANCELADA se marca sobre el último paso. */
@@ -60,12 +63,13 @@ function ultimaLlegada(
 
 /**
  * Detalle de una orden (RF11–RF14): encabezado, línea de tiempo, acciones según
- * `accionesPermitidas` (lo decide el backend) y pestañas. El pago llega en F09C: su pestaña se ve
- * deshabilitada.
+ * `accionesPermitidas` (lo decide el backend) y pestañas. `?pestana=pago` abre directamente el
+ * pago (lo usan las cuentas pendientes).
  */
 @Component({
   selector: 'hk-orden-detalle-page',
   imports: [
+    NgTemplateOutlet,
     RouterLink,
     TranslocoPipe,
     LucideDynamicIcon,
@@ -78,6 +82,7 @@ function ultimaLlegada(
     HkDiagnosticoForm,
     HkItemsOrden,
     HkPresupuestosOrden,
+    HkPagoEntregaOrden,
     HkEmptyState,
     HkPageHeader,
     HkPlaca,
@@ -121,7 +126,7 @@ function ultimaLlegada(
       <hk-card>
         <div class="flex flex-wrap items-center gap-4">
           <hk-placa tamano="lg" [placa]="o.motocicleta.placa" />
-          <div class="min-w-0 basis-full sm:basis-auto sm:flex-1">
+          <div class="min-w-0 basis-full sm:flex-1 sm:basis-auto">
             <p class="font-display text-lg font-semibold text-fg">
               {{ o.motocicleta.marca }} {{ o.motocicleta.modelo }}
               @if (o.motocicleta.anio) {
@@ -149,45 +154,34 @@ function ultimaLlegada(
         />
 
         @if (o.accionesPermitidas.transiciones.length > 0) {
-          <div class="mt-6 flex flex-wrap gap-2 border-t border-border pt-5">
-            @for (t of o.accionesPermitidas.transiciones; track t.estado) {
-              @let accion = accionDe(o, t);
-              <span
-                class="max-sm:w-full"
-                [hkTooltip]="t.bloqueo ? ('taller.bloqueos.' + t.bloqueo | transloco) : ''"
-                [hkTooltipDeshabilitado]="!t.bloqueo"
-              >
-                <button
-                  hk-button
-                  tamano="lg"
-                  class="max-sm:w-full"
-                  [variante]="accion.variante"
-                  [icono]="accion.icono"
-                  [deshabilitado]="!!t.bloqueo"
-                  [cargando]="transicionando() === t.estado"
-                  [attr.aria-describedby]="t.bloqueo ? 'bloqueo-' + t.estado : null"
-                  (click)="transicionar(o, t)"
-                >
-                  {{ 'taller.acciones.' + accion.clave | transloco }}
-                </button>
-                @if (t.bloqueo) {
-                  <span [id]="'bloqueo-' + t.estado" class="sr-only">{{
-                    'taller.bloqueos.' + t.bloqueo | transloco
-                  }}</span>
-                }
-              </span>
-            }
+          <div class="mt-6 flex flex-wrap gap-2 border-t border-border pt-5 max-md:hidden">
+            <ng-container
+              [ngTemplateOutlet]="acciones"
+              [ngTemplateOutletContext]="{ $implicit: o, sufijo: '' }"
+            />
           </div>
+          <!-- IU6: en el celular, las acciones grandes y fijas abajo (al alcance del pulgar) -->
+          <div
+            class="fixed inset-x-0 bottom-[calc(3.5rem+env(safe-area-inset-bottom))] z-30 grid auto-cols-fr grid-flow-col gap-2 border-t border-border bg-surface/95 px-4 py-3 backdrop-blur-md md:hidden"
+            role="group"
+            [attr.aria-label]="'taller.detalle.acciones' | transloco"
+          >
+            <ng-container
+              [ngTemplateOutlet]="acciones"
+              [ngTemplateOutletContext]="{ $implicit: o, sufijo: '-movil' }"
+            />
+          </div>
+          <div class="h-20 md:hidden" aria-hidden="true"></div>
         }
       </hk-card>
 
       <hk-card class="mt-6">
         <hk-tabs
           [pestanas]="pestanas()"
-          [(activa)]="pestana"
+          [(activa)]="pestanaActiva"
           [etiqueta]="'taller.detalle.secciones' | transloco"
         >
-          @switch (pestana()) {
+          @switch (pestanaActiva()) {
             @case ('resumen') {
               <div class="grid gap-6 lg:grid-cols-3">
                 <dl class="grid gap-4 text-sm sm:grid-cols-2 lg:col-span-2">
@@ -250,6 +244,9 @@ function ultimaLlegada(
             @case ('presupuestos') {
               <hk-presupuestos-orden [orden]="o" (cambio)="orden.reload()" />
             }
+            @case ('pago') {
+              <hk-pago-entrega-orden [orden]="o" (cambio)="alPagarOEntregar($event)" />
+            }
             @case ('diagnostico') {
               <hk-diagnostico-form [orden]="o" (guardado)="alGuardarDiagnostico($event)" />
             }
@@ -302,6 +299,36 @@ function ultimaLlegada(
         <hk-skeleton variante="rectangulo" alto="16rem" />
       </div>
     }
+
+    <ng-template #acciones let-o let-sufijo="sufijo">
+      @for (t of transicionesOrdenadas(o); track t.estado) {
+        @let accion = accionDe(o, t);
+        <span
+          class="min-w-0 max-md:w-full"
+          [hkTooltip]="t.bloqueo ? ('taller.bloqueos.' + t.bloqueo | transloco) : ''"
+          [hkTooltipDeshabilitado]="!t.bloqueo"
+        >
+          <button
+            hk-button
+            tamano="lg"
+            class="max-md:w-full"
+            [variante]="accion.variante"
+            [icono]="accion.icono"
+            [deshabilitado]="!!t.bloqueo"
+            [cargando]="transicionando() === t.estado"
+            [attr.aria-describedby]="t.bloqueo ? 'bloqueo-' + t.estado + sufijo : null"
+            (click)="transicionar(o, t)"
+          >
+            <span class="truncate">{{ 'taller.acciones.' + accion.clave | transloco }}</span>
+          </button>
+          @if (t.bloqueo) {
+            <span [id]="'bloqueo-' + t.estado + sufijo" class="sr-only">{{
+              'taller.bloqueos.' + t.bloqueo | transloco
+            }}</span>
+          }
+        </span>
+      }
+    </ng-template>
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -314,12 +341,14 @@ export class OrdenDetallePage {
   private readonly idioma = inject(LanguageService);
 
   readonly id = input.required({ transform: numberAttribute });
+  /** Pestaña inicial desde la URL (`?pestana=pago`). */
+  readonly pestana = input<string>();
 
   protected readonly orden = rxResource({
     params: () => this.id(),
     stream: ({ params }) => this.api.obtener(params, erroresManejados()),
   });
-  protected readonly pestana = signal('resumen');
+  protected readonly pestanaActiva = linkedSignal(() => this.pestana() ?? 'resumen');
   protected readonly transicionando = signal<EstadoOrden | null>(null);
 
   /** Cambia al cargar las traducciones o el idioma: los `computed` que traducen la leen. */
@@ -327,7 +356,6 @@ export class OrdenDetallePage {
   protected readonly pestanas = computed<Pestana[]>(() => {
     this.traducciones();
     const t = (clave: string) => this.transloco.translate(clave);
-    const pronto = t('taller.detalle.pronto');
     const o = this.orden.value();
     return [
       { id: 'resumen', etiqueta: t('taller.detalle.pestanas.resumen'), icono: 'info' },
@@ -347,12 +375,7 @@ export class OrdenDetallePage {
         etiqueta: t('taller.detalle.pestanas.presupuestos'),
         icono: 'hourglass',
       },
-      {
-        id: 'pago',
-        etiqueta: `${t('taller.detalle.pestanas.pago')} · ${pronto}`,
-        icono: 'banknote',
-        deshabilitada: true,
-      },
+      { id: 'pago', etiqueta: t('taller.detalle.pestanas.pago'), icono: 'banknote' },
       {
         id: 'historial',
         etiqueta: t('taller.detalle.pestanas.historial'),
@@ -388,6 +411,18 @@ export class OrdenDetallePage {
     [...(this.orden.value()?.historial ?? [])].reverse(),
   );
 
+  /**
+   * Las acciones secundarias y peligrosas primero y la principal al final: en el celular queda a la
+   * derecha, donde llega el pulgar.
+   */
+  protected transicionesOrdenadas(orden: Orden): TransicionPermitida[] {
+    const peso = (t: TransicionPermitida) => {
+      const variante = accionTransicion(orden.estado, t.estado).variante;
+      return variante === 'primary' ? 2 : variante === 'danger' ? 0 : 1;
+    };
+    return [...orden.accionesPermitidas.transiciones].sort((a, b) => peso(a) - peso(b));
+  }
+
   protected accionDe(orden: Orden, transicion: TransicionPermitida) {
     return accionTransicion(orden.estado, transicion.estado);
   }
@@ -400,6 +435,11 @@ export class OrdenDetallePage {
     if (transicion.bloqueo || this.transicionando()) return;
     if (transicion.estado === 'PENDIENTE_APROBACION') {
       this.enviarPresupuesto(orden);
+      return;
+    }
+    // Entregar guarda quién, cuándo y observaciones: se hace en la pestaña de pago y entrega
+    if (transicion.estado === 'ENTREGADA') {
+      this.pestanaActiva.set('pago');
       return;
     }
     const accion = accionTransicion(orden.estado, transicion.estado);
@@ -427,7 +467,7 @@ export class OrdenDetallePage {
           }),
         );
         if (actualizada.estado === 'EN_DIAGNOSTICO')
-          this.pestana.set(actualizada.diagnostico ? 'items' : 'diagnostico');
+          this.pestanaActiva.set(actualizada.diagnostico ? 'items' : 'diagnostico');
       },
       // El interceptor ya avisó (p. ej. otro usuario la cambió): se recarga lo vigente
       error: () => {
@@ -450,7 +490,7 @@ export class OrdenDetallePage {
         this.toast.exito(
           this.transloco.translate('taller.presupuestos.enviado', { numero: presupuesto.numero }),
         );
-        this.pestana.set('presupuestos');
+        this.pestanaActiva.set('presupuestos');
         this.orden.reload();
       });
   }
@@ -473,6 +513,16 @@ export class OrdenDetallePage {
         this.orden.set(actualizada);
         this.toast.exito(this.transloco.translate('taller.mecanicos.guardados'));
       });
+  }
+
+  protected alPagarOEntregar(orden: Orden): void {
+    this.orden.set(orden);
+    this.toast.exito(
+      this.transloco.translate(
+        orden.estado === 'ENTREGADA' ? 'taller.pago.entregada_toast' : 'taller.pago.pagado_toast',
+        { numero: orden.numero },
+      ),
+    );
   }
 
   protected alGuardarDiagnostico(orden: Orden): void {

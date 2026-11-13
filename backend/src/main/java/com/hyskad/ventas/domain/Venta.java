@@ -11,8 +11,9 @@ import org.hibernate.type.SqlTypes;
 
 import com.hyskad.catalogo.domain.Producto;
 import com.hyskad.clientes.domain.Cliente;
-import com.hyskad.shared.dinero.CalculadoraTotales;
 import com.hyskad.shared.dinero.CalculadoraTotales.Totales;
+import com.hyskad.shared.dinero.CalculadoraTotales;
+import com.hyskad.shared.dinero.MetodoPago;
 import com.hyskad.shared.error.ConflictException;
 import com.hyskad.shared.error.ErrorCode;
 import com.hyskad.shared.persistence.BaseEntity;

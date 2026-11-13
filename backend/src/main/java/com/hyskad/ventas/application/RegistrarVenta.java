@@ -3,7 +3,7 @@ package com.hyskad.ventas.application;
 import java.math.BigDecimal;
 import java.util.List;
 
-import com.hyskad.ventas.domain.MetodoPago;
+import com.hyskad.shared.dinero.MetodoPago;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;

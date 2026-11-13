@@ -108,7 +108,8 @@ class MotocicletaControllerIT {
         mvc.perform(get(BASE + "/" + id).header(HttpHeaders.AUTHORIZATION, bearer)).andExpect(status().isOk());
         mvc.perform(get(BASE + "/" + id + "/historial").header(HttpHeaders.AUTHORIZATION, bearer))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(0)));
+                .andExpect(jsonPath("$.content", hasSize(0)))
+                .andExpect(jsonPath("$.totalElements").value(0));
         mvc.perform(get("/api/v1/clientes/" + cliente + "/motocicletas").header(HttpHeaders.AUTHORIZATION, bearer))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)));

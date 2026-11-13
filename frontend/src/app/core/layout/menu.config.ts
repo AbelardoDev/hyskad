@@ -117,6 +117,12 @@ export const MENU: readonly GrupoMenu[] = [
         permisos: ['USUARIOS_GESTIONAR'],
       },
       {
+        clave: 'menu.auditoria',
+        icono: 'history',
+        ruta: '/auditoria',
+        permisos: ['AUDITORIA_VER'],
+      },
+      {
         clave: 'menu.configuracion',
         icono: 'settings',
         ruta: '/configuracion',

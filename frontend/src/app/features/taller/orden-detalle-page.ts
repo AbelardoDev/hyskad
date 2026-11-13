@@ -14,6 +14,7 @@ import { RouterLink } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LucideDynamicIcon } from '@lucide/angular';
 
+import { HkTienePermisoDirective } from '../../core/auth/tiene-permiso.directive';
 import { erroresManejados } from '../../core/http/contexto-http';
 import { LanguageService } from '../../core/i18n/language.service';
 import { formatoFecha } from '../../core/utils/formato';
@@ -72,6 +73,7 @@ function ultimaLlegada(
     NgTemplateOutlet,
     RouterLink,
     TranslocoPipe,
+    HkTienePermisoDirective,
     LucideDynamicIcon,
     CantidadPipe,
     FechaPipe,
@@ -111,6 +113,16 @@ function ultimaLlegada(
           'taller.detalle.ingreso' | transloco: { fecha: (o.fechaIngreso | fecha: 'fechaHora') }
         "
       >
+        <a
+          *hkTienePermiso="'AUDITORIA_VER'"
+          hk-button
+          variante="secondary"
+          icono="history"
+          routerLink="/auditoria"
+          [queryParams]="{ entidad: 'orden_trabajo', entidadId: o.id }"
+        >
+          {{ 'auditoria.ver_registro' | transloco }}
+        </a>
         @if (o.accionesPermitidas.editar) {
           <button hk-button variante="secondary" icono="pencil" (click)="editarRecepcion(o)">
             {{ 'comun.editar' | transloco }}

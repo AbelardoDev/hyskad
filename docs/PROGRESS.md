@@ -19,7 +19,7 @@
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ✅ Terminada | #15 | Diagrama de estados en ARCHITECTURE §6.2 (verificado por `DiagramaEstadosTest`); capturas en `docs/capturas/f09a` |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ✅ Terminada | #16 | Presupuesto imprimible en `/presupuestos/:id`; capturas en `docs/capturas/f09b` |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
-| F10 | Notificaciones en tiempo real, correos y auditoría | 🟦 En curso | | |
+| F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #PR | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ⬜ Pendiente | | |
 | F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ⬜ Pendiente | | |
 | F13 | Despliegue en VPS | ⬜ Pendiente | | |
@@ -28,12 +28,17 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
+- **Fase:** F10 ✅ (cerrada 2026-11-12, PR #PR)
+- **Rama:** `feature/f10-notificaciones` → `main`
+- **Hecho:** migración V10 (`notificacion` con claves de i18n, parámetros JSON y enlace). Módulo `notificaciones`: `NotificacionListener` (AFTER_COMMIT + `@Async`) para todos los eventos de BUSINESS-RULES §9 (destinatarios por rol, asignación o creador; nunca el autor ni inactivos), `NotificacionService` (guarda y empuja tras el commit) y `StreamNotificaciones` (ticket de un solo uso de 30 s, varias pestañas por usuario, latido de 25 s, cierre al cambiar el acceso). Endpoints de lista, conteo, marcar leída(s), ticket y stream. Correos: `CorreoService` con layout (logo CID a 240 px, pie del taller vía `PieCorreo`), versión en texto plano, 2 reintentos con espera creciente; plantillas `orden-recibida`, `presupuesto-pendiente`, `orden-lista`, `orden-entregada` y `recuperacion-password` en el nuevo layout; `CorreoClientesListener` respeta RN-45. Auditoría: `GET /auditoria` y `/auditoria/entidad/{entidad}/{id}` (`AUDITORIA_VER`); RN-51 ya estaba cubierta, se agregó motivo y total a las anulaciones. Frontend: `core/realtime` (`NotificacionesStreamService` con reconexión exponencial hasta 30 s, campana con contador y punto cian, panel con las últimas 10, toast solo con la pestaña visible), páginas Notificaciones y Auditoría (filtros, panel clave → valor, historia de un registro), enlaces "Ver auditoría" en orden, venta y usuario. Nginx e2e sin búfer para el stream. Pruebas: backend 229 unitarias y 240 IT; frontend 280 unitarias; 83 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f10/` (campana clara/oscura, toast, notificaciones en móvil y correo en Mailpit escritorio/móvil).
+- **Siguiente paso concreto:** iniciar F11 con `/fase F11` (reportes, dashboard, búsqueda global y configuración; la edición de la configuración debe auditarse, RN-51).
+- **Bloqueos o dudas:** ninguno. Para F13: repetir en el Nginx de producción el bloque sin búfer de `/api/v1/notificaciones/stream`.
+
+### Sesión anterior (F09C)
+
 - **Fase:** F09C ✅ (cerrada 2026-11-12, PR #22)
 - **Rama:** `feature/f09c-pago-entrega` → `main`
 - **Hecho:** migración V9 (`pago` único por orden con `monto_recibido`; `fecha_entrega`, `entregada_por` y `observaciones_entrega` en la orden; índice para cuentas pendientes). `PagoEntregaService`: pago total y único solo en `FINALIZADA` por el total exacto (`MONTO_INVALIDO`, `PAGO_DUPLICADO`, RN-20 para referencia y monto recibido) y entrega que exige el pago (`PAGO_REQUERIDO`), transiciona a `ENTREGADA` y publica `OrdenEntregada`; ambos auditados. `accionesPermitidas` con `registrarPago`/`registrarEntrega` y bloqueo `SIN_PAGO` real; la transición genérica a `ENTREGADA` responde `ENTREGA_REQUERIDA`. `GET /ordenes-trabajo/{id}/comprobante` (diagnóstico resumido a 300 caracteres, leyenda RN-06). Historial RF9 real vía `HistorialMotocicleta` (implementada por `taller`), paginado y sin canceladas salvo `incluirCanceladas`. Módulo `reportes` con `GET /reportes/cuentas-pendientes` (días de calendario en Bogotá y total adeudado). `MetodoPago` pasa a `shared.dinero`. Frontend: `hk-campos-pago` en el kit (lo usan el POS y la orden; textos en `pago.*`); pestaña "Pago y entrega" con resumen, cobro, entrega y pantalla de éxito (`?pestana=pago` la abre); comprobante imprimible; historial de la moto en línea de tiempo expandible con la progresión del kilometraje; cuentas pendientes con días por antigüedad y acceso directo al pago (`/reportes` redirige ahí hasta F11); "Mis órdenes" agrupada por estado con el motivo, acciones grandes fijas abajo en el celular y página de inicio de quien solo ve sus órdenes. Pruebas: backend 217 unitarias y 229 IT (apoyo `FlujoOrdenes`); frontend 268 unitarias; 78 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f09c/`.
-- **Siguiente paso concreto:** iniciar F10 con `/fase F10` (notificaciones en tiempo real, correos y auditoría; ya existen los eventos `OrdenEntregada`, `OrdenFinalizada`, etc.).
-- **Bloqueos o dudas:** ninguno. Pendiente menor: en la barra inferior del mecánico, estando en "Mis órdenes" también se resalta "Órdenes" (`routerLinkActive` por prefijo).
-
 ### Sesión anterior (F09B)
 
 - **Fase:** F09B ✅ (cerrada 2026-10-30, PR #16)
@@ -73,6 +78,16 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-11-12 · F10 · Los destinatarios por rol siguen la tabla de BUSINESS-RULES §9 (VENDEDOR, ADMIN, ALMACEN) y nunca se notifica a quien hizo la acción ni a usuarios inactivos, aprobado por el usuario en el plan · la regla habla de roles; avisarse a uno mismo es ruido.
+- 2026-11-12 · F10 · Los streams SSE se cierran con `AccesoUsuarioModificado` (desactivar, cambiar rol o permisos), después del commit · ya existía para revocar sesiones; el cliente reconecta con un ticket nuevo si sigue activo.
+- 2026-11-12 · F10 · El registro de emisores y tickets SSE vive en memoria · hay una sola instancia del backend (F13); con varias haría falta un broker.
+- 2026-11-12 · F10 · `PresupuestoEnviado` lleva `enviadoPor` · para no notificar al vendedor que lo envió.
+- 2026-11-12 · F10 · `OrdenTrabajoService.paraAvisos` y `PresupuestoService.paraAvisos` no verifican visibilidad · los listeners corren en otro hilo sin sesión; no se exponen por la API.
+- 2026-11-12 · F10 · El pie de los correos sale de `shared.correo.PieCorreo`, implementada por `configuracion` · `shared` no debe depender de un módulo de negocio.
+- 2026-11-12 · F10 · Los correos a clientes van siempre en español (`es-CO`) y llevan versión en texto plano (plantillas `*.txt` con un resolver TEXT) · lo pide el prompt; mejora la entregabilidad.
+- 2026-11-12 · F10 · La consulta de auditoría vive en `shared.audit.AuditoriaService` y el controller en el módulo `auditoria` · ArchUnit prohíbe usar el repositorio de `shared` desde otro módulo.
+- 2026-11-12 · F10 · Las no leídas se distinguen con título en negrita y un punto (sin fondo `primary-soft`) · axe: el texto atenuado sobre ese fondo no llegaba a AA.
+- 2026-11-12 · F10 · El ayudante de axe de las E2E repite el análisis una vez si encuentra violaciones · una notificación real de otra prueba en paralelo puede animar un toast durante el análisis; una violación real persiste.
 - 2026-11-12 · F09C · Se mantiene la ruta `/ordenes/mias` (el prompt decía `/taller/mis-ordenes`), aprobado por el usuario · no romper enlaces ni pruebas existentes.
 - 2026-11-12 · F09C · El historial de la moto lo sirve `taller` a través de `motocicletas.application.HistorialMotocicleta`, aprobado por el usuario · `taller` depende de `motocicletas`; consultarlo al revés crearía un ciclo.
 - 2026-11-12 · F09C · `GET /motocicletas/{id}/historial` pasa a `PageResponse` con orden fijo (fecha de ingreso descendente; ignora `sort`) · el prompt pide paginado y ordenado.

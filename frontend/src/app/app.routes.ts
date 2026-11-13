@@ -129,6 +129,21 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'auditoria',
+        canMatch: [permisoGuard('AUDITORIA_VER')],
+        data: { miga: 'menu.auditoria' },
+        loadChildren: () =>
+          import('./features/auditoria/auditoria.routes').then((m) => m.AUDITORIA_ROUTES),
+      },
+      {
+        path: 'notificaciones',
+        data: { miga: 'notificaciones.titulo' },
+        loadChildren: () =>
+          import('./features/notificaciones/notificaciones.routes').then(
+            (m) => m.NOTIFICACIONES_ROUTES,
+          ),
+      },
+      {
         path: 'perfil',
         data: { miga: 'menu.perfil' },
         loadChildren: () => import('./features/perfil/perfil.routes').then((m) => m.PERFIL_ROUTES),

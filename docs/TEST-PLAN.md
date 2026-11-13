@@ -190,10 +190,10 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 ### Notificaciones, auditoría, reportes y dashboard (F10–F11)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
-| CP-52 | RF30 | Cambio de estado notifica en tiempo real | I (SSE), E | La campana se actualiza sin recargar en < 2 s | Pendiente |
-| CP-53 | RF30, RN-45 | Orden finalizada envía correo solo a cliente con autorización | I | Correo recibido solo cuando corresponde | Pendiente |
-| CP-54 | RF30 | Fallo del SMTP no revierte la operación | I | La orden cambia de estado; el error queda en log | Pendiente |
-| CP-55 | RF31, RN-51 | Auditoría de una anulación de venta | I | Registro con usuario, acción, entidad, IP y fecha | Pendiente |
+| CP-52 | RF30 | Cambio de estado notifica en tiempo real | I (SSE), E | La campana se actualiza sin recargar en < 2 s | Aprobado (F10: `NotificacionesIT` lee el evento SSE en < 2 s; E2E con dos navegadores, el vendedor asigna y al mecánico le llega sin recargar; además: rollback no notifica, ticket de un solo uso que vence a los 30 s, notificaciones ajenas → 404) |
+| CP-53 | RF30, RN-45 | Orden finalizada envía correo solo a cliente con autorización | I | Correo recibido solo cuando corresponde | Aprobado (F10: `CorreosClientesIT` con GreenMail; sin autorización no llega ningún correo; snapshots de las plantillas en `PlantillasCorreoTest`) |
+| CP-54 | RF30 | Fallo del SMTP no revierte la operación | I | La orden cambia de estado; el error queda en log | Aprobado (F10: `FalloCorreoIT`, 3 intentos con espera creciente y error con `requestId`, sin el destinatario) |
+| CP-55 | RF31, RN-51 | Auditoría de una anulación de venta | I | Registro con usuario, acción, entidad, IP y fecha | Aprobado (F10: `AuditoriaIT` vía `GET /auditoria/entidad/venta/{id}`, con motivo en el detalle; solo con `AUDITORIA_VER`) |
 | CP-56 | RF32 | Reporte de servicios por rango y mecánico | I | Totales correctos | Pendiente |
 | CP-57 | RF33 | Reporte de inventario con stock bajo | I | Lista correcta y exportable a CSV | Pendiente |
 | CP-58 | RF34 | KPIs del dashboard con datos semilla | I | Valores coinciden con consulta manual | Pendiente |

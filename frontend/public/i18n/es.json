@@ -56,7 +56,8 @@
     "perfil": "Mi perfil",
     "dev_ui": "Kit de interfaz",
     "ordenes_corto": "Órdenes",
-    "mis_ordenes": "Mis órdenes"
+    "mis_ordenes": "Mis órdenes",
+    "auditoria": "Auditoría"
   },
   "layout": {
     "saltar_contenido": "Saltar al contenido",
@@ -1258,6 +1259,99 @@
       "dias": "{{n}} d",
       "registrar_pago": "Registrar pago",
       "accion": "Acción"
+    }
+  },
+  "notificaciones": {
+    "titulo": "Notificaciones",
+    "subtitulo": "Lo que pasó en el taller y te concierne",
+    "marcar_todas": "Marcar todas como leídas",
+    "ver_todas": "Ver todas",
+    "no_leida": "No leída",
+    "campana_con": "Notificaciones, {{n}} sin leer",
+    "filtro": "Filtrar notificaciones",
+    "filtros": {
+      "todas": "Todas",
+      "no_leidas": "No leídas"
+    },
+    "vacio_no_leidas": "No tienes notificaciones sin leer",
+    "error": "No se pudieron cargar las notificaciones",
+    "tipos": {
+      "ORDEN_CREADA": {
+        "titulo": "Nueva orden {{numero}}",
+        "mensaje": "Se recibió la moto {{placa}}."
+      },
+      "MECANICO_ASIGNADO": {
+        "titulo": "Te asignaron la orden {{numero}}",
+        "mensaje": "Moto {{placa}}."
+      },
+      "ESTADO_ORDEN_CAMBIADO": {
+        "titulo": "Orden {{numero}}: {{estado}}",
+        "mensaje": "La moto {{placa}} pasó a {{estado}}."
+      },
+      "PRESUPUESTO_ENVIADO": {
+        "titulo": "Presupuesto {{presupuesto}} enviado",
+        "mensaje": "Orden {{numero}} · moto {{placa}}: espera la decisión del cliente."
+      },
+      "PRESUPUESTO_APROBADO": {
+        "titulo": "Presupuesto {{presupuesto}} aprobado",
+        "mensaje": "Orden {{numero}} · moto {{placa}}: puedes iniciar la reparación."
+      },
+      "PRESUPUESTO_RECHAZADO": {
+        "titulo": "Presupuesto {{presupuesto}} rechazado",
+        "mensaje": "Orden {{numero}} · moto {{placa}}: la orden se canceló."
+      },
+      "ORDEN_FINALIZADA": {
+        "titulo": "Orden {{numero}} lista",
+        "mensaje": "La moto {{placa}} está lista para cobrar y entregar."
+      },
+      "ORDEN_ENTREGADA": {
+        "titulo": "Orden {{numero}} entregada",
+        "mensaje": "La moto {{placa}} se entregó al cliente."
+      },
+      "STOCK_BAJO": {
+        "titulo": "Stock bajo: {{codigo}}",
+        "mensaje": "{{nombre}} quedó con {{disponible}} disponibles."
+      },
+      "VENTA_ANULADA": {
+        "titulo": "Venta {{numero}} anulada",
+        "mensaje": "El stock de sus productos volvió al inventario."
+      }
+    }
+  },
+  "auditoria": {
+    "titulo": "Auditoría",
+    "subtitulo": "Quién hizo qué y cuándo en el sistema",
+    "campos": {
+      "fecha": "Fecha",
+      "usuario": "Usuario",
+      "accion": "Acción",
+      "entidad": "Registro",
+      "ip": "IP"
+    },
+    "todos_usuarios": "Todos los usuarios",
+    "todas_entidades": "Todos los registros",
+    "sistema": "Sistema",
+    "detalle": "Detalle",
+    "sin_detalle": "Esta acción no guarda detalle.",
+    "error": "No se pudo cargar la auditoría",
+    "vacio_titulo": "Sin registros de auditoría",
+    "vacio_texto": "Prueba con otros filtros.",
+    "de_registro": "Historia de {{entidad}} #{{id}}",
+    "ver_todo": "Ver toda la auditoría",
+    "ver_registro": "Ver auditoría",
+    "entidades": {
+      "orden_trabajo": "Orden de trabajo",
+      "presupuesto": "Presupuesto",
+      "venta": "Venta",
+      "compra": "Compra",
+      "producto": "Producto",
+      "categoria": "Categoría",
+      "cliente": "Cliente",
+      "motocicleta": "Motocicleta",
+      "proveedor": "Proveedor",
+      "servicio": "Servicio",
+      "usuario": "Usuario",
+      "notificacion": "Notificación"
     }
   }
 }

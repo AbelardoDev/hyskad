@@ -19,7 +19,7 @@
 | F09A | Órdenes: creación, asignación, estados y diagnóstico | ✅ Terminada | #15 | Diagrama de estados en ARCHITECTURE §6.2 (verificado por `DiagramaEstadosTest`); capturas en `docs/capturas/f09a` |
 | F09B | Órdenes: servicios, repuestos y presupuestos | ✅ Terminada | #16 | Presupuesto imprimible en `/presupuestos/:id`; capturas en `docs/capturas/f09b` |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
-| F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #PR | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
+| F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #23 | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ⬜ Pendiente | | |
 | F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ⬜ Pendiente | | |
 | F13 | Despliegue en VPS | ⬜ Pendiente | | |
@@ -28,7 +28,7 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F10 ✅ (cerrada 2026-11-12, PR #PR)
+- **Fase:** F10 ✅ (cerrada 2026-11-12, PR #23)
 - **Rama:** `feature/f10-notificaciones` → `main`
 - **Hecho:** migración V10 (`notificacion` con claves de i18n, parámetros JSON y enlace). Módulo `notificaciones`: `NotificacionListener` (AFTER_COMMIT + `@Async`) para todos los eventos de BUSINESS-RULES §9 (destinatarios por rol, asignación o creador; nunca el autor ni inactivos), `NotificacionService` (guarda y empuja tras el commit) y `StreamNotificaciones` (ticket de un solo uso de 30 s, varias pestañas por usuario, latido de 25 s, cierre al cambiar el acceso). Endpoints de lista, conteo, marcar leída(s), ticket y stream. Correos: `CorreoService` con layout (logo CID a 240 px, pie del taller vía `PieCorreo`), versión en texto plano, 2 reintentos con espera creciente; plantillas `orden-recibida`, `presupuesto-pendiente`, `orden-lista`, `orden-entregada` y `recuperacion-password` en el nuevo layout; `CorreoClientesListener` respeta RN-45. Auditoría: `GET /auditoria` y `/auditoria/entidad/{entidad}/{id}` (`AUDITORIA_VER`); RN-51 ya estaba cubierta, se agregó motivo y total a las anulaciones. Frontend: `core/realtime` (`NotificacionesStreamService` con reconexión exponencial hasta 30 s, campana con contador y punto cian, panel con las últimas 10, toast solo con la pestaña visible), páginas Notificaciones y Auditoría (filtros, panel clave → valor, historia de un registro), enlaces "Ver auditoría" en orden, venta y usuario. Nginx e2e sin búfer para el stream. Pruebas: backend 229 unitarias y 240 IT; frontend 280 unitarias; 83 E2E + axe (las nuevas, estables en 3 repeticiones). Capturas en `docs/capturas/f10/` (campana clara/oscura, toast, notificaciones en móvil y correo en Mailpit escritorio/móvil).
 - **Siguiente paso concreto:** iniciar F11 con `/fase F11` (reportes, dashboard, búsqueda global y configuración; la edición de la configuración debe auditarse, RN-51).

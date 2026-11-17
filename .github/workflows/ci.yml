@@ -123,6 +123,10 @@ jobs:
           E2E_MAILPIT_URL: http://localhost:8026
         run: npx playwright test $PROYECTOS
 
+      # OWASP A09: el log de toda la corrida no debe tener tokens, contraseñas ni datos personales
+      - name: Revisar datos sensibles en el log del backend
+        run: bash infra/scripts/revisar-logs.sh backend-e2e.log
+
       - name: Reporte de Playwright y log del backend
         if: failure()
         uses: actions/upload-artifact@v7

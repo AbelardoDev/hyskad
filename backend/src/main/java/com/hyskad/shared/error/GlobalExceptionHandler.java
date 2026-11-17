@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +23,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -30,6 +30,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -136,6 +137,22 @@ public class GlobalExceptionHandler {
     ResponseEntity<ProblemDetail> propiedadDeOrden(PropertyReferenceException ex, HttpServletRequest request) {
         ProblemDetail problema = problema(ErrorCode.PARAMETRO_INVALIDO,
                 "No se puede ordenar por '" + ex.getPropertyName() + "'", request);
+        problema.setProperty("errors", List.of(new ErrorCampo("sort", "TIPO_INVALIDO")));
+        return responder(problema, ex);
+    }
+
+    /**
+     * Spring Data rechaza un {@code ?sort=} que no es una propiedad simple (p. ej. con SQL) antes de
+     * armar la consulta: es un parámetro inválido del cliente, no un error interno (F12, CP-61).
+     * Cualquier otro uso indebido de la API de datos sigue siendo un error del servidor.
+     */
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    ResponseEntity<ProblemDetail> usoInvalidoDeDatos(InvalidDataAccessApiUsageException ex,
+            HttpServletRequest request) {
+        if (ex.getMessage() == null || !ex.getMessage().startsWith("Sort expression")) {
+            return inesperado(ex, request);
+        }
+        ProblemDetail problema = problema(ErrorCode.PARAMETRO_INVALIDO, "El orden pedido no es válido", request);
         problema.setProperty("errors", List.of(new ErrorCampo("sort", "TIPO_INVALIDO")));
         return responder(problema, ex);
     }

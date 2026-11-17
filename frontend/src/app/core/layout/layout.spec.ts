@@ -259,14 +259,14 @@ describe('HkShell', () => {
     expect(TestBed.inject(Router).url).toBe('/login');
   });
 
-  it('Ctrl+K abre el buscador global (placeholder)', async () => {
+  it('Ctrl+K abre la paleta de comandos', async () => {
     const { fixture } = await montar(1440);
 
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }));
     await fixture.whenStable();
 
-    expect(document.querySelector('hk-busqueda-proximamente')?.textContent).toContain(
-      'La búsqueda global llega pronto',
-    );
+    const paleta = document.querySelector('hk-command-palette')!;
+    expect(paleta.querySelector('[role="combobox"]')).not.toBeNull();
+    expect(paleta.textContent).toContain('Acciones rápidas');
   });
 });

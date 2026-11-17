@@ -70,8 +70,6 @@
     "migas": "Ruta de navegación",
     "buscar": "Buscar…",
     "buscar_etiqueta": "Buscar clientes, placas, órdenes o productos",
-    "buscar_proximamente": "La búsqueda global llega pronto",
-    "buscar_proximamente_texto": "Podrás encontrar clientes, motos por placa, órdenes, productos y acciones rápidas desde aquí, con Ctrl + K.",
     "idioma": "Idioma",
     "tema": "Tema",
     "tema_system": "Sistema",
@@ -1446,5 +1444,31 @@
     "sin_stock_critico": "Todo el inventario está sobre el mínimo",
     "minimo": "mín. {{n}}",
     "ir_mis_ordenes": "Ir a mis órdenes"
+  },
+  "paleta": {
+    "titulo": "Buscar o ir a…",
+    "placeholder": "Busca una placa, cliente, orden, producto o acción",
+    "tipos": {
+      "motocicletas": "Motocicletas",
+      "ordenes": "Órdenes",
+      "clientes": "Clientes",
+      "productos": "Productos",
+      "ventas": "Ventas"
+    },
+    "acciones": {
+      "titulo": "Acciones rápidas",
+      "nueva_venta": "Nueva venta",
+      "recibir_moto": "Recibir moto",
+      "nuevo_cliente": "Nuevo cliente",
+      "tema_oscuro": "Cambiar a tema oscuro",
+      "tema_claro": "Cambiar a tema claro"
+    },
+    "paginas": "Ir a",
+    "disponible": "Disponible: {{n}}",
+    "sin_resultados": "Sin resultados para «{{q}}»",
+    "minimo": "Escribe al menos {{n}} caracteres para buscar",
+    "error": "No se pudo buscar. Inténtalo de nuevo.",
+    "navegar": "navegar",
+    "abrir": "abrir"
   }
 }

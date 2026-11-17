@@ -70,8 +70,6 @@
     "migas": "Breadcrumb",
     "buscar": "Search…",
     "buscar_etiqueta": "Search customers, plates, orders or products",
-    "buscar_proximamente": "Global search is coming soon",
-    "buscar_proximamente_texto": "You will be able to find customers, motorcycles by plate, orders, products and quick actions from here, with Ctrl + K.",
     "idioma": "Language",
     "tema": "Theme",
     "tema_system": "System",
@@ -1446,5 +1444,31 @@
     "sin_stock_critico": "All inventory is above minimum",
     "minimo": "min. {{n}}",
     "ir_mis_ordenes": "Go to my orders"
+  },
+  "paleta": {
+    "titulo": "Search or go to…",
+    "placeholder": "Search a plate, customer, order, product or action",
+    "tipos": {
+      "motocicletas": "Motorcycles",
+      "ordenes": "Orders",
+      "clientes": "Customers",
+      "productos": "Products",
+      "ventas": "Sales"
+    },
+    "acciones": {
+      "titulo": "Quick actions",
+      "nueva_venta": "New sale",
+      "recibir_moto": "Receive motorcycle",
+      "nuevo_cliente": "New customer",
+      "tema_oscuro": "Switch to dark theme",
+      "tema_claro": "Switch to light theme"
+    },
+    "paginas": "Go to",
+    "disponible": "Available: {{n}}",
+    "sin_resultados": "No results for “{{q}}”",
+    "minimo": "Type at least {{n}} characters to search",
+    "error": "Search failed. Please try again.",
+    "navegar": "navigate",
+    "abrir": "open"
   }
 }

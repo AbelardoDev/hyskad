@@ -12,7 +12,7 @@ import { AuthService } from '../auth/auth.service';
 import { IDIOMAS, LanguageService } from '../i18n/language.service';
 import { HkCampanaNotificaciones } from '../realtime/campana';
 import { PreferenciaTema, ThemeService } from '../theme/theme.service';
-import { BusquedaProximamente } from './busqueda-proximamente';
+import { HkCommandPalette } from './command-palette';
 import { LayoutService } from './layout.service';
 import { MigasService } from './migas.service';
 
@@ -223,7 +223,7 @@ export class HkTopbar {
     if (this.busquedaAbierta) return;
     this.busquedaAbierta = true;
     this.dialogos
-      .abrirModal(BusquedaProximamente, { tamano: 'lg' })
+      .abrirModal(HkCommandPalette, { tamano: 'lg' })
       .closed.subscribe(() => (this.busquedaAbierta = false));
   }
 

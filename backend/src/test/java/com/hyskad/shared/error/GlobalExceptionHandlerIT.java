@@ -151,6 +151,11 @@ class GlobalExceptionHandlerIT {
             r.andExpect(content().string(not(containsString("detalle interno"))));
         }
 
+        @Test
+        void unClienteDesconectadoNoRecibeNiRegistraUnError() throws Exception {
+            mvc.perform(get(BASE + "/cliente-desconectado")).andExpect(content().string(""));
+        }
+
         // CP-74
         @Test
         void reutilizaElRequestIdRecibido() throws Exception {

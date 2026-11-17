@@ -26,7 +26,7 @@ class HyskadApplicationTests {
                 "select count(*) from flyway_schema_history where version is null", Integer.class);
 
         assertThat(fallidas).isZero();
-        assertThat(version).isEqualTo("11");
+        assertThat(version).isEqualTo("12");
         assertThat(repetibles).as("los datos de dev no se cargan fuera del perfil dev").isZero();
         assertThat(jdbc.queryForList("select tipo from consecutivo order by tipo", String.class))
                 .containsExactly("COMPRA", "OT", "PRESUPUESTO", "VENTA");

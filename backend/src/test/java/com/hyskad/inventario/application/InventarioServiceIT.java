@@ -90,6 +90,7 @@ class InventarioServiceIT {
                 + "and usuario_id is null and fecha is not null", Integer.class, p.getId())).isEqualTo(2);
     }
 
+    // CP-97
     @Test
     void reservarYConsumirBajaElStockConUnSoloMovimientoSalidaOrden() {
         Producto p = catalogo.producto("0");
@@ -119,6 +120,7 @@ class InventarioServiceIT {
         assertThat(contarMovimientos(p.getId())).isEqualTo(1);
     }
 
+    // CP-100
     @Test
     void devolucionDeVentaEntraAlCostoDeLaVentaYAnulacionDeCompraSaleAlPromedio() {
         Producto p = catalogo.producto("0");
@@ -177,6 +179,7 @@ class InventarioServiceIT {
                 .isEqualTo(ErrorCode.RECURSO_NO_ENCONTRADO);
     }
 
+    // CP-98
     @Test
     void productoInactivoSeRechazaEnCualquierMovimiento() {
         Producto p = catalogo.producto("0");
@@ -228,6 +231,7 @@ class InventarioServiceIT {
         assertThat(eventos.stream(StockBajoDetectado.class)).hasSize(2);
     }
 
+    // CP-96
     @Test
     void veinteReservasSimultaneasSobreStock10DejanExactamenteDiez() throws Exception {
         Producto p = catalogo.producto("0");

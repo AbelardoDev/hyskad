@@ -21,7 +21,7 @@
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #23 | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ✅ Terminada | #25 | `hk-chart` y `hk-command-palette` en el kit; impresión siempre en claro; capturas en `docs/capturas/f11` |
-| F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ⬜ Pendiente | | |
+| F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | 🟦 En curso | | |
 | F13 | Despliegue en VPS | ⬜ Pendiente | | |
 
 Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada

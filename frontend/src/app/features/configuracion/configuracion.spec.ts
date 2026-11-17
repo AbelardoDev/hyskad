@@ -60,6 +60,7 @@ async function montar() {
   return { fixture, http, el, campo, escribir, guardar };
 }
 
+// CP-136
 describe('ConfiguracionPage', () => {
   it('carga los datos por secciones con el NIT y su DV, y no deja guardar sin cambios', async () => {
     const m = await montar();

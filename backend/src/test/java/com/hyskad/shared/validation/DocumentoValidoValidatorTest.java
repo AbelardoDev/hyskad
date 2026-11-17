@@ -16,6 +16,7 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
 /** CP-15 (parte unitaria): documentos de RN-38 y DV del NIT de RN-39. */
+// CP-72
 class DocumentoValidoValidatorTest {
 
     @DocumentoValido

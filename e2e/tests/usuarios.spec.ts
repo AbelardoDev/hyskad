@@ -9,6 +9,7 @@ test.describe('administración de usuarios', () => {
     yo = await nuevaSesion(page, 'ADMIN');
   });
 
+  // CP-85
   test('crea un usuario en el drawer, lo encuentra y lo desactiva con confirmación', async ({ page }) => {
     const email = `e2e-ui-${Date.now()}@hyskad.test`;
     await page.goto('/usuarios');
@@ -44,6 +45,7 @@ test.describe('administración de usuarios', () => {
     await expect(fila).toContainText('Inactivo');
   });
 
+  // CP-85
   test('filtra por rol y no permite cambiar los propios permisos', async ({ page }) => {
     await page.goto('/usuarios');
     await page.getByRole('combobox', { name: 'Rol' }).selectOption('MECANICO');

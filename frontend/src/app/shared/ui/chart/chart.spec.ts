@@ -52,6 +52,7 @@ afterEach(() => {
   document.documentElement.classList.remove('dark');
 });
 
+// CP-134
 describe('HkChart', () => {
   it('toma los colores de los tokens y se vuelve a dibujar al cambiar el tema', async () => {
     raiz.setProperty('--primary', '#1d58e0');

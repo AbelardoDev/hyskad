@@ -18,6 +18,7 @@ import {
   vinValido,
 } from './validadores';
 
+// CP-72
 describe('política de contraseñas (espejo de @PasswordSegura)', () => {
   it.each([
     ['Clave123', null],

@@ -105,6 +105,7 @@ class ItemsPresupuestosIT {
                 .containsExactly("ORDEN_REPUESTO_AGREGADO", "ORDEN_REPUESTO_AGREGADO", "ORDEN_REPUESTO_QUITADO");
     }
 
+    // CP-122
     @Test
     void cambiarLaCantidadAjustaLaReservaPorLaDiferencia() throws Exception {
         Producto p = conStock("10");
@@ -119,6 +120,7 @@ class ItemsPresupuestosIT {
         }
     }
 
+    // CP-124
     @Test
     void sinDisponibleNoSeAgregaNadaYUnProductoReservadoNoSeDesactiva() throws Exception {
         Producto p = conStock("3");
@@ -137,6 +139,7 @@ class ItemsPresupuestosIT {
                 .andExpect(jsonPath("$.code").value("RESERVA_PENDIENTE"));
     }
 
+    // CP-125
     @Test
     void cp41LosItemsSoloCambianEnDiagnosticoYElMecanicoNoAsignadoNoLosToca() throws Exception {
         Producto p = conStock("5");
@@ -224,6 +227,7 @@ class ItemsPresupuestosIT {
         assertThat(eventos.stream(PresupuestoEnviado.class)).hasSize(2);
     }
 
+    // CP-126
     @Test
     void cp43ElPresupuestoAprobadoPasaLaOrdenAReparacionYSuTotalEsElDeLaOrden() throws Exception {
         Producto p = conStock("10");
@@ -260,6 +264,7 @@ class ItemsPresupuestosIT {
         assertThat(catalogo.obtener(a.getId()).getStockActual()).isEqualByComparingTo("5");
     }
 
+    // CP-123
     @Test
     void cancelarUnaOrdenConTresRepuestosLiberaTodasLasReservasYReemplazaElPresupuesto() throws Exception {
         Producto a = conStock("5");
@@ -302,6 +307,7 @@ class ItemsPresupuestosIT {
                 .satisfies(e -> assertThat(e.total()).isEqualByComparingTo(total));
     }
 
+    // CP-127
     @Test
     void siUnRepuestoNoPuedeSalirAlFinalizarNoSaleNinguno() throws Exception {
         Producto a = conStock("10");

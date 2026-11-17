@@ -4,6 +4,7 @@ import { crearClienteConMoto, placaUnica } from './support/datos';
 import { crearUsuario, entrar, nuevaSesion } from './support/sesion';
 
 test.describe('órdenes de trabajo', () => {
+  // CP-118
   test('recepción completa → asignar mecánico → el mecánico ve solo su orden y registra el diagnóstico', async ({
     page,
     browser,
@@ -84,6 +85,7 @@ test.describe('órdenes de trabajo', () => {
     await contexto.close();
   });
 
+  // CP-119
   test('el tablero cambia a kanban y conserva los filtros en la URL', async ({ page }) => {
     const placa = placaUnica();
     const cliente = await crearClienteConMoto(`Kanban ${placa}`, placa);

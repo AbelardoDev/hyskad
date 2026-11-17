@@ -56,6 +56,7 @@ async function montar() {
   return { fixture, el, a: fixture.componentInstance };
 }
 
+// CP-79
 describe('siguienteOrden', () => {
   it('rota asc → desc → sin orden y reinicia al cambiar de columna', () => {
     expect(siguienteOrden(null, 'nombre')).toEqual({ columna: 'nombre', direccion: 'asc' });

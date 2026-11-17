@@ -30,6 +30,7 @@ import jakarta.persistence.Entity;
  * Reglas de ARCHITECTURE.md §2, escritas por patrón de paquete para que apliquen solas a cada
  * módulo nuevo ({@code com.hyskad.<modulo>.web|application|domain|persistence}).
  */
+// CP-73
 @AnalyzeClasses(packages = "com.hyskad", importOptions = ImportOption.DoNotIncludeTests.class)
 class ArquitecturaTest {
 

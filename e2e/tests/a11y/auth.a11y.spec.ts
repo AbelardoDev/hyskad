@@ -17,6 +17,7 @@ for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad de acceso y usuarios en tema ${tema}`, () => {
     test.use({ colorScheme: tema });
 
+    // CP-87
     test('/login con errores visibles', async ({ page }) => {
       await page.goto('/login');
       await page.getByRole('button', { name: 'Entrar' }).click();
@@ -24,6 +25,7 @@ for (const tema of ['light', 'dark'] as const) {
       await sinViolacionesGraves(page);
     });
 
+    // CP-87
     test('/usuarios con el drawer de nuevo usuario', async ({ page }) => {
       await nuevaSesion(page);
       await page.goto('/usuarios');
@@ -35,6 +37,7 @@ for (const tema of ['light', 'dark'] as const) {
       await sinViolacionesGraves(page);
     });
 
+    // CP-87
     test('/usuarios/:id/permisos', async ({ page }) => {
       await nuevaSesion(page);
       await page.goto('/usuarios/3/permisos');

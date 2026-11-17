@@ -15,6 +15,7 @@ class HyskadApplicationTests {
     @Autowired
     private JdbcTemplate jdbc;
 
+    // CP-69
     @Test
     void migracionesAplicadasYEsquemaValido() {
         Integer fallidas = jdbc.queryForObject(

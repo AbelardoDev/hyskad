@@ -4,6 +4,7 @@ import { calcularTotales, subtotalLinea } from './dinero';
  * Los mismos casos fijos de `CalculadoraTotalesTest.casosFijosCompartidosConElFrontend` del
  * backend: el total que ve el vendedor antes de cobrar debe ser idéntico al que se guarda.
  */
+// CP-78
 describe('calcularTotales: casos fijos compartidos con el backend (RN-04, RN-05)', () => {
   const casos: [string, number, number, number, number, number][] = [
     ['1×10000', 0, 19, 10000, 1900, 11900],

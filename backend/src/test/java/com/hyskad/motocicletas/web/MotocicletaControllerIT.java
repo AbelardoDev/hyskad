@@ -99,6 +99,7 @@ class MotocicletaControllerIT {
                 .andExpect(status().isForbidden());
     }
 
+    // CP-88
     @Test
     void mecanicoConsultaMotosYSuHistorial() throws Exception {
         long id = crearMoto(cliente, Identificadores.placa());
@@ -198,6 +199,7 @@ class MotocicletaControllerIT {
                 .isEqualTo("[\"modelo\", \"anio\", \"color\"]");
     }
 
+    // CP-93
     @Test
     void noSeAsignaAUnClienteInactivoNiInexistente() throws Exception {
         long inactivo = crearCliente("Inactivo");
@@ -215,6 +217,7 @@ class MotocicletaControllerIT {
                 .andExpect(jsonPath("$.code").value("CLIENTE_INACTIVO"));
     }
 
+    // CP-89
     @Test
     void cambiaElPropietarioConservandoLaMotoYAudita() throws Exception {
         long id = crearMoto(cliente, Identificadores.placa());
@@ -236,6 +239,7 @@ class MotocicletaControllerIT {
                 .containsEntry("nuevo", String.valueOf(nuevo));
     }
 
+    // CP-90
     @Test
     void buscaPorPlacaParcialEscritaEnMinusculasYConGuion() throws Exception {
         String placa = Identificadores.placa();

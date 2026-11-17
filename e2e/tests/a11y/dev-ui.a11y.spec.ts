@@ -15,6 +15,7 @@ for (const tema of ['light', 'dark'] as const) {
     test.use({ colorScheme: tema });
 
     for (const ruta of ['/dev/ui', '/clientes']) {
+      // CP-81
       test(`${ruta} sin violaciones serias ni críticas (WCAG 2.1 AA)`, async ({ page }) => {
         await page.goto(ruta);
         await expect(page.getByRole('heading', { level: 1 })).toBeVisible();

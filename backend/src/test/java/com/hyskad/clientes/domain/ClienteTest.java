@@ -33,6 +33,7 @@ class ClienteTest {
         assertThat(cliente.getNombreCompleto()).isEqualTo("Ana Pérez");
     }
 
+    // CP-91
     @Test
     void laFechaDeAutorizacionSeConservaHastaQueSeRetira() {
         Cliente cliente = new Cliente(datos(TipoDocumento.CC, true, null), AYER);

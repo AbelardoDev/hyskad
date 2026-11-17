@@ -30,6 +30,7 @@ const producto = (id: number, nombre: string, precio: number, disponible: number
   createdAt: '2026-10-30T00:00:00Z',
 });
 
+// CP-110
 describe('reglas del punto de venta', () => {
   it('no deja vender más de lo disponible (RN-19)', () => {
     expect(hastaDisponible(3)(new FormControl('3'))).toBeNull();
@@ -43,6 +44,7 @@ describe('reglas del punto de venta', () => {
   });
 });
 
+// CP-111
 describe('PuntoVentaPage', () => {
   async function montar() {
     TestBed.configureTestingModule({

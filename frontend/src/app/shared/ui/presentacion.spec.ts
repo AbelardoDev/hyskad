@@ -18,6 +18,7 @@ async function crear<T>(tipo: new () => T) {
   return { fixture, el: fixture.nativeElement as HTMLElement };
 }
 
+// CP-79
 describe('HkBadge y HkStatusBadge', () => {
   @Component({
     imports: [HkBadge, HkStatusBadge],

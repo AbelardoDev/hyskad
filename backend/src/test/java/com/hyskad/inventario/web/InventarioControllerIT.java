@@ -59,6 +59,7 @@ class InventarioControllerIT {
         producto = catalogo.producto("2");
     }
 
+    // CP-101
     @Test
     void ajusteDeEntradaRegistraElMovimientoConElUsuarioYActualizaElStock() throws Exception {
         mvc.perform(comoAlmacen(post(AJUSTES)).content(ajuste("ENTRADA", "12.5", "8000", "Inventario inicial")))
@@ -126,6 +127,7 @@ class InventarioControllerIT {
                 .andExpect(jsonPath("$.totalElements").value(0));
     }
 
+    // CP-102
     @Test
     void exportaCsvParaExcelSinFormulasInyectadas() throws Exception {
         mvc.perform(comoAlmacen(post(AJUSTES)).content(ajuste("ENTRADA", "4", "1500", "=HYPERLINK(\\\"x\\\") prueba")));

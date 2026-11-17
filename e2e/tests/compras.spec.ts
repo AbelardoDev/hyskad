@@ -11,6 +11,7 @@ async function elegirProducto(page: Page, fila: number, nombre: string) {
 }
 
 test.describe('compras a proveedores', () => {
+  // CP-107
   test('registra una compra de 2 productos y el stock y el costo promedio quedan en la ficha', async ({
     page,
   }) => {
@@ -56,6 +57,7 @@ test.describe('compras a proveedores', () => {
     await expect(page.locator('dl > div').filter({ hasText: 'Costo promedio' })).toContainText('$ 2.500');
   });
 
+  // CP-105, CP-108
   test('anula una compra con motivo y avisa si el costo se aleja del promedio', async ({ page }) => {
     const sufijo = Date.now().toString(36).toUpperCase();
     const producto = await crearProducto(`Pastilla E2E ${sufijo}`);

@@ -1,3 +1,4 @@
+// CP-77
 // Falla si es.json y en.json no tienen exactamente las mismas claves, en la raíz y en cada scope.
 // Uso: npm run i18n:check
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';

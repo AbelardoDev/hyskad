@@ -140,6 +140,7 @@ class VentaControllerIT {
                 .isEqualTo(vendedor.id());
     }
 
+    // CP-110
     @Test
     void elClienteNoPuedeEnviarPrecios() throws Exception {
         Producto p = conStock("3", "1000");
@@ -260,6 +261,7 @@ class VentaControllerIT {
                 .content(venta(p.getId(), "1"))).andExpect(status().isForbidden());
     }
 
+    // CP-111
     @Test
     void validaPagoDescuentoClienteEItems() throws Exception {
         Producto p = conStock("3", "1000");
@@ -313,6 +315,7 @@ class VentaControllerIT {
                 .andExpect(jsonPath("$.leyenda").value("Documento interno. No es factura electrónica."));
     }
 
+    // CP-113
     @Test
     void listaYResumenConFiltros() throws Exception {
         Producto p = conStock("10", "1000");

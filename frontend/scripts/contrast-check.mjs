@@ -1,3 +1,4 @@
+// CP-75
 // Verifica que los pares texto/fondo del sistema de diseño cumplen WCAG 2.1 AA en claro y oscuro.
 // Lee los tokens directamente de src/styles.css para que no haya una segunda fuente de verdad.
 // Uso: npm run contrast:check

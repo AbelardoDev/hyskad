@@ -66,6 +66,7 @@ class CalculadoraTotalesTest {
                 .isEqualTo(d("237.00"));
     }
 
+    // CP-95
     @Test
     void lineasConCantidadesFraccionariasConservanCentavos() {
         assertThat(CalculadoraTotales.subtotalLinea(d("2.5"), d("17500.33"))).isEqualTo(d("43750.83"));

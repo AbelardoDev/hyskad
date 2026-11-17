@@ -18,6 +18,7 @@ test.describe('shell en escritorio', () => {
     await expect(page.getByRole('heading', { level: 1, name: /^Hola, / })).toBeVisible();
   });
 
+  // CP-80
   test('navega por el sidebar y lo colapsa recordando el estado', async ({ page }) => {
     await page.goto('/dashboard');
     const sidebar = page.getByRole('navigation', { name: 'Navegación principal' });
@@ -47,6 +48,7 @@ test.describe('shell en escritorio', () => {
 test.describe('shell en móvil (375 px)', () => {
   test.use({ viewport: { width: 375, height: 812 }, hasTouch: true });
 
+  // CP-80
   test('navega con el drawer y con la barra inferior, sin scroll horizontal', async ({ page }) => {
     await page.goto('/dashboard');
     await expect(page.locator('aside')).toBeHidden();

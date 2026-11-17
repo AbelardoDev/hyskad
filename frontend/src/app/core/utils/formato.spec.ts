@@ -8,6 +8,7 @@ import { CopPipe, TiempoRelativoPipe } from './formato.pipes';
 /** Normaliza los espacios duros que usa Intl para comparar textos. */
 const plano = (texto: string) => texto.replace(/\s/g, ' ');
 
+// CP-78
 describe('formatoCop', () => {
   it('formatea pesos sin decimales con separador de miles de la locale', () => {
     expect(plano(formatoCop(1250000, 'es-CO'))).toBe('$ 1.250.000');
@@ -35,6 +36,7 @@ describe('formatoCop', () => {
   });
 });
 
+// CP-78
 describe('tiempoRelativo', () => {
   const ahora = Date.UTC(2026, 9, 29, 12, 0, 0);
 

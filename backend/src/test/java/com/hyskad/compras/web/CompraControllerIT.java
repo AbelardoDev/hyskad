@@ -100,6 +100,7 @@ class CompraControllerIT {
                 + "and detalle->>'$.numero' = ?", Integer.class, numero)).isEqualTo(1);
     }
 
+    // CP-104
     @Test
     void unProductoInactivoEntreVariosDa400YNoCambiaNada() throws Exception {
         Producto bueno = catalogo.producto("0");
@@ -121,6 +122,7 @@ class CompraControllerIT {
                 Integer.class, bueno.getId())).isZero();
     }
 
+    // CP-106
     @Test
     void validaItemsRepetidosOInexistentesFechaFuturaYCantidades() throws Exception {
         Producto p = catalogo.producto("0");
@@ -144,6 +146,7 @@ class CompraControllerIT {
                 .andExpect(jsonPath("$.errors[0].campo").value("items"));
     }
 
+    // CP-106
     @Test
     void proveedorInactivoYFacturaRepetidaMientrasNoSeAnule() throws Exception {
         Producto p = catalogo.producto("0");
@@ -164,6 +167,7 @@ class CompraControllerIT {
                 .andExpect(jsonPath("$.code").value("PROVEEDOR_INACTIVO"));
     }
 
+    // CP-105
     @Test
     void anularSacaElStockSinCambiarElCostoYNoSeAnulaDosVeces() throws Exception {
         Producto p = catalogo.producto("0");

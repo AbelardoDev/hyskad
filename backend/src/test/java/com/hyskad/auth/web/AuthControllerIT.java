@@ -101,6 +101,7 @@ class AuthControllerIT {
     }
 
     /** Dos dispositivos del mismo usuario entrando a la vez no deben bloquearse mutuamente (deadlock). */
+    // CP-86
     @Test
     void loginsSimultaneosDelMismoUsuarioResponden200() throws Exception {
         Creado vendedor = usuarios.crear(Rol.VENDEDOR);

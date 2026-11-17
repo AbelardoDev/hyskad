@@ -102,6 +102,7 @@ class EstadoOrdenTest {
         }
     }
 
+    // CP-115
     @Test
     void laCreacionQuedaEnElHistorialSinEstadoAnterior() {
         OrdenTrabajo orden = nueva();

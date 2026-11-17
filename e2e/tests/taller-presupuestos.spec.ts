@@ -39,6 +39,7 @@ async function ordenEnDiagnostico(): Promise<{ id: number; placa: string }> {
 }
 
 test.describe('ítems y presupuestos de la orden', () => {
+  // CP-128
   test('1 servicio y 2 repuestos → enviar presupuesto → aprobar → finalizar → stock descontado en inventario', async ({
     page,
   }) => {
@@ -112,6 +113,7 @@ test.describe('ítems y presupuestos de la orden', () => {
     }
   });
 
+  // CP-129
   test('el presupuesto se imprime con la leyenda y vuelve a la orden', async ({ page }) => {
     const orden = await ordenEnDiagnostico();
     const { api, token } = await apiComoAdmin();

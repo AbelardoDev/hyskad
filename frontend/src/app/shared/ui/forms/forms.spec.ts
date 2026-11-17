@@ -75,6 +75,7 @@ async function montar() {
   return { fixture, el, q, form: fixture.componentInstance.form, escribir };
 }
 
+// CP-79
 describe('errorCampo', () => {
   it('traduce validadores de Angular a validacion.* y códigos del servidor a errors.*', () => {
     expect(errorCampo(null)).toBeNull();

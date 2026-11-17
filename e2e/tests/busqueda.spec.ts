@@ -12,6 +12,8 @@ test.describe('paleta de comandos', () => {
     const { motoId } = await crearClienteConMoto(`Paleta ${placa}`, placa);
     await nuevaSesion(page);
     await page.goto('/dashboard');
+    // El atajo lo escucha la topbar: se espera a que el shell esté listo
+    await expect(page.getByRole('heading', { level: 1, name: /^Hola, / })).toBeVisible();
 
     await page.keyboard.press('Control+k');
     const paleta = page.getByRole('dialog', { name: 'Buscar o ir a…' });

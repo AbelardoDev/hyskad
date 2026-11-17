@@ -42,6 +42,8 @@ test.describe('ítems y presupuestos de la orden', () => {
   test('1 servicio y 2 repuestos → enviar presupuesto → aprobar → finalizar → stock descontado en inventario', async ({
     page,
   }) => {
+    // Flujo completo de la orden hasta el inventario: con la suite en paralelo pasa de 30 s
+    test.slow();
     const sufijo = Date.now().toString(36).toUpperCase();
     const pastillas = await crearProducto(`Pastillas E2E ${sufijo}`);
     const cadena = await crearProducto(`Kit cadena E2E ${sufijo}`);

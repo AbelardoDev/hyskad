@@ -74,6 +74,8 @@ for (const tema of ['light', 'dark'] as const) {
     });
 
     test('pago y entrega, comprobante, cuentas pendientes e historial de la moto', async ({ page }) => {
+      // Recorre cuatro pantallas con axe en cada una: con la suite en paralelo pasa de 30 s
+      test.slow();
       const orden = await ordenFinalizadaPorApi();
       await nuevaSesion(page, 'VENDEDOR');
       await page.goto('/reportes/cuentas-pendientes');

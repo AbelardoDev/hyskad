@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-import { cargarStock, crearProducto, stockDe } from './support/datos';
-import { nuevaSesion } from './support/sesion';
+import { cargarStock, crearProducto, stockDe } from '../support/datos';
+import { nuevaSesion } from '../support/sesion';
 
 test.describe('ventas de mostrador', () => {
   // CP-34

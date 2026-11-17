@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { crearUsuario, entrar, entrarPorFormulario, nuevaSesion } from './support/sesion';
+import { crearUsuario, entrar, entrarPorFormulario, nuevaSesion } from '../support/sesion';
 
 const MAILPIT = process.env['E2E_MAILPIT_URL'] ?? 'http://localhost:8026';
 
@@ -15,9 +15,11 @@ test.describe('sesión', () => {
 
     // Se captura el token de la respuesta del login (luego la app navega y el cuerpo ya no está).
     let accessToken = '';
+    let setCookie = '';
     await page.route('**/api/v1/auth/login', async (ruta) => {
       const respuesta = await ruta.fetch();
       accessToken = ((await respuesta.json()) as { accessToken: string }).accessToken;
+      setCookie = respuesta.headers()['set-cookie'] ?? '';
       await ruta.fulfill({ response: respuesta });
     });
     await entrarPorFormulario(page, usuario);
@@ -25,9 +27,12 @@ test.describe('sesión', () => {
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole('heading', { level: 1, name: /^Hola, / })).toBeVisible();
 
+    // Lo que manda el servidor (WebKit fuera de macOS no implementa SameSite y la reporta como None)
+    expect(setCookie).toMatch(/hk_refresh=[^;]+;.*HttpOnly/i);
+    expect(setCookie).toMatch(/SameSite=Strict/i);
+    expect(setCookie).toMatch(/Path=\/api\/v1\/auth/i);
     const refresh = (await context.cookies()).find((c) => c.name === 'hk_refresh');
     expect(refresh?.httpOnly).toBe(true);
-    expect(refresh?.sameSite).toBe('Strict');
 
     await page.reload();
     await expect(page.getByRole('heading', { level: 1, name: /^Hola, / })).toBeVisible();

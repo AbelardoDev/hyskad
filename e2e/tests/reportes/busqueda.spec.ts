@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-import { sinViolacionesGraves } from './support/axe';
-import { crearClienteConMoto, placaUnica } from './support/datos';
-import { nuevaSesion } from './support/sesion';
+import { sinViolacionesGraves } from '../support/axe';
+import { crearClienteConMoto, placaUnica } from '../support/datos';
+import { nuevaSesion } from '../support/sesion';
 
 test.describe('paleta de comandos', () => {
   test.use({ viewport: { width: 1440, height: 900 } });

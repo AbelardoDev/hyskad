@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-import { crearClienteConMoto, dvNit, nitUnico, placaUnica } from './support/datos';
-import { nuevaSesion } from './support/sesion';
+import { crearClienteConMoto, dvNit, nitUnico, placaUnica } from '../support/datos';
+import { nuevaSesion } from '../support/sesion';
 
 test.describe('clientes y motocicletas', () => {
   // CP-90, CP-92

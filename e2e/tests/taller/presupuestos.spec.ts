@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-import { cargarStock, crearClienteConMoto, crearProducto, placaUnica } from './support/datos';
-import { apiComoAdmin, crearUsuario, nuevaSesion } from './support/sesion';
+import { cargarStock, crearClienteConMoto, crearProducto, placaUnica } from '../support/datos';
+import { apiComoAdmin, crearUsuario, nuevaSesion } from '../support/sesion';
 
 /** Orden recibida por la API, con un mecánico, en diagnóstico y con el diagnóstico registrado. */
 async function ordenEnDiagnostico(): Promise<{ id: number; placa: string }> {

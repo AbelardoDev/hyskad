@@ -1,7 +1,7 @@
 import { expect, Page, test } from '@playwright/test';
 
-import { crearProducto } from './support/datos';
-import { nuevaSesion } from './support/sesion';
+import { crearProducto } from '../support/datos';
+import { nuevaSesion } from '../support/sesion';
 
 const PROVEEDOR = 'Lubricantes y Filtros de Colombia S.A.';
 

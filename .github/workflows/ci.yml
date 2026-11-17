@@ -64,7 +64,11 @@ jobs:
   e2e:
     name: e2e
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # En cada PR solo Chromium (escritorio y teléfono); en push a main, los tres motores (CP-65)
+    timeout-minutes: ${{ github.event_name == 'push' && 75 || 30 }}
+    env:
+      NAVEGADORES: ${{ github.event_name == 'push' && 'chromium firefox webkit' || 'chromium' }}
+      PROYECTOS: ${{ github.event_name == 'push' && '--project=chromium --project=firefox --project=webkit --project=movil-chromium --project=movil-webkit' || '--project=chromium --project=movil-chromium' }}
     steps:
       - uses: actions/checkout@v7
 
@@ -106,19 +110,18 @@ jobs:
           cat backend-e2e.log
           exit 1
 
-      - name: Instalar Playwright (Chromium)
+      - name: Instalar Playwright (${{ env.NAVEGADORES }})
         working-directory: e2e
         run: |
           npm ci
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps $NAVEGADORES
 
-      # Los tres navegadores se corren en F12; aquí solo Chromium.
       - name: Pruebas E2E y accesibilidad
         working-directory: e2e
         env:
           E2E_BASE_URL: http://localhost:4300
           E2E_MAILPIT_URL: http://localhost:8026
-        run: npx playwright test --project=chromium
+        run: npx playwright test $PROYECTOS
 
       - name: Reporte de Playwright y log del backend
         if: failure()

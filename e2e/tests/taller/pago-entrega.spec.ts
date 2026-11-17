@@ -1,8 +1,8 @@
 import { Browser, expect, Page, test } from '@playwright/test';
 
-import { crearClienteConMoto, placaUnica } from './support/datos';
-import { nuevaOrdenAsignada, ordenFinalizadaPorApi } from './support/ordenes';
-import { crearUsuario, entrar, UsuarioE2e } from './support/sesion';
+import { crearClienteConMoto, placaUnica } from '../support/datos';
+import { nuevaOrdenAsignada, ordenFinalizadaPorApi } from '../support/ordenes';
+import { crearUsuario, entrar, UsuarioE2e } from '../support/sesion';
 
 const MOVIL = { width: 375, height: 812 };
 

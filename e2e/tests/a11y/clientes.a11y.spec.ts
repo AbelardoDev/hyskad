@@ -11,7 +11,9 @@ for (const tema of ['light', 'dark'] as const) {
     // CP-94
     test('/clientes con el drawer de nuevo cliente', async ({ page }) => {
       await nuevaSesion(page, 'VENDEDOR');
+      // Se busca el cliente semilla: las demás pruebas crean muchos clientes que llenan la página
       await page.goto('/clientes');
+      await page.getByRole('searchbox').fill('Mensajería');
       await expect(page.getByRole('table')).toContainText('Mensajería Rápida del Sinú');
       await sinViolacionesGraves(page);
 

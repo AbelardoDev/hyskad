@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { nuevaSesion, UsuarioE2e } from './support/sesion';
+import { nuevaSesion, UsuarioE2e } from '../support/sesion';
 
 test.describe('administración de usuarios', () => {
   let yo: UsuarioE2e;
@@ -69,7 +69,7 @@ test.describe('administración de usuarios', () => {
     await expect(page.getByRole('switch', { name: 'Gestionar usuarios y permisos' })).toBeDisabled();
   });
 
-  test.describe('en móvil (375 px)', () => {
+  test.describe('en móvil (375 px) @movil', () => {
     test.use({ viewport: { width: 375, height: 812 }, hasTouch: true });
 
     test('la acción principal flota sobre la barra inferior y la tabla pasa a tarjetas', async ({ page }) => {

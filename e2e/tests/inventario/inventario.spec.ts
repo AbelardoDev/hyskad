@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { nuevaSesion } from './support/sesion';
+import { nuevaSesion } from '../support/sesion';
 
 const unico = () => `${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`.toUpperCase();
 

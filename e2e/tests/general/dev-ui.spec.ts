@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { nuevaSesion } from './support/sesion';
+import { nuevaSesion } from '../support/sesion';
 
 // El shell exige sesión: cada prueba entra con un admin propio (cambiar idioma lo guarda en su cuenta).
 test.beforeEach(async ({ page }) => {

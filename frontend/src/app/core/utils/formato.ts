@@ -123,3 +123,9 @@ export function formatoFecha(
 export function hoyEnBogota(ahora = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Bogota' }).format(ahora);
 }
+
+/** `aaaa-mm-dd` de hace `dias - 1` días respecto a `hasta` (el periodo incluye ese día). */
+export function desdeParaPeriodo(hasta: string, dias: number): string {
+  const [a, m, d] = hasta.split('-').map(Number);
+  return new Date(Date.UTC(a, m - 1, d - (dias - 1))).toISOString().slice(0, 10);
+}

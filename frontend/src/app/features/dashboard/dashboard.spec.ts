@@ -8,7 +8,8 @@ import { iniciarSesionDePrueba } from '../../core/auth/sesion-de-prueba';
 import { UsuarioSesion } from '../../core/auth/auth.models';
 import { CREAR_GRAFICA } from '../../shared/ui/chart/chart';
 import { Dashboard } from './dashboard-api.service';
-import { DashboardPage, desdeParaPeriodo } from './dashboard-page';
+import { desdeParaPeriodo } from '../../core/utils/formato';
+import { DashboardPage } from './dashboard-page';
 
 const API = '/api/v1/dashboard';
 

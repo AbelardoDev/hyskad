@@ -23,14 +23,14 @@ test.describe('sesión', () => {
     await entrarPorFormulario(page, usuario);
 
     await expect(page).toHaveURL(/\/dashboard$/);
-    await expect(page.getByRole('heading', { level: 1, name: 'Inicio' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /^Hola, / })).toBeVisible();
 
     const refresh = (await context.cookies()).find((c) => c.name === 'hk_refresh');
     expect(refresh?.httpOnly).toBe(true);
     expect(refresh?.sameSite).toBe('Strict');
 
     await page.reload();
-    await expect(page.getByRole('heading', { level: 1, name: 'Inicio' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /^Hola, / })).toBeVisible();
     await expect(page).toHaveURL(/\/dashboard$/);
 
     const almacenado = await page.evaluate(() =>

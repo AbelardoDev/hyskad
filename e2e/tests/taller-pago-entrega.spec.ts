@@ -154,9 +154,12 @@ test.describe('pago, entrega y vista del mecánico', () => {
     const cajero = await crearUsuario('VENDEDOR');
     const caja = await sesionAparte(browser, cajero);
 
+    // El vendedor entra a reportes por su primera pestaña (servicios) y cambia a cuentas pendientes
     await caja.goto('/reportes');
+    await expect(caja).toHaveURL(/\/reportes\/servicios$/);
+    await caja.getByRole('tab', { name: 'Cuentas pendientes' }).click();
     await expect(caja).toHaveURL(/\/reportes\/cuentas-pendientes$/);
-    await expect(caja.getByRole('heading', { level: 1, name: 'Cuentas pendientes' })).toBeVisible();
+    await expect(caja.getByRole('tab', { name: 'Cuentas pendientes' })).toHaveAttribute('aria-selected', 'true');
     const fila = caja.getByRole('row').filter({ hasText: orden.numero });
     await expect(fila).toContainText('0 d');
     await expect(fila).toContainText('$ 119.000');
@@ -171,7 +174,7 @@ test.describe('pago, entrega y vista del mecánico', () => {
     await expect(caja.getByText('Pagado en Transferencia')).toBeVisible();
 
     await caja.goto('/reportes/cuentas-pendientes');
-    await expect(caja.getByRole('heading', { level: 1, name: 'Cuentas pendientes' })).toBeVisible();
+    await expect(caja.getByRole('tab', { name: 'Cuentas pendientes' })).toHaveAttribute('aria-selected', 'true');
     await expect(caja.getByRole('row').filter({ hasText: orden.numero })).toHaveCount(0);
     await caja.context().close();
   });

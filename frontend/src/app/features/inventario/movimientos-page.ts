@@ -6,6 +6,7 @@ import { LucideDynamicIcon } from '@lucide/angular';
 import { finalize } from 'rxjs';
 
 import { erroresManejados } from '../../core/http/contexto-http';
+import { descargarArchivo } from '../../core/utils/descarga';
 import { CantidadPipe, CopPipe, FechaPipe } from '../../core/utils/formato.pipes';
 import { HkButton } from '../../shared/ui/button/button';
 import { HkCard } from '../../shared/ui/card/card';
@@ -282,13 +283,6 @@ export class MovimientosPage {
     this.api
       .exportarMovimientos(this.filtros())
       .pipe(finalize(() => this.exportando.set(false)))
-      .subscribe((csv) => {
-        const url = URL.createObjectURL(csv);
-        const enlace = document.createElement('a');
-        enlace.href = url;
-        enlace.download = 'movimientos-inventario.csv';
-        enlace.click();
-        URL.revokeObjectURL(url);
-      });
+      .subscribe((csv) => descargarArchivo(csv, 'movimientos-inventario.csv'));
   }
 }

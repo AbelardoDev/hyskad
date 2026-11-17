@@ -8,7 +8,12 @@ import { AuthService } from '../../core/auth/auth.service';
 import { erroresManejados } from '../../core/http/contexto-http';
 import { LanguageService } from '../../core/i18n/language.service';
 import { contadorAnimado } from '../../core/utils/contador';
-import { formatoCantidad, formatoCop, hoyEnBogota } from '../../core/utils/formato';
+import {
+  desdeParaPeriodo,
+  formatoCantidad,
+  formatoCop,
+  hoyEnBogota,
+} from '../../core/utils/formato';
 import { CantidadPipe, TiempoRelativoPipe } from '../../core/utils/formato.pipes';
 import { EstadoOrden, HkStatusBadge } from '../../shared/ui/badge/status-badge';
 import { HkButton } from '../../shared/ui/button/button';
@@ -43,13 +48,6 @@ const ORDEN_ESTADOS: readonly EstadoOrden[] = [
   'ENTREGADA',
   'CANCELADA',
 ];
-
-/** `aaaa-mm-dd` de hace `dias - 1` días respecto a `hasta` (el periodo incluye hoy). */
-export function desdeParaPeriodo(hasta: string, dias: number): string {
-  const [a, m, d] = hasta.split('-').map(Number);
-  const fecha = new Date(Date.UTC(a, m - 1, d - (dias - 1)));
-  return fecha.toISOString().slice(0, 10);
-}
 
 /**
  * Panel de control (RF34, DESIGN-SYSTEM §7): saludo, KPIs con contadores animados, ingresos de los

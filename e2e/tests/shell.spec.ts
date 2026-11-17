@@ -15,7 +15,7 @@ test.describe('shell en escritorio', () => {
 
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page).toHaveTitle('Inicio · HYSKAD');
-    await expect(page.getByRole('heading', { level: 1, name: 'Inicio' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /^Hola, / })).toBeVisible();
   });
 
   test('navega por el sidebar y lo colapsa recordando el estado', async ({ page }) => {

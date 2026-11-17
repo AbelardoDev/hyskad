@@ -13,6 +13,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.EntityManagerFactory;
+
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +74,9 @@ class ItemsPresupuestosIT {
     @Autowired
     private ApplicationEvents eventos;
 
+    @Autowired
+    private EntityManagerFactory emf;
+
     private String admin;
     private String vendedor;
     private UsuariosDePrueba.Creado mecanico;
@@ -103,6 +110,25 @@ class ItemsPresupuestosIT {
         assertThat(jdbc.queryForList("select accion from auditoria where entidad = 'orden_trabajo' and entidad_id = ? "
                 + "and accion like 'ORDEN_REPUESTO%' order by id", String.class, id(orden)))
                 .containsExactly("ORDEN_REPUESTO_AGREGADO", "ORDEN_REPUESTO_AGREGADO", "ORDEN_REPUESTO_QUITADO");
+    }
+
+    // CP-59: el detalle no hace una consulta por repuesto (antes: 89 sentencias con 80 repuestos)
+    @Test
+    void elDetalleDeUnaOrdenNoHaceUnaConsultaPorRepuesto() throws Exception {
+        JsonNode orden = ordenEnDiagnostico();
+        for (int i = 0; i < 10; i++) {
+            orden = repuesto(orden, conStock("10"), "1", vendedor);
+        }
+        Statistics estadisticas = emf.unwrap(SessionFactory.class).getStatistics();
+        estadisticas.setStatisticsEnabled(true);
+        estadisticas.clear();
+        try {
+            assertThat(obtener(orden, vendedor).get("repuestos")).hasSize(10);
+            // Con N+1 serían unas 18 (una por producto); con carga por lotes, una para todos
+            assertThat(estadisticas.getPrepareStatementCount()).isLessThanOrEqualTo(12);
+        } finally {
+            estadisticas.setStatisticsEnabled(false);
+        }
     }
 
     // CP-122

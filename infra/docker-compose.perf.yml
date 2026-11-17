@@ -1,0 +1,36 @@
+# Infraestructura de las pruebas de rendimiento (F12, CP-59 y CP-60): MySQL 8.4 con volumen propio
+# (los 12 meses de datos se cargan una vez) y Mailpit. El backend corre con el perfil `perf`.
+# Pasos completos en infra/k6/README.md.
+#   docker compose -f infra/docker-compose.perf.yml up -d --wait
+name: hyskad-perf
+
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: hyskad_perf
+      MYSQL_USER: hyskad
+      MYSQL_PASSWORD: hyskad_perf
+      MYSQL_ROOT_PASSWORD: root_perf
+      TZ: UTC
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
+    ports:
+      - "127.0.0.1:3308:3306"
+    volumes:
+      - mysql-perf:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -proot_perf --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:1027:1025"
+
+volumes:
+  mysql-perf:

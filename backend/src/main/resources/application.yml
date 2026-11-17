@@ -18,6 +18,9 @@ spring:
           time_zone: UTC
         type:
           preferred_instant_jdbc_type: TIMESTAMP
+        # Las relaciones diferidas de una misma sesión se cargan en lotes con IN (...) en vez de una
+        # consulta por fila (F12: el detalle de una orden con 80 repuestos hacía 82 consultas de producto).
+        default_batch_fetch_size: 50
   flyway:
     enabled: true
     locations: classpath:db/migration

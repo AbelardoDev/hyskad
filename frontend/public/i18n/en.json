@@ -70,8 +70,6 @@
     "migas": "Breadcrumb",
     "buscar": "Search…",
     "buscar_etiqueta": "Search customers, plates, orders or products",
-    "buscar_proximamente": "Global search is coming soon",
-    "buscar_proximamente_texto": "You will be able to find customers, motorcycles by plate, orders, products and quick actions from here, with Ctrl + K.",
     "idioma": "Language",
     "tema": "Theme",
     "tema_system": "System",
@@ -1242,6 +1240,67 @@
     }
   },
   "reportes": {
+    "titulo": "Reports",
+    "subtitulo": "Workshop, inventory and sales results by period",
+    "pestanas": {
+      "servicios": "Services",
+      "inventario": "Inventory",
+      "ventas": "Sales",
+      "cuentas-pendientes": "Outstanding balances"
+    },
+    "desde": "From",
+    "hasta": "To",
+    "exportar_csv": "Export CSV",
+    "imprimir": "Print",
+    "periodo_impreso": "Period: {{desde}} to {{hasta}}",
+    "error": "We couldn't generate the report",
+    "sin_datos": "No results in this period",
+    "sin_datos_texto": "Try another date range or clear the filters.",
+    "detalle": "Detail",
+    "resumen": "Summary",
+    "horas": "{{n}} h",
+    "servicios": {
+      "servicio": "Service",
+      "todos_servicios": "All services",
+      "mecanico": "Mechanic",
+      "todos_mecanicos": "All mechanics",
+      "ordenes": "Completed orders",
+      "n_servicios": "Services performed: {{n}}",
+      "mano_obra": "Labor",
+      "repuestos": "Parts",
+      "tiempo_promedio": "Average time in shop",
+      "detalle": "Order detail",
+      "mecanicos": "Mechanics",
+      "en_taller": "In shop"
+    },
+    "inventario": {
+      "nivel": "Stock level",
+      "todos_niveles": "All levels",
+      "valor": "Inventory value",
+      "productos": "Products",
+      "n_unidades": "Units: {{n}}",
+      "movimientos": "Movements in period",
+      "sin_movimientos": "No movements in this period",
+      "tipo": "Type",
+      "n_movimientos": "{{n}} mov. · {{unidades}} units",
+      "cantidad_movimientos": "Movements",
+      "existencias": "Valued stock",
+      "producto": "Product",
+      "existencias_col": "On hand",
+      "disponible": "Available / min.",
+      "costo_promedio": "Average cost",
+      "valor_col": "Value"
+    },
+    "ventas": {
+      "todos_vendedores": "All sellers",
+      "total": "Total sold",
+      "costo": "Cost",
+      "utilidad": "Gross profit",
+      "margen": "Margin",
+      "por_dia": "Sales per day",
+      "por_metodo": "By payment method",
+      "detalle": "Sales detail"
+    },
     "cuentas": {
       "titulo": "Accounts receivable",
       "subtitulo": "Finished orders that have not been paid yet",
@@ -1353,5 +1412,94 @@
       "usuario": "User",
       "notificacion": "Notification"
     }
+  },
+  "dashboard": {
+    "saludo": "Hi, {{nombre}}",
+    "periodo": "Period",
+    "ultimos_dias": "Last {{n}} days",
+    "error": "We couldn't load the dashboard",
+    "indicadores": "Indicators",
+    "kpis": {
+      "ventas_hoy": "Today's sales",
+      "ingresos_ordenes": "Orders delivered today",
+      "activas": "Active orders",
+      "pendientes": "Awaiting approval",
+      "por_cobrar": "Finished, not yet paid",
+      "stock_bajo": "Low-stock products",
+      "finalizadas_mes": "Finished this month"
+    },
+    "n_ventas": "Count: {{n}}",
+    "ingresos": "Daily revenue",
+    "dia": "Day",
+    "serie_ventas": "Sales",
+    "serie_ordenes": "Orders",
+    "por_estado": "Orders by status",
+    "ordenes": "Orders",
+    "sin_ordenes": "No orders in this period",
+    "ultimas": "Latest orders",
+    "top_servicios": "Top services",
+    "top_repuestos": "Top parts",
+    "cantidad": "Quantity",
+    "stock_critico": "Critical stock",
+    "sin_stock_critico": "All inventory is above minimum",
+    "minimo": "min. {{n}}",
+    "ir_mis_ordenes": "Go to my orders",
+    "sin_ingresos": "No revenue in this period"
+  },
+  "paleta": {
+    "titulo": "Search or go to…",
+    "placeholder": "Search a plate, customer, order, product or action",
+    "tipos": {
+      "motocicletas": "Motorcycles",
+      "ordenes": "Orders",
+      "clientes": "Customers",
+      "productos": "Products",
+      "ventas": "Sales"
+    },
+    "acciones": {
+      "titulo": "Quick actions",
+      "nueva_venta": "New sale",
+      "recibir_moto": "Receive motorcycle",
+      "nuevo_cliente": "New customer",
+      "tema_oscuro": "Switch to dark theme",
+      "tema_claro": "Switch to light theme"
+    },
+    "paginas": "Go to",
+    "disponible": "Available: {{n}}",
+    "sin_resultados": "No results for “{{q}}”",
+    "minimo": "Type at least {{n}} characters to search",
+    "error": "Search failed. Please try again.",
+    "navegar": "navigate",
+    "abrir": "open",
+    "cerrar": "close"
+  },
+  "configuracion": {
+    "titulo": "Settings",
+    "subtitulo": "Shop details, taxes and privacy",
+    "guardar": "Save changes",
+    "guardada": "Settings saved",
+    "error": "We couldn't load the settings",
+    "secciones": {
+      "taller": "Shop",
+      "taller_texto": "Shown on receipts, quotes and emails.",
+      "impuestos": "Taxes",
+      "privacidad": "Privacy",
+      "privacidad_texto": "Text the customer accepts when registered (Colombian Law 1581 of 2012).",
+      "alertas": "Alerts"
+    },
+    "campos": {
+      "nombre": "Shop name",
+      "nit": "NIT (tax ID)",
+      "direccion": "Address",
+      "telefono": "Phone",
+      "email": "Email",
+      "iva": "VAT (%)",
+      "autorizacion": "Data processing authorization",
+      "alerta_stock": "Notify when a product reaches its minimum stock"
+    },
+    "nit_ayuda": "With or without the check digit (900123456-8).",
+    "nit_dv": "Check digit: {{dv}}",
+    "iva_ayuda": "Applies to new sales, purchases and quotes; existing ones keep their VAT.",
+    "alerta_stock_ayuda": "Notifies warehouse and administration."
   }
 }

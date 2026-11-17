@@ -1,7 +1,5 @@
 package com.hyskad.inventario.web;
 
-import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
@@ -15,6 +13,7 @@ import com.hyskad.catalogo.domain.Producto;
 import com.hyskad.inventario.domain.MovimientoInventario;
 import com.hyskad.inventario.web.dto.MovimientoResponse;
 import com.hyskad.shared.config.TiempoConfig;
+import com.hyskad.shared.web.Csv;
 import com.hyskad.usuarios.application.UsuarioService;
 
 /**
@@ -26,10 +25,6 @@ class MovimientosWeb {
 
     private static final DateTimeFormatter FECHA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
             .withZone(TiempoConfig.ZONA_NEGOCIO);
-    private static final String SEPARADOR = ";";
-    private static final String BOM = "﻿";
-    private static final List<String> ENCABEZADOS = List.of("fecha", "tipo", "codigo", "producto", "cantidad",
-            "costo_unitario", "stock_resultante", "referencia", "motivo", "usuario");
 
     private final UsuarioService usuarios;
 
@@ -48,23 +43,16 @@ class MovimientosWeb {
 
     byte[] csv(List<MovimientoInventario> movimientos) {
         Map<Long, String> nombres = nombresDe(movimientos);
-        StringBuilder csv = new StringBuilder(BOM).append(String.join(SEPARADOR, ENCABEZADOS)).append("\r\n");
+        Csv csv = Csv.con("fecha", "tipo", "codigo", "producto", "cantidad", "costo_unitario", "stock_resultante",
+                "referencia", "motivo", "usuario");
         for (MovimientoInventario m : movimientos) {
             Producto p = m.getProducto();
-            csv.append(String.join(SEPARADOR,
-                    FECHA.format(m.getFecha()),
-                    m.getTipo().name(),
-                    celda(p.getCodigo()),
-                    celda(p.getNombre()),
-                    numero(m.getCantidad()),
-                    numero(m.getCostoUnitario()),
-                    numero(m.getStockResultante()),
-                    celda(m.getReferenciaNumero()),
-                    celda(m.getMotivo()),
-                    celda(m.getUsuarioId() == null ? null : nombres.get(m.getUsuarioId()))))
-                    .append("\r\n");
+            csv.fila(FECHA.format(m.getFecha()), m.getTipo().name(), Csv.texto(p.getCodigo()), Csv.texto(p.getNombre()),
+                    Csv.numero(m.getCantidad()), Csv.numero(m.getCostoUnitario()), Csv.numero(m.getStockResultante()),
+                    Csv.texto(m.getReferenciaNumero()), Csv.texto(m.getMotivo()),
+                    Csv.texto(m.getUsuarioId() == null ? null : nombres.get(m.getUsuarioId())));
         }
-        return csv.toString().getBytes(StandardCharsets.UTF_8);
+        return csv.bytes();
     }
 
     private MovimientoResponse respuesta(MovimientoInventario m, Map<Long, String> nombres) {
@@ -85,19 +73,5 @@ class MovimientosWeb {
                 .collect(Collectors.toSet()));
     }
 
-    private static String numero(BigDecimal valor) {
-        return valor.stripTrailingZeros().toPlainString();
-    }
 
-    /**
-     * Texto entre comillas (duplicando las internas). Si empieza por {@code = + - @} se antepone un
-     * apóstrofo para que la hoja de cálculo no lo ejecute como fórmula (inyección CSV).
-     */
-    static String celda(String valor) {
-        if (valor == null) {
-            return "";
-        }
-        String seguro = valor.matches("^[=+\\-@\\t\\r].*") ? "'" + valor : valor;
-        return "\"" + seguro.replace("\"", "\"\"") + "\"";
-    }
 }

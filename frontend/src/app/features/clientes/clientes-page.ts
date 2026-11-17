@@ -1,9 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  effect,
+  inject,
+  input,
+  signal,
+  untracked,
+} from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { Router } from '@angular/router';
 import { translateSignal, TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LucideDynamicIcon } from '@lucide/angular';
 
+import { AuthService } from '../../core/auth/auth.service';
 import { HkTienePermisoDirective } from '../../core/auth/tiene-permiso.directive';
 import { erroresManejados } from '../../core/http/contexto-http';
 import { HkBadge } from '../../shared/ui/badge/badge';
@@ -151,6 +161,7 @@ export class ClientesPage {
   private readonly dialogos = inject(DialogosService);
   private readonly toast = inject(ToastService);
   private readonly transloco = inject(TranslocoService);
+  private readonly auth = inject(AuthService);
 
   protected readonly tamanoPagina = TAMANO_PAGINA;
   protected readonly filtros = signal<FiltrosClientes>({
@@ -160,6 +171,9 @@ export class ClientesPage {
     size: TAMANO_PAGINA,
     sort: 'nombreCompleto,asc',
   });
+
+  /** `?nuevo` abre el alta (acción rápida de la paleta de comandos) y se quita de la URL. */
+  readonly nuevo = input<string>();
 
   protected readonly clientes = rxResource({
     params: () => this.filtros(),
@@ -219,6 +233,16 @@ export class ClientesPage {
 
   protected verDetalle(cliente: ClienteResumen): void {
     void this.router.navigate(['/clientes', cliente.id]);
+  }
+
+  constructor() {
+    effect(() => {
+      if (this.nuevo() === undefined) return;
+      untracked(() => {
+        void this.router.navigate([], { queryParams: { nuevo: null }, replaceUrl: true });
+        if (this.auth.tienePermiso('CLIENTES_GESTIONAR')) this.abrirFormulario();
+      });
+    });
   }
 
   /** Registra un cliente y abre su ficha, desde donde se le agregan motos. */

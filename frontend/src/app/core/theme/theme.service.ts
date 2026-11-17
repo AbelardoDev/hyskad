@@ -33,8 +33,16 @@ export class ThemeService {
   constructor() {
     const alCambiarSistema = (e: MediaQueryListEvent) => this.sistemaOscuro.set(e.matches);
     this.consulta?.addEventListener('change', alCambiarSistema);
+    // Se imprime siempre en claro (reportes, listados): el papel es blanco
+    const ventana = this.document.defaultView;
+    const antesDeImprimir = () => this.document.documentElement.classList.remove('dark');
+    const despuesDeImprimir = () => this.aplicar(this.oscuro(), false);
+    ventana?.addEventListener('beforeprint', antesDeImprimir);
+    ventana?.addEventListener('afterprint', despuesDeImprimir);
     inject(DestroyRef).onDestroy(() => {
       this.consulta?.removeEventListener('change', alCambiarSistema);
+      ventana?.removeEventListener('beforeprint', antesDeImprimir);
+      ventana?.removeEventListener('afterprint', despuesDeImprimir);
       clearTimeout(this.temporizador);
     });
 

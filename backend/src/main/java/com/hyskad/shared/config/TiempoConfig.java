@@ -24,6 +24,14 @@ public class TiempoConfig {
     /** Zona del negocio: las fechas que escribe el usuario (fecha de factura, filtros) son de Colombia. */
     public static final ZoneId ZONA_NEGOCIO = ZoneId.of("America/Bogota");
 
+    /**
+     * RN-53 en SQL: día de calendario en Bogotá de una columna UTC. Colombia no tiene horario de
+     * verano, así que el desfase fijo evita depender de las tablas de zonas horarias de MySQL.
+     */
+    public static String diaNegocioSql(String columna) {
+        return "DATE(CONVERT_TZ(" + columna + ", '+00:00', '-05:00'))";
+    }
+
     @Bean
     Clock clock() {
         return Clock.systemUTC();

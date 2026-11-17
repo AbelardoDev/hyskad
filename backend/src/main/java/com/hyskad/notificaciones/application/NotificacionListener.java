@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionPhase;
 import org.springframework.transaction.event.TransactionalEventListener;
 
+import com.hyskad.configuracion.application.ConfiguracionService;
 import com.hyskad.inventario.domain.StockBajoDetectado;
 import com.hyskad.notificaciones.domain.TipoNotificacion;
 import com.hyskad.taller.application.OrdenParaAvisos;
@@ -39,12 +40,14 @@ public class NotificacionListener {
     private final NotificacionService notificaciones;
     private final OrdenTrabajoService ordenes;
     private final UsuarioService usuarios;
+    private final ConfiguracionService configuracion;
 
     public NotificacionListener(NotificacionService notificaciones, OrdenTrabajoService ordenes,
-            UsuarioService usuarios) {
+            UsuarioService usuarios, ConfiguracionService configuracion) {
         this.notificaciones = notificaciones;
         this.ordenes = ordenes;
         this.usuarios = usuarios;
+        this.configuracion = configuracion;
     }
 
     @Async
@@ -116,6 +119,10 @@ public class NotificacionListener {
     @Async
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void alDetectarStockBajo(StockBajoDetectado e) {
+        // RN-14: el administrador puede apagar la alerta desde la configuración del taller
+        if (!configuracion.isAlertaStockHabilitada()) {
+            return;
+        }
         avisar(TipoNotificacion.STOCK_BAJO, usuarios.idsActivosConRol(Rol.ALMACEN, Rol.ADMIN), null,
                 Map.of("codigo", e.codigo(), "nombre", e.nombre(), "disponible", e.stockDisponible().stripTrailingZeros()
                         .toPlainString()),

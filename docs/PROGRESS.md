@@ -20,13 +20,21 @@
 | F09B | Órdenes: servicios, repuestos y presupuestos | ✅ Terminada | #16 | Presupuesto imprimible en `/presupuestos/:id`; capturas en `docs/capturas/f09b` |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #23 | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
-| F11 | Reportes, dashboard, búsqueda global y configuración | ⬜ Pendiente | | |
+| F11 | Reportes, dashboard, búsqueda global y configuración | ✅ Terminada | #25 | `hk-chart` y `hk-command-palette` en el kit; impresión siempre en claro; capturas en `docs/capturas/f11` |
 | F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ⬜ Pendiente | | |
 | F13 | Despliegue en VPS | ⬜ Pendiente | | |
 
 Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
+
+- **Fase:** F11 ✅ (cerrada 2026-11-17, PR #25)
+- **Rama:** `feature/f11-reportes-dashboard` → `main`
+- **Hecho:** backend: `GET /dashboard` (KPIs según permisos, ingresos diarios con días de Bogotá, órdenes por estado, top de servicios y repuestos, últimas órdenes y stock crítico; el mecánico solo recibe sus órdenes por estado y sus finalizadas del mes), reportes de servicios, inventario y ventas con `?formato=csv` (`shared.web.Csv`: UTF-8 con BOM y `;`), `GET /busqueda` (5 por tipo con permisos y visibilidad), `GET/PUT /configuracion` auditado, V11 con claves e índices. La alerta de stock (`stock.alerta.habilitada`) ahora se respeta al notificar. Frontend: `hk-chart` (Chart.js con solo los controladores usados, colores de los tokens, redibujo al cambiar tema o idioma, COP en ejes y tooltip, tabla `sr-only`), dashboard con contadores animados y vista del mecánico, `/reportes` con pestañas por permiso (servicios, inventario, ventas, cuentas pendientes), filtros, KPIs, gráfica, tabla paginada en el cliente, Exportar CSV e Imprimir; `hk-command-palette` (`Ctrl/⌘+K` y buscador de la topbar, 250 ms, agrupada por tipo, acciones rápidas y páginas según permisos, combobox + listbox ARIA); `/configuracion` por secciones (Taller, Impuestos, Privacidad, Alertas); `?nuevo` abre el alta de cliente. Revisión visual: contador que no terminaba, ejes con decimales, desborde de la tabla `sr-only` en 375 px, gráficas vacías al imprimir, impresión en oscuro, paginación sin relleno. Pruebas: backend con `ReportesIT` (CP-56, CP-57, día en Bogotá, CSV, permisos), `DashboardIT` (CP-58), `BusquedaIT` (CP-20), `ConfiguracionEdicionIT` (incluida la alerta apagada); backend 227 unitarias y 252 IT (cobertura 95 %); frontend 315 unitarias; 89 E2E + axe (paleta estable en 3 repeticiones; `reportes.a11y.spec.ts` nueva). Capturas en `docs/capturas/f11/` (dashboard admin y mecánico en inglés, reportes, paleta, configuración e impresión; claro/oscuro; 375/768/1440).
+- **Siguiente paso concreto:** iniciar F12 con `/fase F12` (calidad: E2E, accesibilidad, rendimiento y seguridad).
+- **Bloqueos o dudas:** ninguno. Pendientes menores para F12: las gráficas no se redibujan con los colores claros al imprimir desde el tema oscuro (las líneas de la rejilla salen oscuras, legibles); cada inicio de sesión carga ahora el dashboard, así que medir `/dashboard` con k6 (dos flujos E2E largos ya necesitaron `test.slow()`).
+
+### Sesión anterior (F10)
 
 - **Fase:** F10 ✅ (cerrada 2026-11-12, PR #23)
 - **Rama:** `feature/f10-notificaciones` → `main`
@@ -78,6 +86,15 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-11-17 · F11 · Cada reporte exige `REPORTES_VER` más el permiso de su área (servicios: `PRESUPUESTOS_GESTIONAR`; inventario con costos: `PRODUCTOS_GESTIONAR`; ventas con utilidad: `VENTAS_ANULAR`; cuentas: `PAGOS_REGISTRAR`) y el frontend muestra solo esas pestañas; `/reportes` abre la primera permitida · ARCHITECTURE §5 da el alcance por rol y los permisos son la regla, no el nombre del rol.
+- 2026-11-17 · F11 · El detalle de los reportes llega completo (periodo máximo de un año) y se pagina en el cliente · el CSV y la impresión necesitan todo el resultado.
+- 2026-11-17 · F11 · Cuentas pendientes no tiene CSV (solo Imprimir) · el prompt pide CSV para los reportes nuevos; el endpoint de F09C es paginado.
+- 2026-11-17 · F11 · La configuración tiene una cuarta sección, Alertas, con el interruptor de stock bajo · el prompt pedía Taller, Impuestos y Privacidad; el umbral no encaja en ninguna.
+- 2026-11-17 · F11 · El filtro de vendedor del reporte de ventas solo aparece para quien gestiona usuarios · es el único que puede listarlos.
+- 2026-11-17 · F11 · La paleta incluye, además de las acciones del prompt, las páginas del menú que coinciden con lo escrito · mismo costo, sin backend.
+- 2026-11-17 · F11 · Las gráficas no se animan (los contadores de los KPIs sí) · con animación salían vacías al imprimir y en capturas; respeta también el movimiento reducido.
+- 2026-11-17 · F11 · Al imprimir se quita la clase `dark` (`beforeprint`/`afterprint` en `ThemeService`) · el papel es blanco y el texto claro desaparecía.
+- 2026-11-17 · F11 · `/reportes` ya no abre cuentas pendientes y el `h1` del inicio es el saludo; se ajustaron las E2E de F04B y F09C · cambio de diseño de la fase.
 - 2026-11-12 · F10 · Los destinatarios por rol siguen la tabla de BUSINESS-RULES §9 (VENDEDOR, ADMIN, ALMACEN) y nunca se notifica a quien hizo la acción ni a usuarios inactivos, aprobado por el usuario en el plan · la regla habla de roles; avisarse a uno mismo es ruido.
 - 2026-11-12 · F10 · Los streams SSE se cierran con `AccesoUsuarioModificado` (desactivar, cambiar rol o permisos), después del commit · ya existía para revocar sesiones; el cliente reconecta con un ticket nuevo si sigue activo.
 - 2026-11-12 · F10 · El registro de emisores y tickets SSE vive en memoria · hay una sola instancia del backend (F13); con varias haría falta un broker.

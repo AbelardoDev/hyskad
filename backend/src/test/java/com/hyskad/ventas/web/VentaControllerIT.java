@@ -132,8 +132,10 @@ class VentaControllerIT {
         assertThat(jdbc.queryForList("select concat_ws('|', precio_unitario, costo_unitario) from venta_detalle "
                 + "where venta_id = ? order by id", String.class, id))
                 .containsExactly("25000.00|15000.00", "25000.00|8000.00");
+        // Acotado a los productos de la prueba: otros IT registran salidas con ids de venta inventados
         assertThat(jdbc.queryForObject("select count(*) from movimiento_inventario where tipo = 'SALIDA_VENTA' "
-                + "and referencia_id = ?", Integer.class, id)).isEqualTo(2);
+                + "and referencia_id = ? and producto_id in (?, ?)", Integer.class, id, a.getId(), b.getId()))
+                .isEqualTo(2);
         assertThat(jdbc.queryForObject("select created_by from venta where id = ?", Long.class, id))
                 .isEqualTo(vendedor.id());
     }

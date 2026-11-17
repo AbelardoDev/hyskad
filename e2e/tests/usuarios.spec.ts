@@ -47,6 +47,8 @@ test.describe('administración de usuarios', () => {
   test('filtra por rol y no permite cambiar los propios permisos', async ({ page }) => {
     await page.goto('/usuarios');
     await page.getByRole('combobox', { name: 'Rol' }).selectOption('MECANICO');
+    // Solo los usuarios semilla: las demás pruebas crean muchos mecánicos "E2E…" que llenan la página
+    await page.getByRole('searchbox').fill('@hyskad.local');
 
     await expect(page.getByRole('list', { name: 'Filtros activos' })).toContainText('Mecánico');
     await expect(page.getByRole('table')).toContainText('mecanico@hyskad.local');

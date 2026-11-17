@@ -14,10 +14,10 @@ import { HkEmptyState } from '../../shared/ui/empty-state/empty-state';
 import { HkCombobox } from '../../shared/ui/forms/combobox';
 import { HkDateInput } from '../../shared/ui/forms/date-input';
 import { HkFormField } from '../../shared/ui/forms/form-field';
-import { HkPageHeader } from '../../shared/ui/page-header/page-header';
 import { HkPlaca } from '../../shared/ui/placa/placa';
 import { ColumnaTabla, HkCelda, HkTable } from '../../shared/ui/table/table';
 import { buscadorClientes } from '../clientes/buscador-clientes';
+import { HkAccionesReporte } from './base-reporte';
 import {
   CuentaPendiente,
   FiltrosCuentasPendientes,
@@ -51,17 +51,17 @@ export function tonoAntiguedad(dias: number): TonoBadge {
     HkDateInput,
     HkEmptyState,
     HkFormField,
-    HkPageHeader,
+    HkAccionesReporte,
     HkPlaca,
     HkStatCard,
     HkTable,
     HkCelda,
   ],
   template: `
-    <hk-page-header
-      [titulo]="'reportes.cuentas.titulo' | transloco"
-      [subtitulo]="'reportes.cuentas.subtitulo' | transloco"
-    />
+    <div class="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <p class="text-sm text-muted">{{ 'reportes.cuentas.subtitulo' | transloco }}</p>
+      <hk-acciones-reporte [exportable]="false" [listo]="cuentas.hasValue()" />
+    </div>
 
     <div class="mb-6 grid gap-4 sm:grid-cols-2">
       <hk-stat-card
@@ -77,7 +77,7 @@ export function tonoAntiguedad(dias: number): TonoBadge {
     </div>
 
     <hk-card>
-      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 print:hidden">
         <hk-form-field class="sm:col-span-2" [etiqueta]="'taller.campos.cliente' | transloco">
           <hk-combobox
             [valor]="filtros().clienteId?.toString() ?? null"

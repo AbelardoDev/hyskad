@@ -70,8 +70,6 @@
     "migas": "Ruta de navegación",
     "buscar": "Buscar…",
     "buscar_etiqueta": "Buscar clientes, placas, órdenes o productos",
-    "buscar_proximamente": "La búsqueda global llega pronto",
-    "buscar_proximamente_texto": "Podrás encontrar clientes, motos por placa, órdenes, productos y acciones rápidas desde aquí, con Ctrl + K.",
     "idioma": "Idioma",
     "tema": "Tema",
     "tema_system": "Sistema",
@@ -1242,6 +1240,67 @@
     }
   },
   "reportes": {
+    "titulo": "Reportes",
+    "subtitulo": "Resultados del taller, el inventario y las ventas por periodo",
+    "pestanas": {
+      "servicios": "Servicios",
+      "inventario": "Inventario",
+      "ventas": "Ventas",
+      "cuentas-pendientes": "Cuentas pendientes"
+    },
+    "desde": "Desde",
+    "hasta": "Hasta",
+    "exportar_csv": "Exportar CSV",
+    "imprimir": "Imprimir",
+    "periodo_impreso": "Periodo: del {{desde}} al {{hasta}}",
+    "error": "No se pudo generar el reporte",
+    "sin_datos": "Sin resultados en este periodo",
+    "sin_datos_texto": "Prueba con otro rango de fechas o quita los filtros.",
+    "detalle": "Detalle",
+    "resumen": "Resumen",
+    "horas": "{{n}} h",
+    "servicios": {
+      "servicio": "Servicio",
+      "todos_servicios": "Todos los servicios",
+      "mecanico": "Mecánico",
+      "todos_mecanicos": "Todos los mecánicos",
+      "ordenes": "Órdenes realizadas",
+      "n_servicios": "Servicios realizados: {{n}}",
+      "mano_obra": "Mano de obra",
+      "repuestos": "Repuestos",
+      "tiempo_promedio": "Tiempo promedio en taller",
+      "detalle": "Detalle de órdenes",
+      "mecanicos": "Mecánicos",
+      "en_taller": "En taller"
+    },
+    "inventario": {
+      "nivel": "Nivel de stock",
+      "todos_niveles": "Todos los niveles",
+      "valor": "Valor del inventario",
+      "productos": "Productos",
+      "n_unidades": "Unidades: {{n}}",
+      "movimientos": "Movimientos del periodo",
+      "sin_movimientos": "No hubo movimientos en este periodo",
+      "tipo": "Tipo",
+      "n_movimientos": "{{n}} mov. · {{unidades}} unid.",
+      "cantidad_movimientos": "Movimientos",
+      "existencias": "Existencias valorizadas",
+      "producto": "Producto",
+      "existencias_col": "Existencias",
+      "disponible": "Disponible / mín.",
+      "costo_promedio": "Costo promedio",
+      "valor_col": "Valor"
+    },
+    "ventas": {
+      "todos_vendedores": "Todos los vendedores",
+      "total": "Total vendido",
+      "costo": "Costo",
+      "utilidad": "Utilidad bruta",
+      "margen": "Margen",
+      "por_dia": "Ventas por día",
+      "por_metodo": "Por método de pago",
+      "detalle": "Detalle de ventas"
+    },
     "cuentas": {
       "titulo": "Cuentas pendientes",
       "subtitulo": "Órdenes finalizadas que aún no se han pagado",
@@ -1353,5 +1412,94 @@
       "usuario": "Usuario",
       "notificacion": "Notificación"
     }
+  },
+  "dashboard": {
+    "saludo": "Hola, {{nombre}}",
+    "periodo": "Periodo",
+    "ultimos_dias": "Últimos {{n}} días",
+    "error": "No pudimos cargar el panel",
+    "indicadores": "Indicadores",
+    "kpis": {
+      "ventas_hoy": "Ventas de hoy",
+      "ingresos_ordenes": "Órdenes entregadas hoy",
+      "activas": "Órdenes activas",
+      "pendientes": "Pendientes de aprobación",
+      "por_cobrar": "Finalizadas sin cobrar",
+      "stock_bajo": "Productos con stock bajo",
+      "finalizadas_mes": "Finalizadas este mes"
+    },
+    "n_ventas": "Cantidad: {{n}}",
+    "ingresos": "Ingresos diarios",
+    "dia": "Día",
+    "serie_ventas": "Ventas",
+    "serie_ordenes": "Órdenes",
+    "por_estado": "Órdenes por estado",
+    "ordenes": "Órdenes",
+    "sin_ordenes": "No hay órdenes en este periodo",
+    "ultimas": "Últimas órdenes",
+    "top_servicios": "Servicios más realizados",
+    "top_repuestos": "Repuestos más usados",
+    "cantidad": "Cantidad",
+    "stock_critico": "Stock crítico",
+    "sin_stock_critico": "Todo el inventario está sobre el mínimo",
+    "minimo": "mín. {{n}}",
+    "ir_mis_ordenes": "Ir a mis órdenes",
+    "sin_ingresos": "Sin ingresos en este periodo"
+  },
+  "paleta": {
+    "titulo": "Buscar o ir a…",
+    "placeholder": "Busca una placa, cliente, orden, producto o acción",
+    "tipos": {
+      "motocicletas": "Motocicletas",
+      "ordenes": "Órdenes",
+      "clientes": "Clientes",
+      "productos": "Productos",
+      "ventas": "Ventas"
+    },
+    "acciones": {
+      "titulo": "Acciones rápidas",
+      "nueva_venta": "Nueva venta",
+      "recibir_moto": "Recibir moto",
+      "nuevo_cliente": "Nuevo cliente",
+      "tema_oscuro": "Cambiar a tema oscuro",
+      "tema_claro": "Cambiar a tema claro"
+    },
+    "paginas": "Ir a",
+    "disponible": "Disponible: {{n}}",
+    "sin_resultados": "Sin resultados para «{{q}}»",
+    "minimo": "Escribe al menos {{n}} caracteres para buscar",
+    "error": "No se pudo buscar. Inténtalo de nuevo.",
+    "navegar": "navegar",
+    "abrir": "abrir",
+    "cerrar": "cerrar"
+  },
+  "configuracion": {
+    "titulo": "Configuración",
+    "subtitulo": "Datos del taller, impuestos y privacidad",
+    "guardar": "Guardar cambios",
+    "guardada": "Configuración guardada",
+    "error": "No se pudo cargar la configuración",
+    "secciones": {
+      "taller": "Taller",
+      "taller_texto": "Aparecen en comprobantes, presupuestos y correos.",
+      "impuestos": "Impuestos",
+      "privacidad": "Privacidad",
+      "privacidad_texto": "Texto que acepta el cliente al registrarse (Ley 1581 de 2012).",
+      "alertas": "Alertas"
+    },
+    "campos": {
+      "nombre": "Nombre del taller",
+      "nit": "NIT",
+      "direccion": "Dirección",
+      "telefono": "Teléfono",
+      "email": "Correo electrónico",
+      "iva": "IVA (%)",
+      "autorizacion": "Autorización de tratamiento de datos",
+      "alerta_stock": "Avisar cuando un producto llegue al stock mínimo"
+    },
+    "nit_ayuda": "Con o sin dígito de verificación (900123456-8).",
+    "nit_dv": "Dígito de verificación: {{dv}}",
+    "iva_ayuda": "Aplica a ventas, compras y presupuestos nuevos; los ya registrados conservan su IVA.",
+    "alerta_stock_ayuda": "Notifica a almacén y administración."
   }
 }

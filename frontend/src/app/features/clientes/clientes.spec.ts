@@ -1,11 +1,17 @@
 import { DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
+import { Component } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router, RouterOutlet, withComponentInputBinding } from '@angular/router';
+import { of } from 'rxjs';
 
 import { errorInterceptor } from '../../core/http/error.interceptor';
+import { iniciarSesionDePrueba } from '../../core/auth/sesion-de-prueba';
 import { numeroConDv } from '../../core/utils/validadores';
+import { DialogosService } from '../../shared/ui/dialog/dialogos.service';
 import { ClienteFormDrawer, DatosFormCliente } from './cliente-form-drawer';
+import { ClientesPage } from './clientes-page';
 import { Cliente } from './clientes-api.service';
 
 const CLIENTE: Cliente = {
@@ -156,5 +162,38 @@ describe('ClienteFormDrawer', () => {
 
     expect(errores()).toEqual(['Ya existe un registro con ese documento']);
     expect(cerrar).not.toHaveBeenCalled();
+  });
+});
+
+@Component({ imports: [RouterOutlet], template: '<router-outlet />' })
+class Anfitrion {}
+
+describe('ClientesPage', () => {
+  it('?nuevo (acción rápida de la paleta) abre el alta y se quita de la URL', async () => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideRouter([{ path: 'clientes', component: ClientesPage }], withComponentInputBinding()),
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
+    });
+    iniciarSesionDePrueba();
+    const abrirDrawer = vi
+      .spyOn(TestBed.inject(DialogosService), 'abrirDrawer')
+      .mockReturnValue({ closed: of(undefined) } as unknown as ReturnType<
+        DialogosService['abrirDrawer']
+      >);
+
+    const fixture = TestBed.createComponent(Anfitrion);
+    await TestBed.inject(Router).navigateByUrl('/clientes?nuevo=1');
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController)
+      .match(() => true)
+      .forEach((r) => r.flush({ content: [], totalElements: 0, page: 0, size: 20, totalPages: 0 }));
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(abrirDrawer).toHaveBeenCalledWith(ClienteFormDrawer, expect.anything());
+    expect(TestBed.inject(Router).url).toBe('/clientes');
   });
 });

@@ -99,7 +99,7 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | CP-17 | RF7, RN-41 | Placas `ABC12D`, `abc-12d`, `ABC12`, `123ABC` válidas; `AB123`, `ABCD12` inválidas | U (back y front) | Normaliza y acepta/rechaza según patrón | Aprobado (U backend F02, U front F05; también I) |
 | CP-18 | RF7 | Placa duplicada | I | 409 `PLACA_DUPLICADA` | Aprobado (F05, también escrita en minúsculas y al editar) |
 | CP-19 | RF6, RN-44 | Desactivar cliente con orden activa | I | 409 | Aprobado (F05 con un doble; F09A con órdenes reales: cliente y moto 409 `ORDENES_ACTIVAS` y, cancelada la orden, se desactivan) |
-| CP-20 | RF29 | Buscar clientes por nombre parcial, documento y teléfono | I | Resultados paginados correctos | Aprobado (F05) |
+| CP-20 | RF29 | Buscar clientes por nombre parcial, documento y teléfono | I | Resultados paginados correctos | Aprobado (F05; F11: búsqueda global `BusquedaIT`, 5 por tipo con permisos y visibilidad del mecánico, y E2E de la paleta) |
 | CP-21 | RF9 | Historial de una moto con 3 órdenes | I, E | Lista ordenada por fecha con servicios, repuestos y totales | Aprobado (F09C: `HistorialMotocicletaIT`, más reciente primero, sin canceladas salvo `incluirCanceladas`, paginado; E2E en CP-50) |
 | CP-88 | RF4, IS4 | Permisos de cada endpoint de clientes y motos | I | Vendedor gestiona; mecánico solo consulta (403 al escribir); almacén 403 en todo; sin token 401 | Aprobado (F05) |
 | CP-89 | RN-43 | Cambiar el propietario de una moto | I, E | La moto pasa al nuevo cliente con confirmación, se audita `MOTOCICLETA_PROPIETARIO_CAMBIADO` y deja de listarse en el anterior | Aprobado (F05) |
@@ -194,9 +194,17 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 | CP-53 | RF30, RN-45 | Orden finalizada envía correo solo a cliente con autorización | I | Correo recibido solo cuando corresponde | Aprobado (F10: `CorreosClientesIT` con GreenMail; sin autorización no llega ningún correo; snapshots de las plantillas en `PlantillasCorreoTest`) |
 | CP-54 | RF30 | Fallo del SMTP no revierte la operación | I | La orden cambia de estado; el error queda en log | Aprobado (F10: `FalloCorreoIT`, 3 intentos con espera creciente y error con `requestId`, sin el destinatario) |
 | CP-55 | RF31, RN-51 | Auditoría de una anulación de venta | I | Registro con usuario, acción, entidad, IP y fecha | Aprobado (F10: `AuditoriaIT` vía `GET /auditoria/entidad/venta/{id}`, con motivo en el detalle; solo con `AUDITORIA_VER`) |
-| CP-56 | RF32 | Reporte de servicios por rango y mecánico | I | Totales correctos | Pendiente |
-| CP-57 | RF33 | Reporte de inventario con stock bajo | I | Lista correcta y exportable a CSV | Pendiente |
-| CP-58 | RF34 | KPIs del dashboard con datos semilla | I | Valores coinciden con consulta manual | Pendiente |
+| CP-56 | RF32 | Reporte de servicios por rango y mecánico | I | Totales correctos | Aprobado (F11: `ReportesIT`, filtros por servicio y mecánico, mano de obra, repuestos y horas en taller) |
+| CP-57 | RF33 | Reporte de inventario con stock bajo | I | Lista correcta y exportable a CSV | Aprobado (F11: `ReportesIT`, valor a costo promedio, bajos/agotados, movimientos por tipo y CSV UTF-8 con BOM y `;`) |
+| CP-58 | RF34 | KPIs del dashboard con datos semilla | I | Valores coinciden con consulta manual | Aprobado (F11: `DashboardIT`; el mecánico solo recibe sus órdenes por estado y sus finalizadas del mes) |
+| CP-131 | RN-53 | Agrupación por día en Bogotá | I | Una venta a las 23:30 hora Colombia cuenta en ese día y no en el siguiente | Aprobado (F11: `ReportesIT`) |
+| CP-132 | RF32, RF33 | CSV de reportes | I | UTF-8 con BOM, separador `;`, tildes intactas y montos sin separador de miles | Aprobado (F11: `ReportesIT`) |
+| CP-133 | RF32, RF33 | Permisos de reportes por área | I, U | Vendedor sin inventario con costos, mecánico sin reportes; pestañas y redirección según permisos | Aprobado (F11: `ReportesIT` y `reportes.spec.ts`) |
+| CP-134 | RF34 | `hk-chart` toma los colores del tema | U | Al cambiar a oscuro se redibuja con los tokens nuevos; tabla `sr-only` con los datos | Aprobado (F11: `chart.spec.ts`) |
+| CP-135 | RF29 | Paleta de comandos con teclado | U, E | Espera de 250 ms, mínimo 2 caracteres, flechas en círculo, Enter abre; `Ctrl+K` → placa → detalle de la moto | Aprobado (F11: `command-palette.spec.ts` y `busqueda.spec.ts`, estable en 3 repeticiones) |
+| CP-136 | RF34, RN-51 | Configuración del taller | U, I | NIT con DV, IVA de 0 a 100, guardado auditado; la alerta de stock apagada no notifica | Aprobado (F11: `configuracion.spec.ts` y `ConfiguracionEdicionIT`) |
+| CP-137 | RNF Acc. | axe en dashboard (admin y mecánico), reportes y configuración, claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F11: `reportes.a11y.spec.ts`) |
+| CP-138 | IU5 | Revisión visual de F11 | M | Claro/oscuro, 375/768/1440 px, es/en, sin scroll horizontal; impresión en claro | Aprobado (F11: capturas en `docs/capturas/f11`) |
 
 ### Requisitos no funcionales (F12–F13)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |

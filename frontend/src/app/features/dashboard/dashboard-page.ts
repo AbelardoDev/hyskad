@@ -143,16 +143,24 @@ const ORDEN_ESTADOS: readonly EstadoOrden[] = [
       @if (d.vista === 'GENERAL' && d.ingresosDiarios.length > 0) {
         <div class="mt-6 grid gap-6 lg:grid-cols-3">
           <hk-card class="lg:col-span-2" [titulo]="'dashboard.ingresos' | transloco">
-            <hk-chart
-              tipo="area"
-              formato="cop"
-              alto="18rem"
-              [leyenda]="true"
-              [etiquetas]="diasCortos()"
-              [series]="seriesIngresos()"
-              [etiqueta]="'dashboard.ingresos' | transloco"
-              [encabezado]="'dashboard.dia' | transloco"
-            />
+            @if (sinIngresos()) {
+              <hk-empty-state
+                compacto
+                icono="chart-column"
+                [titulo]="'dashboard.sin_ingresos' | transloco"
+              />
+            } @else {
+              <hk-chart
+                tipo="area"
+                formato="cop"
+                alto="18rem"
+                [leyenda]="true"
+                [etiquetas]="diasCortos()"
+                [series]="seriesIngresos()"
+                [etiqueta]="'dashboard.ingresos' | transloco"
+                [encabezado]="'dashboard.dia' | transloco"
+              />
+            }
           </hk-card>
           <hk-card [titulo]="'dashboard.por_estado' | transloco">
             <ng-container [ngTemplateOutlet]="dona" />
@@ -173,7 +181,10 @@ const ORDEN_ESTADOS: readonly EstadoOrden[] = [
         @if (d.topServicios.length > 0 || d.topRepuestos.length > 0) {
           <div class="mt-6 grid gap-6 lg:grid-cols-2">
             @if (d.topServicios.length > 0) {
-              <hk-card [titulo]="'dashboard.top_servicios' | transloco">
+              <hk-card
+                [class]="d.topRepuestos.length > 0 ? '' : 'lg:col-span-2'"
+                [titulo]="'dashboard.top_servicios' | transloco"
+              >
                 <hk-chart
                   tipo="barras"
                   alto="14rem"
@@ -190,7 +201,10 @@ const ORDEN_ESTADOS: readonly EstadoOrden[] = [
               </hk-card>
             }
             @if (d.topRepuestos.length > 0) {
-              <hk-card [titulo]="'dashboard.top_repuestos' | transloco">
+              <hk-card
+                [class]="d.topServicios.length > 0 ? '' : 'lg:col-span-2'"
+                [titulo]="'dashboard.top_repuestos' | transloco"
+              >
                 <hk-chart
                   tipo="barras"
                   alto="14rem"
@@ -208,7 +222,7 @@ const ORDEN_ESTADOS: readonly EstadoOrden[] = [
             }
           </div>
         }
-        <div class="mt-6 grid gap-6 lg:grid-cols-2">
+        <div class="mt-6 grid items-start gap-6 lg:grid-cols-2">
           @if (d.ultimasOrdenes.length > 0) {
             <hk-card [titulo]="'dashboard.ultimas' | transloco">
               <ng-container [ngTemplateOutlet]="ultimas" />
@@ -417,6 +431,9 @@ export class DashboardPage {
       },
     ];
   });
+  protected readonly sinIngresos = computed(() =>
+    (this.datos()?.ingresosDiarios ?? []).every((d) => d.ventas === 0 && d.ordenes === 0),
+  );
   protected readonly totalOrdenes = computed(() =>
     Object.values(this.datos()?.ordenesPorEstado ?? {}).reduce((a, b) => a + (b ?? 0), 0),
   );

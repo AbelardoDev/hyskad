@@ -187,7 +187,7 @@ export function normalizar(texto: string): string {
         {{ 'paleta.navegar' | transloco }}</span
       >
       <span><kbd class="font-sans">Enter</kbd> {{ 'paleta.abrir' | transloco }}</span>
-      <span><kbd class="font-sans">Esc</kbd> {{ 'comun.cerrar' | transloco }}</span>
+      <span><kbd class="font-sans">Esc</kbd> {{ 'paleta.cerrar' | transloco }}</span>
     </footer>
   `,
   host: {

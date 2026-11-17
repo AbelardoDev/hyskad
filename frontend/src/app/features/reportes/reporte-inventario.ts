@@ -179,7 +179,7 @@ export const ESTADO_POR_NIVEL: Record<NivelInventario, EstadoStock> = {
         </hk-card>
       </div>
 
-      <hk-card class="mt-6" [titulo]="'reportes.inventario.existencias' | transloco" sinRelleno>
+      <hk-card class="mt-6" [titulo]="'reportes.inventario.existencias' | transloco">
         <hk-table
           [columnas]="columnas()"
           [filas]="pagina.visibles()"

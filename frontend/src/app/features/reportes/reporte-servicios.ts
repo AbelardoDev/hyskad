@@ -150,7 +150,7 @@ import {
             />
           </hk-card>
         }
-        <hk-card class="mt-6" [titulo]="'reportes.detalle' | transloco" sinRelleno>
+        <hk-card class="mt-6" [titulo]="'reportes.detalle' | transloco">
           <hk-table
             [columnas]="columnas()"
             [filas]="pagina.visibles()"

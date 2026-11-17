@@ -1443,7 +1443,8 @@
     "stock_critico": "Critical stock",
     "sin_stock_critico": "All inventory is above minimum",
     "minimo": "min. {{n}}",
-    "ir_mis_ordenes": "Go to my orders"
+    "ir_mis_ordenes": "Go to my orders",
+    "sin_ingresos": "No revenue in this period"
   },
   "paleta": {
     "titulo": "Search or go to…",
@@ -1469,7 +1470,8 @@
     "minimo": "Type at least {{n}} characters to search",
     "error": "Search failed. Please try again.",
     "navegar": "navigate",
-    "abrir": "open"
+    "abrir": "open",
+    "cerrar": "close"
   },
   "configuracion": {
     "titulo": "Settings",

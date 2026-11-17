@@ -3,7 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { ChartConfiguration } from 'chart.js';
 
 import { ThemeService } from '../../../core/theme/theme.service';
-import { conAlfa, CREAR_GRAFICA, HkChart, SerieGrafica, TipoGrafica } from './chart';
+import { conAlfa, CREAR_GRAFICA, HkChart, recortar, SerieGrafica, TipoGrafica } from './chart';
 
 @Component({
   imports: [HkChart],
@@ -74,7 +74,7 @@ describe('HkChart', () => {
     const { fixture, el } = montar();
     await fixture.whenStable();
 
-    const tabla = el.querySelector('table.sr-only')!;
+    const tabla = el.querySelector('.sr-only table')!;
     expect(tabla.querySelector('caption')?.textContent?.trim()).toBe('Ingresos');
     expect(Array.from(tabla.querySelectorAll('thead th')).map((t) => t.textContent)).toEqual([
       'Día',
@@ -101,6 +101,23 @@ describe('HkChart', () => {
     expect(config.type).toBe('doughnut');
     expect(config.data.datasets[0].backgroundColor).toEqual(['#1d58e0', '#1d58e0']);
     expect(config.options?.scales).toEqual({});
+    // La dona conserva la leyenda por sector de Chart.js
+    expect(config.options?.plugins?.legend?.labels?.generateLabels).toBeUndefined();
+  });
+
+  it('una serie de línea con un solo dato muestra su punto', async () => {
+    const { fixture, configs } = montar();
+    fixture.componentInstance.tipo.set('area');
+    fixture.componentInstance.series.set([{ nombre: 'Ventas', datos: [119000] }]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(configs.at(-1)!.data.datasets[0]).toMatchObject({ pointRadius: 4 });
+  });
+
+  it('recortar acorta las etiquetas largas del eje', () => {
+    expect(recortar('Filtro')).toBe('Filtro');
+    expect(recortar('E2E-EKG66669 · Casco captura 1794926593106')).toBe('E2E-EKG66669 · Casco …');
   });
 
   it('conAlfa convierte un hex en rgba y deja otros formatos igual', () => {

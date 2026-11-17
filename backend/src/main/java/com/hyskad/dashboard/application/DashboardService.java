@@ -76,9 +76,11 @@ public class DashboardService {
                 resumenHoy == null ? null : resumenHoy.total(),
                 todas ? taller.ingresosEntregadas(hoy, hoy) : null,
                 activas,
-                porEstado.isEmpty() ? null : porEstado.getOrDefault(EstadoOrden.PENDIENTE_APROBACION, 0L),
+                // El mecánico solo ve sus órdenes por estado y sus finalizadas del mes (F11)
+                porEstado.isEmpty() || mecanico ? null
+                        : porEstado.getOrDefault(EstadoOrden.PENDIENTE_APROBACION, 0L),
                 todas ? taller.porCobrar() : null,
-                verProductos ? inventario.conStockBajo() : null,
+                verProductos && !mecanico ? inventario.conStockBajo() : null,
                 mecanico ? taller.finalizadasDelMecanico(usuarioActual.idRequerido(), hoy.withDayOfMonth(1), hoy)
                         : null);
 

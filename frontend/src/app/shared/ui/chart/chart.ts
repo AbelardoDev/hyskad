@@ -115,36 +115,39 @@ const COLORES_POR_DEFECTO: readonly ColorGrafica[] = [
 @Component({
   selector: 'hk-chart',
   template: `
-    <div class="relative" [style.height]="alto()">
+    <div class="relative w-full min-w-0" [style.height]="alto()">
       <canvas #lienzo role="img" [attr.aria-label]="etiqueta()"></canvas>
     </div>
-    <table class="sr-only">
-      <caption>
-        {{
-          etiqueta()
-        }}
-      </caption>
-      <thead>
-        <tr>
-          <th scope="col">{{ encabezado() }}</th>
-          @for (s of series(); track s.nombre) {
-            <th scope="col">{{ s.nombre }}</th>
-          }
-        </tr>
-      </thead>
-      <tbody>
-        @for (fila of filasTabla(); track $index) {
+    <!-- Una tabla no respeta width: 1px; el sr-only va en un contenedor para no desbordar -->
+    <div class="sr-only">
+      <table>
+        <caption>
+          {{
+            etiqueta()
+          }}
+        </caption>
+        <thead>
           <tr>
-            <th scope="row">{{ fila.etiqueta }}</th>
-            @for (v of fila.valores; track $index) {
-              <td>{{ v }}</td>
+            <th scope="col">{{ encabezado() }}</th>
+            @for (s of series(); track s.nombre) {
+              <th scope="col">{{ s.nombre }}</th>
             }
           </tr>
-        }
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          @for (fila of filasTabla(); track $index) {
+            <tr>
+              <th scope="row">{{ fila.etiqueta }}</th>
+              @for (v of fila.valores; track $index) {
+                <td>{{ v }}</td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
   `,
-  host: { class: 'block' },
+  host: { class: 'relative block min-w-0' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HkChart {
@@ -223,7 +226,9 @@ export class HkChart {
           tipo === 'area' ? degradado(base) : tipo === 'barras' ? base : conAlfa(base, 0.2),
         fill: tipo === 'area',
         tension: 0.35,
-        pointRadius: 0,
+        // Con un solo dato la línea no se ve: se marca el punto
+        pointRadius: s.datos.length === 1 ? 4 : 0,
+        pointBackgroundColor: base,
         pointHoverRadius: 4,
         borderWidth: 2,
         borderRadius: tipo === 'barras' ? 6 : 0,
@@ -237,15 +242,27 @@ export class HkChart {
         : {
             x: {
               grid: { display: false },
-              ticks: { color: colores.texto, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+              ticks: {
+                color: colores.texto,
+                maxRotation: 0,
+                autoSkip: true,
+                autoSkipPadding: 12,
+                maxTicksLimit: 8,
+                // Nombres largos (repuestos) se recortan; el texto completo está en el tooltip
+                callback(this: { getLabelForValue(v: number): string }, v: string | number) {
+                  return recortar(this.getLabelForValue(Number(v)));
+                },
+              },
               border: { color: colores.rejilla },
             },
             y: {
               beginAtZero: true,
               grid: { color: colores.rejilla },
               border: { display: false },
+              // Solo enteros: con valores pequeños Chart.js propone 0,1, 0,2… (o $ 0 repetido)
               ticks: {
                 color: colores.texto,
+                precision: 0,
                 callback: (v: string | number) => formatear(Number(v)),
               },
             },
@@ -257,7 +274,8 @@ export class HkChart {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        animation: { duration: 300 },
+        // Sin animación: la gráfica aparece completa al cargar, al imprimir y al cambiar tema o datos
+        animation: false,
         interaction: { mode: 'index', intersect: false },
         cutout: tipo === 'dona' ? '68%' : undefined,
         scales: ejes,
@@ -265,7 +283,21 @@ export class HkChart {
           legend: {
             display: this.leyenda() || tipo === 'dona',
             position: 'bottom',
-            labels: { color: colores.texto, usePointStyle: true, boxWidth: 8 },
+            labels: {
+              color: colores.texto,
+              usePointStyle: true,
+              boxWidth: 8,
+              // Punto sólido del color de la serie (el área usa un degradado casi transparente);
+              // la dona conserva su leyenda por sector
+              ...(tipo === 'dona'
+                ? {}
+                : {
+                    generateLabels: (chart: Chart) =>
+                      Chart.defaults.plugins.legend.labels
+                        .generateLabels(chart)
+                        .map((l) => ({ ...l, fillStyle: l.strokeStyle })),
+                  }),
+            },
           },
           tooltip: {
             callbacks: {
@@ -281,6 +313,14 @@ export class HkChart {
   private formatear(valor: number, locale: string): string {
     return this.formato() === 'cop' ? formatoCop(valor, locale) : formatoCantidad(valor, locale);
   }
+}
+
+/** Máximo de caracteres de una etiqueta del eje X. */
+const LARGO_ETIQUETA = 22;
+
+/** Recorta una etiqueta larga del eje con puntos suspensivos. */
+export function recortar(texto: string, largo = LARGO_ETIQUETA): string {
+  return texto.length > largo ? `${texto.slice(0, largo - 1)}…` : texto;
 }
 
 /** Relleno del área: el color de la serie que se desvanece hacia abajo. */

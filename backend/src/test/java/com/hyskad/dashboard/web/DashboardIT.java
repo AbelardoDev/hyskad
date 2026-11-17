@@ -90,6 +90,8 @@ class DashboardIT {
         assertThat(k.get("ordenesActivas").asLong()).isEqualTo(2);
         assertThat(k.get("ventasHoyTotal").isNull()).isTrue();
         assertThat(k.get("porCobrar").isNull()).isTrue();
+        assertThat(k.get("pendientesAprobacion").isNull()).isTrue();
+        assertThat(k.get("productosStockBajo").isNull()).isTrue();
         assertThat(d.get("ordenesPorEstado").get("RECIBIDA").asLong()).isOne();
         assertThat(d.get("ingresosDiarios")).isEmpty();
         assertThat(d.get("stockCritico")).isEmpty();

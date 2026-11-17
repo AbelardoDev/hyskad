@@ -1,4 +1,4 @@
-import { DestroyRef, effect, inject, Signal, signal } from '@angular/core';
+import { DestroyRef, effect, inject, Signal, signal, untracked } from '@angular/core';
 
 /** Duración de la animación de los contadores del dashboard. */
 export const DURACION_CONTADOR_MS = 600;
@@ -24,7 +24,8 @@ export function contadorAnimado(fuente: Signal<number | null>): Signal<number | 
       valor.set(destino);
       return;
     }
-    const inicio = valor() ?? 0;
+    // Sin rastrear: si el efecto dependiera de `valor`, cada cuadro reiniciaría la animación
+    const inicio = untracked(valor) ?? 0;
     let comienzo: number | undefined;
     const paso = (t: number) => {
       comienzo ??= t;

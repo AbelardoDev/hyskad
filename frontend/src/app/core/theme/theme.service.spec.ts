@@ -95,4 +95,17 @@ describe('ThemeService', () => {
 
     expect(html.classList.contains('hk-cambiando-tema')).toBe(true);
   });
+
+  it('al imprimir quita el tema oscuro y lo devuelve después', () => {
+    simularMatchMedia(false);
+    localStorage.setItem(CLAVE_TEMA, 'dark');
+    crear();
+    TestBed.tick();
+    expect(html.classList.contains('dark')).toBe(true);
+
+    window.dispatchEvent(new Event('beforeprint'));
+    expect(html.classList.contains('dark')).toBe(false);
+    window.dispatchEvent(new Event('afterprint'));
+    expect(html.classList.contains('dark')).toBe(true);
+  });
 });

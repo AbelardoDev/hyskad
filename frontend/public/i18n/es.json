@@ -1443,7 +1443,8 @@
     "stock_critico": "Stock crítico",
     "sin_stock_critico": "Todo el inventario está sobre el mínimo",
     "minimo": "mín. {{n}}",
-    "ir_mis_ordenes": "Ir a mis órdenes"
+    "ir_mis_ordenes": "Ir a mis órdenes",
+    "sin_ingresos": "Sin ingresos en este periodo"
   },
   "paleta": {
     "titulo": "Buscar o ir a…",
@@ -1469,7 +1470,8 @@
     "minimo": "Escribe al menos {{n}} caracteres para buscar",
     "error": "No se pudo buscar. Inténtalo de nuevo.",
     "navegar": "navegar",
-    "abrir": "abrir"
+    "abrir": "abrir",
+    "cerrar": "cerrar"
   },
   "configuracion": {
     "titulo": "Configuración",

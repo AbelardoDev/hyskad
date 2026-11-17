@@ -23,7 +23,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, input } from '@an
     </div>
     <ng-content select="[hkCardPie]" />
   `,
-  host: { class: 'block overflow-hidden hk-panel' },
+  host: { class: 'block min-w-0 overflow-hidden hk-panel' },
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HkCard {

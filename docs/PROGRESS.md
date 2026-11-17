@@ -20,7 +20,7 @@
 | F09B | Órdenes: servicios, repuestos y presupuestos | ✅ Terminada | #16 | Presupuesto imprimible en `/presupuestos/:id`; capturas en `docs/capturas/f09b` |
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #23 | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
-| F11 | Reportes, dashboard, búsqueda global y configuración | ✅ Terminada | #PR | `hk-chart` y `hk-command-palette` en el kit; impresión siempre en claro; capturas en `docs/capturas/f11` |
+| F11 | Reportes, dashboard, búsqueda global y configuración | ✅ Terminada | #25 | `hk-chart` y `hk-command-palette` en el kit; impresión siempre en claro; capturas en `docs/capturas/f11` |
 | F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ⬜ Pendiente | | |
 | F13 | Despliegue en VPS | ⬜ Pendiente | | |
 
@@ -28,7 +28,7 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F11 ✅ (cerrada 2026-11-17, PR #PR)
+- **Fase:** F11 ✅ (cerrada 2026-11-17, PR #25)
 - **Rama:** `feature/f11-reportes-dashboard` → `main`
 - **Hecho:** backend: `GET /dashboard` (KPIs según permisos, ingresos diarios con días de Bogotá, órdenes por estado, top de servicios y repuestos, últimas órdenes y stock crítico; el mecánico solo recibe sus órdenes por estado y sus finalizadas del mes), reportes de servicios, inventario y ventas con `?formato=csv` (`shared.web.Csv`: UTF-8 con BOM y `;`), `GET /busqueda` (5 por tipo con permisos y visibilidad), `GET/PUT /configuracion` auditado, V11 con claves e índices. La alerta de stock (`stock.alerta.habilitada`) ahora se respeta al notificar. Frontend: `hk-chart` (Chart.js con solo los controladores usados, colores de los tokens, redibujo al cambiar tema o idioma, COP en ejes y tooltip, tabla `sr-only`), dashboard con contadores animados y vista del mecánico, `/reportes` con pestañas por permiso (servicios, inventario, ventas, cuentas pendientes), filtros, KPIs, gráfica, tabla paginada en el cliente, Exportar CSV e Imprimir; `hk-command-palette` (`Ctrl/⌘+K` y buscador de la topbar, 250 ms, agrupada por tipo, acciones rápidas y páginas según permisos, combobox + listbox ARIA); `/configuracion` por secciones (Taller, Impuestos, Privacidad, Alertas); `?nuevo` abre el alta de cliente. Revisión visual: contador que no terminaba, ejes con decimales, desborde de la tabla `sr-only` en 375 px, gráficas vacías al imprimir, impresión en oscuro, paginación sin relleno. Pruebas: backend con `ReportesIT` (CP-56, CP-57, día en Bogotá, CSV, permisos), `DashboardIT` (CP-58), `BusquedaIT` (CP-20), `ConfiguracionEdicionIT` (incluida la alerta apagada); backend 227 unitarias y 252 IT (cobertura 95 %); frontend 315 unitarias; 89 E2E + axe (paleta estable en 3 repeticiones; `reportes.a11y.spec.ts` nueva). Capturas en `docs/capturas/f11/` (dashboard admin y mecánico en inglés, reportes, paleta, configuración e impresión; claro/oscuro; 375/768/1440).
 - **Siguiente paso concreto:** iniciar F12 con `/fase F12` (calidad: E2E, accesibilidad, rendimiento y seguridad).

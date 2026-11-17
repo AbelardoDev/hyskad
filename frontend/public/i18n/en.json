@@ -1470,5 +1470,34 @@
     "error": "Search failed. Please try again.",
     "navegar": "navigate",
     "abrir": "open"
+  },
+  "configuracion": {
+    "titulo": "Settings",
+    "subtitulo": "Shop details, taxes and privacy",
+    "guardar": "Save changes",
+    "guardada": "Settings saved",
+    "error": "We couldn't load the settings",
+    "secciones": {
+      "taller": "Shop",
+      "taller_texto": "Shown on receipts, quotes and emails.",
+      "impuestos": "Taxes",
+      "privacidad": "Privacy",
+      "privacidad_texto": "Text the customer accepts when registered (Colombian Law 1581 of 2012).",
+      "alertas": "Alerts"
+    },
+    "campos": {
+      "nombre": "Shop name",
+      "nit": "NIT (tax ID)",
+      "direccion": "Address",
+      "telefono": "Phone",
+      "email": "Email",
+      "iva": "VAT (%)",
+      "autorizacion": "Data processing authorization",
+      "alerta_stock": "Notify when a product reaches its minimum stock"
+    },
+    "nit_ayuda": "With or without the check digit (900123456-8).",
+    "nit_dv": "Check digit: {{dv}}",
+    "iva_ayuda": "Applies to new sales, purchases and quotes; existing ones keep their VAT.",
+    "alerta_stock_ayuda": "Notifies warehouse and administration."
   }
 }

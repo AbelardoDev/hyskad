@@ -1470,5 +1470,34 @@
     "error": "No se pudo buscar. Inténtalo de nuevo.",
     "navegar": "navegar",
     "abrir": "abrir"
+  },
+  "configuracion": {
+    "titulo": "Configuración",
+    "subtitulo": "Datos del taller, impuestos y privacidad",
+    "guardar": "Guardar cambios",
+    "guardada": "Configuración guardada",
+    "error": "No se pudo cargar la configuración",
+    "secciones": {
+      "taller": "Taller",
+      "taller_texto": "Aparecen en comprobantes, presupuestos y correos.",
+      "impuestos": "Impuestos",
+      "privacidad": "Privacidad",
+      "privacidad_texto": "Texto que acepta el cliente al registrarse (Ley 1581 de 2012).",
+      "alertas": "Alertas"
+    },
+    "campos": {
+      "nombre": "Nombre del taller",
+      "nit": "NIT",
+      "direccion": "Dirección",
+      "telefono": "Teléfono",
+      "email": "Correo electrónico",
+      "iva": "IVA (%)",
+      "autorizacion": "Autorización de tratamiento de datos",
+      "alerta_stock": "Avisar cuando un producto llegue al stock mínimo"
+    },
+    "nit_ayuda": "Con o sin dígito de verificación (900123456-8).",
+    "nit_dv": "Dígito de verificación: {{dv}}",
+    "iva_ayuda": "Aplica a ventas, compras y presupuestos nuevos; los ya registrados conservan su IVA.",
+    "alerta_stock_ayuda": "Notifica a almacén y administración."
   }
 }

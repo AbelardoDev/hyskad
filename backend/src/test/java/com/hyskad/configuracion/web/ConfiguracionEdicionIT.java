@@ -2,18 +2,25 @@ package com.hyskad.configuracion.web;
 
 import static com.hyskad.support.FlujoOrdenes.con;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.math.BigDecimal;
+import java.time.Duration;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.support.TransactionTemplate;
 
+import com.hyskad.inventario.domain.StockBajoDetectado;
 import com.hyskad.support.FlujoOrdenes;
 import com.hyskad.support.IntegrationTest;
 import com.hyskad.support.UsuariosDePrueba;
@@ -21,6 +28,7 @@ import com.hyskad.usuarios.domain.Rol;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /** Edición de la configuración del taller (F11) con auditoría (RN-51). Restaura los valores al final. */
 @IntegrationTest
@@ -42,6 +50,12 @@ class ConfiguracionEdicionIT {
 
     @Autowired
     private ObjectMapper json;
+
+    @Autowired
+    private ApplicationEventPublisher eventos;
+
+    @Autowired
+    private TransactionTemplate transaccion;
 
     private String admin;
     private JsonNode original;
@@ -101,5 +115,31 @@ class ConfiguracionEdicionIT {
         mvc.perform(con(get(BASE), vendedor)).andExpect(status().isForbidden());
         mvc.perform(con(put(BASE), vendedor).content(json.writeValueAsString(original)))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void conLaAlertaDeStockApagadaNoSeNotificaElStockBajo() throws Exception {
+        Long almacen = usuarios.crear(Rol.ALMACEN).id();
+        ObjectNode apagada = ((ObjectNode) original.deepCopy()).put("alertaStockHabilitada", false);
+        mvc.perform(con(put(BASE), admin).content(json.writeValueAsString(apagada)))
+                .andExpect(jsonPath("$.alertaStockHabilitada").value(false));
+        publicarStockBajo("ALERTA-OFF");
+
+        ObjectNode encendida = ((ObjectNode) original.deepCopy()).put("alertaStockHabilitada", true);
+        mvc.perform(con(put(BASE), admin).content(json.writeValueAsString(encendida))).andExpect(status().isOk());
+        publicarStockBajo("ALERTA-ON");
+
+        await().atMost(Duration.ofSeconds(5)).until(() -> avisosStockBajo(almacen, "ALERTA-ON") == 1);
+        assertThat(avisosStockBajo(almacen, "ALERTA-OFF")).isZero();
+    }
+
+    private void publicarStockBajo(String codigo) {
+        transaccion.executeWithoutResult(estado -> eventos.publishEvent(
+                new StockBajoDetectado(-1L, codigo, "Producto " + codigo, BigDecimal.ONE, BigDecimal.TEN)));
+    }
+
+    private int avisosStockBajo(Long usuarioId, String codigo) {
+        return jdbc.queryForObject("select count(*) from notificacion where usuario_id = ? and tipo = 'STOCK_BAJO'"
+                + " and parametros->>'$.codigo' = ?", Integer.class, usuarioId, codigo);
     }
 }

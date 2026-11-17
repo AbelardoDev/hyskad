@@ -15,6 +15,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { of } from 'rxjs';
 
 import { routes } from '../../app.routes';
+import { Dashboard, DashboardApiService } from '../../features/dashboard/dashboard-api.service';
 import { authInterceptor } from '../auth/auth.interceptor';
 import { UsuarioSesion } from '../auth/auth.models';
 import { iniciarSesionDePrueba } from '../auth/sesion-de-prueba';
@@ -23,6 +24,29 @@ import { CLAVE_SIDEBAR, ESCRITORIO, LayoutService, MOVIL } from './layout.servic
 import { ACCESOS_RAPIDOS, MENU } from './menu.config';
 import { MigasService } from './migas.service';
 import { TituloStrategy } from './titulo.strategy';
+
+/** Inicio sin datos: las pruebas del shell no dependen del contenido del dashboard. */
+const PANEL_VACIO: Dashboard = {
+  vista: 'GENERAL',
+  desde: '2026-10-19',
+  hasta: '2026-11-17',
+  kpis: {
+    ventasHoyCantidad: null,
+    ventasHoyTotal: null,
+    ingresosOrdenesHoy: null,
+    ordenesActivas: null,
+    pendientesAprobacion: null,
+    porCobrar: null,
+    productosStockBajo: null,
+    finalizadasMes: null,
+  },
+  ingresosDiarios: [],
+  ordenesPorEstado: {},
+  topServicios: [],
+  topRepuestos: [],
+  ultimasOrdenes: [],
+  stockCritico: [],
+};
 
 /** Simula el ancho de pantalla para BreakpointObserver. */
 function simularPantalla(ancho: number) {
@@ -48,6 +72,7 @@ function configurar(ancho: number, sesion: Partial<UsuarioSesion> | null = {}) {
       { provide: TitleStrategy, useClass: TituloStrategy },
       provideHttpClient(withInterceptors([authInterceptor])),
       provideHttpClientTesting(),
+      { provide: DashboardApiService, useValue: { obtener: () => of(PANEL_VACIO) } },
     ],
   });
   if (sesion) iniciarSesionDePrueba(sesion);
@@ -113,7 +138,6 @@ describe('migas y título', () => {
 });
 
 describe('HkShell', () => {
-  // Inicio (dashboard) sigue siendo "Próximamente" hasta F11: no hace peticiones al backend.
   async function montar(ancho: number, url = '/dashboard', sesion: Partial<UsuarioSesion> = {}) {
     configurar(ancho, sesion);
     const fixture = TestBed.createComponent(Anfitrion);
@@ -122,15 +146,14 @@ describe('HkShell', () => {
     return { fixture, el: fixture.nativeElement as HTMLElement };
   }
 
-  it('renderiza sidebar, topbar, migas, contenido y la página "Próximamente" del módulo', async () => {
+  it('renderiza sidebar, topbar, migas y el contenido de la página', async () => {
     const { el } = await montar(1440);
 
     expect(el.querySelector('a[href="#contenido"]')?.textContent).toContain('Saltar al contenido');
     expect(el.querySelector('aside nav')?.getAttribute('aria-label')).toBe('Navegación principal');
     expect(el.querySelector('aside [aria-current="page"]')?.textContent).toContain('Inicio');
     expect(el.querySelector('hk-topbar [aria-current="page"]')?.textContent?.trim()).toBe('Inicio');
-    expect(el.querySelector('main#contenido h1')?.textContent?.trim()).toBe('Inicio');
-    expect(el.querySelector('main hk-empty-state')?.textContent).toContain('Inicio llega pronto');
+    expect(el.querySelector('main#contenido h1')?.textContent?.trim()).toBe('Hola, Ana');
   });
 
   it('el botón de menú colapsa el sidebar a solo íconos en escritorio', async () => {

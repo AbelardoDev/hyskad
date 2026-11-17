@@ -1353,5 +1353,37 @@
       "usuario": "Usuario",
       "notificacion": "Notificación"
     }
+  },
+  "dashboard": {
+    "saludo": "Hola, {{nombre}}",
+    "periodo": "Periodo",
+    "ultimos_dias": "Últimos {{n}} días",
+    "error": "No pudimos cargar el panel",
+    "indicadores": "Indicadores",
+    "kpis": {
+      "ventas_hoy": "Ventas de hoy",
+      "ingresos_ordenes": "Órdenes entregadas hoy",
+      "activas": "Órdenes activas",
+      "pendientes": "Pendientes de aprobación",
+      "por_cobrar": "Finalizadas sin cobrar",
+      "stock_bajo": "Productos con stock bajo",
+      "finalizadas_mes": "Finalizadas este mes"
+    },
+    "n_ventas": "Cantidad: {{n}}",
+    "ingresos": "Ingresos diarios",
+    "dia": "Día",
+    "serie_ventas": "Ventas",
+    "serie_ordenes": "Órdenes",
+    "por_estado": "Órdenes por estado",
+    "ordenes": "Órdenes",
+    "sin_ordenes": "No hay órdenes en este periodo",
+    "ultimas": "Últimas órdenes",
+    "top_servicios": "Servicios más realizados",
+    "top_repuestos": "Repuestos más usados",
+    "cantidad": "Cantidad",
+    "stock_critico": "Stock crítico",
+    "sin_stock_critico": "Todo el inventario está sobre el mínimo",
+    "minimo": "mín. {{n}}",
+    "ir_mis_ordenes": "Ir a mis órdenes"
   }
 }

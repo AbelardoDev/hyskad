@@ -1353,5 +1353,37 @@
       "usuario": "User",
       "notificacion": "Notification"
     }
+  },
+  "dashboard": {
+    "saludo": "Hi, {{nombre}}",
+    "periodo": "Period",
+    "ultimos_dias": "Last {{n}} days",
+    "error": "We couldn't load the dashboard",
+    "indicadores": "Indicators",
+    "kpis": {
+      "ventas_hoy": "Today's sales",
+      "ingresos_ordenes": "Orders delivered today",
+      "activas": "Active orders",
+      "pendientes": "Awaiting approval",
+      "por_cobrar": "Finished, not yet paid",
+      "stock_bajo": "Low-stock products",
+      "finalizadas_mes": "Finished this month"
+    },
+    "n_ventas": "Count: {{n}}",
+    "ingresos": "Daily revenue",
+    "dia": "Day",
+    "serie_ventas": "Sales",
+    "serie_ordenes": "Orders",
+    "por_estado": "Orders by status",
+    "ordenes": "Orders",
+    "sin_ordenes": "No orders in this period",
+    "ultimas": "Latest orders",
+    "top_servicios": "Top services",
+    "top_repuestos": "Top parts",
+    "cantidad": "Quantity",
+    "stock_critico": "Critical stock",
+    "sin_stock_critico": "All inventory is above minimum",
+    "minimo": "min. {{n}}",
+    "ir_mis_ordenes": "Go to my orders"
   }
 }

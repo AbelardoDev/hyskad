@@ -57,6 +57,8 @@ export function puntosSparkline(valores: readonly number[], ancho = ANCHO, alto 
           </span>
           <span class="text-muted">{{ 'ui.stat.vs_anterior' | transloco }}</span>
         </p>
+      } @else if (detalle()) {
+        <p class="text-xs text-muted">{{ detalle() }}</p>
       } @else {
         <span></span>
       }
@@ -97,6 +99,8 @@ export class HkStatCard {
   /** Valor ya formateado (`'$ 1.250.000'`, `'12'`). */
   readonly valor = input.required<string>();
   readonly icono = input<string>();
+  /** Línea de contexto bajo el valor cuando no hay variación (p. ej. "3 ventas"). */
+  readonly detalle = input<string>();
   /** Variación porcentual frente al periodo anterior (12.5 = +12,5 %). */
   readonly variacion = input<number>();
   /** Si subir es malo (p. ej. órdenes pendientes), el color se invierte. */

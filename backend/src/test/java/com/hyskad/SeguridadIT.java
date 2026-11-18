@@ -13,7 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -133,15 +135,29 @@ class SeguridadIT {
     // CP-61, OWASP A03: las búsquedas tratan la entrada como dato (consultas con parámetros)
     @Test
     void cp61LasBusquedasNoEjecutanInyeccionSql() throws Exception {
+        // Datos propios para que "todo el listado" no sea vacío en clientes, motos, órdenes y usuarios
+        long mecanicoId = usuarios.crear(Rol.MECANICO).id();
+        flujo.recibida(flujo.clienteConMoto(admin), 1000, vendedor, mecanicoId);
         long clientesAntes = jdbc.queryForObject("select count(*) from cliente", Long.class);
-        List<String> listados = List.of("/api/v1/clientes", "/api/v1/motocicletas", ORDENES, "/api/v1/productos",
-                "/api/v1/ventas", "/api/v1/proveedores", "/api/v1/usuarios");
-        for (String listado : listados) {
-            long todos = total(listado, null);
-            for (String carga : INYECCIONES) {
-                // Una inyección exitosa (OR '1'='1') devolvería todo el listado
-                long encontrados = total(listado, carga);
-                assertThat(encontrados).as(listado + " con " + carga).isLessThan(Math.max(todos, 1));
+        // Cada listado con sus parámetros de texto reales: uno que no existe se ignoraría y devolvería todo
+        Map<String, List<String>> busquedas = new LinkedHashMap<>();
+        busquedas.put("/api/v1/clientes", List.of("q"));
+        busquedas.put("/api/v1/motocicletas", List.of("placa", "marca", "modelo"));
+        busquedas.put(ORDENES, List.of("q"));
+        busquedas.put("/api/v1/productos", List.of("q", "marca"));
+        busquedas.put("/api/v1/ventas", List.of("numero"));
+        busquedas.put("/api/v1/proveedores", List.of("q"));
+        busquedas.put("/api/v1/usuarios", List.of("q"));
+        for (Map.Entry<String, List<String>> busqueda : busquedas.entrySet()) {
+            String listado = busqueda.getKey();
+            long todos = total(listado, null, null);
+            for (String parametro : busqueda.getValue()) {
+                for (String carga : INYECCIONES) {
+                    // Una inyección exitosa (OR '1'='1') devolvería todo el listado
+                    long encontrados = total(listado, parametro, carga);
+                    assertThat(encontrados).as(listado + "?" + parametro + "=" + carga)
+                            .isLessThan(Math.max(todos, 1));
+                }
             }
         }
         for (String carga : INYECCIONES) {
@@ -150,10 +166,10 @@ class SeguridadIT {
         assertThat(jdbc.queryForObject("select count(*) from cliente", Long.class)).isEqualTo(clientesAntes);
     }
 
-    private long total(String listado, String q) throws Exception {
+    private long total(String listado, String parametro, String valor) throws Exception {
         MockHttpServletRequestBuilder peticion = get(listado);
-        if (q != null) {
-            peticion.param("q", q);
+        if (parametro != null) {
+            peticion.param(parametro, valor);
         }
         return flujo.ok(mvc.perform(con(peticion, admin)).andExpect(status().isOk())).get("totalElements").asLong();
     }

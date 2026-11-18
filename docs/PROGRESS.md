@@ -21,14 +21,14 @@
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #23 | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ✅ Terminada | #25 | `hk-chart` y `hk-command-palette` en el kit; impresión siempre en claro; capturas en `docs/capturas/f11` |
-| F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ✅ Terminada | PR_F12 | Informe en `docs/test-reports/INFORME-PRUEBAS.md`; checklist OWASP y guion de usabilidad al lado |
+| F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ✅ Terminada | #26 | Informe en `docs/test-reports/INFORME-PRUEBAS.md`; checklist OWASP y guion de usabilidad al lado |
 | F13 | Despliegue en VPS | ⬜ Pendiente | | |
 
 Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
 
-- **Fase:** F12 ✅ (cerrada 2026-11-18, PR PR_F12)
+- **Fase:** F12 ✅ (cerrada 2026-11-18, PR #26)
 - **Rama:** `feature/f12-calidad` → `main`
 - **Hecho:** inventario de pruebas: cada prueba lleva su `CP-xx` (69 casos sin referencia etiquetados). E2E por flujos (auth, clientes, inventario, compras, ventas, taller, notificaciones, reportes, general y a11y), proyectos Chromium/Firefox/WebKit a 1440 px y teléfonos emulados (Pixel 7, iPhone 13) para `@movil`; CI con Chromium en cada PR y los tres motores en push a `main`; recepción solo con teclado (`:focus-visible`) y CSV real de ventas. Rendimiento: `infra/perf/datos-perf.sql` (12 meses: 500 productos, 1.500 clientes, 3.000 órdenes, 8.000 ventas), `docker-compose.perf.yml`, perfil `perf` y escenarios k6 en `infra/k6`; N+1 del detalle de la orden corregido con `hibernate.default_batch_fetch_size=50` (89 → 9 sentencias; p95 de operaciones 390 → 214 ms; reportes 715 ms). Seguridad: `SeguridadIT` (IDOR del mecánico en 13 sub-recursos, permisos entre roles, inyección SQL en los parámetros reales de 7 listados, `sort` con SQL → 400 `PARAMETRO_INVALIDO`, XSS almacenado), `ConfiguracionProduccionTest`, E2E de XSS, `infra/scripts/revisar-logs.sh` en el CI, perfil Maven `seguridad` con OWASP Dependency-Check, `npm audit` en 0. Otros defectos: stacktrace al cerrar el stream SSE, índice duplicado (V12). `@vitest/coverage-v8` agregado (aprobado por el usuario). Documentos: `seguridad-owasp.md`, `usabilidad.md`, `INFORME-PRUEBAS.md` y estado de todos los casos en TEST-PLAN. Resultados: backend 229 unitarias y 259 IT (JaCoCo 96,4 % `application`, 97,5 % `domain`); frontend 315 unitarias (72 % de líneas); E2E 276 ejecuciones en 5 proyectos (233 a la primera con la máquina cargada; las 43 restantes, timeouts, en verde al repetirlas); 133 de 138 casos aprobados, 100 % de los ejecutados.
 - **Siguiente paso concreto:** iniciar F13 con `/fase F13` (despliegue en VPS) y ejecutar allí CP-62, CP-63, CP-66 y CP-67.

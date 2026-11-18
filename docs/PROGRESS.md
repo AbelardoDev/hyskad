@@ -21,12 +21,20 @@
 | F09C | Órdenes: pago, entrega, historial y vista del mecánico | ✅ Terminada | #22 | Comprobante en `/ordenes/:id/comprobante`; "Mis órdenes" es el inicio del mecánico; capturas en `docs/capturas/f09c` |
 | F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #23 | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ✅ Terminada | #25 | `hk-chart` y `hk-command-palette` en el kit; impresión siempre en claro; capturas en `docs/capturas/f11` |
-| F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | 🟦 En curso | | |
+| F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ✅ Terminada | PR_F12 | Informe en `docs/test-reports/INFORME-PRUEBAS.md`; checklist OWASP y guion de usabilidad al lado |
 | F13 | Despliegue en VPS | ⬜ Pendiente | | |
 
 Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
+
+- **Fase:** F12 ✅ (cerrada 2026-11-18, PR PR_F12)
+- **Rama:** `feature/f12-calidad` → `main`
+- **Hecho:** inventario de pruebas: cada prueba lleva su `CP-xx` (69 casos sin referencia etiquetados). E2E por flujos (auth, clientes, inventario, compras, ventas, taller, notificaciones, reportes, general y a11y), proyectos Chromium/Firefox/WebKit a 1440 px y teléfonos emulados (Pixel 7, iPhone 13) para `@movil`; CI con Chromium en cada PR y los tres motores en push a `main`; recepción solo con teclado (`:focus-visible`) y CSV real de ventas. Rendimiento: `infra/perf/datos-perf.sql` (12 meses: 500 productos, 1.500 clientes, 3.000 órdenes, 8.000 ventas), `docker-compose.perf.yml`, perfil `perf` y escenarios k6 en `infra/k6`; N+1 del detalle de la orden corregido con `hibernate.default_batch_fetch_size=50` (89 → 9 sentencias; p95 de operaciones 390 → 214 ms; reportes 715 ms). Seguridad: `SeguridadIT` (IDOR del mecánico en 13 sub-recursos, permisos entre roles, inyección SQL en los parámetros reales de 7 listados, `sort` con SQL → 400 `PARAMETRO_INVALIDO`, XSS almacenado), `ConfiguracionProduccionTest`, E2E de XSS, `infra/scripts/revisar-logs.sh` en el CI, perfil Maven `seguridad` con OWASP Dependency-Check, `npm audit` en 0. Otros defectos: stacktrace al cerrar el stream SSE, índice duplicado (V12). `@vitest/coverage-v8` agregado (aprobado por el usuario). Documentos: `seguridad-owasp.md`, `usabilidad.md`, `INFORME-PRUEBAS.md` y estado de todos los casos en TEST-PLAN. Resultados: backend 229 unitarias y 259 IT (JaCoCo 96,4 % `application`, 97,5 % `domain`); frontend 315 unitarias (72 % de líneas); E2E 276 ejecuciones en 5 proyectos (233 a la primera con la máquina cargada; las 43 restantes, timeouts, en verde al repetirlas); 133 de 138 casos aprobados, 100 % de los ejecutados.
+- **Siguiente paso concreto:** iniciar F13 con `/fase F13` (despliegue en VPS) y ejecutar allí CP-62, CP-63, CP-66 y CP-67.
+- **Bloqueos o dudas:** OWASP Dependency-Check sin `NVD_API_KEY` seguía descargando la base del NVD al cerrar; agregar su resultado al informe (§6). CP-68 espera la sesión con usuarios reales (el usuario llena `usabilidad.md`). El usuario enviará una plantilla para el informe de pruebas. El bundle inicial está en 891 kB (aviso en 900 kB).
+
+### Sesión anterior (F11)
 
 - **Fase:** F11 ✅ (cerrada 2026-11-17, PR #25)
 - **Rama:** `feature/f11-reportes-dashboard` → `main`
@@ -86,6 +94,10 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 ## Decisiones tomadas durante el desarrollo
 
 <!-- Formato: AAAA-MM-DD · Fase · Decisión · Motivo -->
+- 2026-11-18 · F12 · Los casos que dependen del servidor (CP-62, CP-63, CP-66, CP-67) y la sesión con usuarios (CP-68) quedan como `No ejecutado` y el porcentaje se calcula sobre los ejecutados (también se informa sobre los 138) · el plan define aprobados / ejecutados; no se inventan resultados.
+- 2026-11-18 · F12 · Los 43 fallos E2E de la primera corrida local (timeouts con Dependency-Check, `npm install` y la cobertura corriendo a la vez) se repitieron con 2 workers y se informan por separado · ninguno falló al repetirse sin cambios de código.
+- 2026-11-18 · F12 · Dependency-Check va en un perfil Maven aparte (`-Pseguridad`), fuera del build normal y del CI · la primera descarga del NVD tarda mucho sin clave de API.
+- 2026-11-17 · F12 · Carga por lotes de Hibernate (`default_batch_fetch_size=50`) en vez de `JOIN FETCH` por consulta · corrige el N+1 en todas las asociaciones perezosas sin tocar cada repositorio.
 - 2026-11-17 · F11 · Cada reporte exige `REPORTES_VER` más el permiso de su área (servicios: `PRESUPUESTOS_GESTIONAR`; inventario con costos: `PRODUCTOS_GESTIONAR`; ventas con utilidad: `VENTAS_ANULAR`; cuentas: `PAGOS_REGISTRAR`) y el frontend muestra solo esas pestañas; `/reportes` abre la primera permitida · ARCHITECTURE §5 da el alcance por rol y los permisos son la regla, no el nombre del rol.
 - 2026-11-17 · F11 · El detalle de los reportes llega completo (periodo máximo de un año) y se pagina en el cliente · el CSV y la impresión necesitan todo el resultado.
 - 2026-11-17 · F11 · Cuentas pendientes no tiene CSV (solo Imprimir) · el prompt pide CSV para los reportes nuevos; el endpoint de F09C es paginado.
@@ -230,7 +242,7 @@ pm-cache-hk`.
 - Los refresh tokens y enlaces de recuperación vencidos no se purgan de la BD (crecen despacio; se puede agregar una tarea programada más adelante).
 - `debeCambiarPassword` no bloquea otros endpoints en el backend: solo lo hace cumplir el frontend (`authGuard`).
 - Aviso de Mockito por auto-attach del agente en las pruebas del backend (JDK 25); sin impacto por ahora.
-- Las E2E corren en el CI solo en Chromium (los tres navegadores en F12). Bajo carga paralela del servidor de desarrollo, Firefox puede exceder el timeout de 30 s (en serie pasan).
+- Las E2E locales con los tres navegadores en paralelo y otras cargas en la máquina exceden el timeout de 30 s (F12: 40 de 276); con 2 workers pasan. En el CI hay 2 reintentos.
 - La campana de notificaciones muestra un estado vacío hasta F10.
 - Detrás de Nginx (F13) el rate limit verá la IP del proxy: configurar `server.forward-headers-strategy` y confiar solo en el proxy propio.
 - `GET /motocicletas/{id}/historial` devuelve `[]` con la estructura final (`HistorialServicio`); se llena en F09C (CP-21).

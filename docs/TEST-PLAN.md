@@ -44,7 +44,7 @@ Cada fallo encontrado fuera de la fase en curso se registra como *issue* en GitH
 ## 6. Catálogo de casos de prueba
 
 Tipos: **U** unitaria · **I** integración · **E** E2E · **A** accesibilidad · **R** rendimiento · **M** manual.
-Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerrar cada fase).
+Estado: `Pendiente` → `Aprobado` / `Fallido` / `No ejecutado` (Claude Code lo actualiza al cerrar cada fase).
 
 ### Base del backend (F02)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
@@ -209,16 +209,16 @@ Estado: `Pendiente` → `Aprobado` / `Fallido` (Claude Code lo actualiza al cerr
 ### Requisitos no funcionales (F12–F13)
 | ID | Req. | Caso | Tipo | Resultado esperado | Estado |
 |---|---|---|---|---|---|
-| CP-59 | RNF Rend. | 8 usuarios concurrentes, operaciones habituales, 5 min | R | p95 ≤ 2 s, 0 % errores | Pendiente |
-| CP-60 | RNF Rend. | Reportes con 12 meses de datos | R | p95 ≤ 5 s | Pendiente |
-| CP-61 | RNF Seg. | Inyección SQL y XSS en búsquedas y formularios | I, M | Sin ejecución; datos escapados | Pendiente |
-| CP-62 | RNF Seg. | Cabeceras de seguridad en producción | M | HSTS, CSP, X-Content-Type-Options, Referrer-Policy presentes | Pendiente |
-| CP-63 | IC1, IC7 | HTTP redirige a HTTPS; puerto 3306 cerrado desde Internet | M | Redirección 301; `nmap` no muestra 3306 | Pendiente |
-| CP-64 | RNF Acc. | axe en login, dashboard, órdenes, venta, en claro y oscuro | A | 0 violaciones serias o críticas | Pendiente |
-| CP-65 | RNF Compat. | Flujos E2E en Chromium, Firefox y WebKit | E | En verde en los tres | Pendiente |
-| CP-66 | RNF Disp. | Backup diario y restauración en BD limpia | M | Restauración completa y app funcional | Pendiente |
-| CP-67 | RNF Desp. | Despliegue desde cero con el pipeline | M | App operativa con HTTPS sin pasos manuales fuera del runbook | Pendiente |
-| CP-68 | IU / Usab. | Sesión con usuarios reales (una tarea por rol) | M | ≥ 80 % de tareas completadas sin ayuda | Pendiente |
+| CP-59 | RNF Rend. | 8 usuarios concurrentes, operaciones habituales, 5 min | R | p95 ≤ 2 s, 0 % errores | Aprobado (F12: k6 `operaciones.js`, p95 214 ms y 0 % de errores en 8.777 peticiones; antes del arreglo del N+1, 390 ms) |
+| CP-60 | RNF Rend. | Reportes con 12 meses de datos | R | p95 ≤ 5 s | Aprobado (F12: k6 `reportes.js` sobre 12 meses, p95 715 ms; el más lento, reporte de ventas, 913 ms) |
+| CP-61 | RNF Seg. | Inyección SQL y XSS en búsquedas y formularios | I, M | Sin ejecución; datos escapados | Aprobado (F12: `SeguridadIT` con 6 cargas en los parámetros de búsqueda de 7 listados, `sort` con SQL → 400, XSS almacenado como JSON; E2E con `<script>`/`<img onerror>` mostrado como texto; sin `innerHTML` ni `bypassSecurityTrust*`) |
+| CP-62 | RNF Seg. | Cabeceras de seguridad en producción | M | HSTS, CSP, X-Content-Type-Options, Referrer-Policy presentes | No ejecutado (F13: requiere el Nginx de producción) |
+| CP-63 | IC1, IC7 | HTTP redirige a HTTPS; puerto 3306 cerrado desde Internet | M | Redirección 301; `nmap` no muestra 3306 | No ejecutado (F13: requiere el VPS) |
+| CP-64 | RNF Acc. | axe en login, dashboard, órdenes, venta, en claro y oscuro | A | 0 violaciones serias o críticas | Aprobado (F12: axe en las 5 suites de `e2e/tests/a11y`, claro y oscuro, en Chromium, Firefox y WebKit; recepción y venta solo con teclado) |
+| CP-65 | RNF Compat. | Flujos E2E en Chromium, Firefox y WebKit | E | En verde en los tres | Aprobado (F12: 276 ejecuciones en 5 proyectos; 233 a la primera y las 43 restantes, timeouts con la máquina cargada, en verde al repetirlas con 2 workers) |
+| CP-66 | RNF Disp. | Backup diario y restauración en BD limpia | M | Restauración completa y app funcional | No ejecutado (F13) |
+| CP-67 | RNF Desp. | Despliegue desde cero con el pipeline | M | App operativa con HTTPS sin pasos manuales fuera del runbook | No ejecutado (F13) |
+| CP-68 | IU / Usab. | Sesión con usuarios reales (una tarea por rol) | M | ≥ 80 % de tareas completadas sin ayuda | No ejecutado (guion listo en `docs/test-reports/usabilidad.md`; falta la sesión con usuarios reales) |
 
 ## 7. Informe de pruebas
 

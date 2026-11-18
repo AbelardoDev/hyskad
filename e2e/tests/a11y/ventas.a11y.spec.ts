@@ -8,7 +8,7 @@ for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad de ventas en tema ${tema}`, () => {
     test.use({ colorScheme: tema });
 
-    // CP-114
+    // CP-64, CP-114
     test('punto de venta con un producto en el carrito y lista de ventas', async ({ page }) => {
       await nuevaSesion(page, 'VENDEDOR');
       await page.goto('/ventas/nueva');

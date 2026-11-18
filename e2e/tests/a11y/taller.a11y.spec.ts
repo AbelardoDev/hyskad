@@ -30,7 +30,7 @@ for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad del taller en tema ${tema}`, () => {
     test.use({ colorScheme: tema });
 
-    // CP-121
+    // CP-64, CP-121
     test('tablero (lista y kanban), recepción y servicios', async ({ page }) => {
       await ordenPorApi();
       await nuevaSesion(page, 'ADMIN');
@@ -51,7 +51,7 @@ for (const tema of ['light', 'dark'] as const) {
       await sinViolacionesGraves(page);
     });
 
-    // CP-121, CP-130
+    // CP-64, CP-121, CP-130
     test('detalle de una orden con sus pestañas y la confirmación de cancelar', async ({ page }) => {
       const id = await ordenPorApi();
       await nuevaSesion(page, 'VENDEDOR');

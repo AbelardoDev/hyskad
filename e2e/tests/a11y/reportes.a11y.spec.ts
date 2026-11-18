@@ -8,7 +8,7 @@ for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad de F11 en tema ${tema}`, () => {
     test.use({ colorScheme: tema });
 
-    // CP-137
+    // CP-64, CP-137
     test('dashboard, reportes y configuración del admin', async ({ page }) => {
       // Recorre siete pantallas con axe en cada una
       test.slow();

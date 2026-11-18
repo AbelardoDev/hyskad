@@ -41,9 +41,15 @@ class SeguridadIT {
 
     private static final String ORDENES = "/api/v1/ordenes-trabajo";
 
-    /** Cargas típicas de inyección SQL. */
-    private static final List<String> INYECCIONES = List.of("' OR '1'='1", "%' OR 1=1 -- ", "'; DROP TABLE cliente; --",
-            "\" OR \"\"=\"", "1 UNION SELECT password_hash FROM usuario", "\\'; SELECT SLEEP(5); --");
+    /**
+     * Cargas típicas de inyección SQL. Empiezan por "zqx", que no aparece en los datos: las búsquedas
+     * normalizan la entrada (p. ej. un documento se reduce a sus dígitos), así que sin el prefijo
+     * "%' OR 1=1" quedaría en "11" y encontraría documentos reales. Si la inyección funcionara,
+     * OR '1'='1' devolvería todo; como se trata como dato, no encuentra nada.
+     */
+    private static final List<String> INYECCIONES = List.of("zqx' OR '1'='1", "zqx%' OR 1=1 -- ",
+            "zqx'; DROP TABLE cliente; --", "zqx\" OR \"\"=\"", "zqx' UNION SELECT password_hash FROM usuario -- ",
+            "zqx\\'; SELECT SLEEP(5); --");
 
     @Autowired
     private MockMvc mvc;
@@ -130,16 +136,26 @@ class SeguridadIT {
         long clientesAntes = jdbc.queryForObject("select count(*) from cliente", Long.class);
         List<String> listados = List.of("/api/v1/clientes", "/api/v1/motocicletas", ORDENES, "/api/v1/productos",
                 "/api/v1/ventas", "/api/v1/proveedores", "/api/v1/usuarios");
-        for (String carga : INYECCIONES) {
-            for (String listado : listados) {
-                mvc.perform(con(get(listado).param("q", carga), admin))
-                        .andExpect(status().isOk())
-                        .andExpect(jsonPath("$.totalElements").value(0));
+        for (String listado : listados) {
+            long todos = total(listado, null);
+            for (String carga : INYECCIONES) {
+                // Una inyección exitosa (OR '1'='1') devolvería todo el listado
+                long encontrados = total(listado, carga);
+                assertThat(encontrados).as(listado + " con " + carga).isLessThan(Math.max(todos, 1));
             }
-            JsonNode busqueda = flujo.ok(mvc.perform(con(get("/api/v1/busqueda").param("q", carga), admin)));
-            busqueda.properties().forEach(tipo -> assertThat(tipo.getValue()).as(tipo.getKey()).isEmpty());
+        }
+        for (String carga : INYECCIONES) {
+            mvc.perform(con(get("/api/v1/busqueda").param("q", carga), admin)).andExpect(status().isOk());
         }
         assertThat(jdbc.queryForObject("select count(*) from cliente", Long.class)).isEqualTo(clientesAntes);
+    }
+
+    private long total(String listado, String q) throws Exception {
+        MockHttpServletRequestBuilder peticion = get(listado);
+        if (q != null) {
+            peticion.param("q", q);
+        }
+        return flujo.ok(mvc.perform(con(peticion, admin)).andExpect(status().isOk())).get("totalElements").asLong();
     }
 
     // CP-61: el ordenamiento solo acepta propiedades conocidas; lo demás es 400, no SQL ni 500

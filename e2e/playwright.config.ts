@@ -19,7 +19,7 @@ export default defineConfig({
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
-  // Escritorio (1440) en los tres motores; las pruebas marcadas @movil corren en teléfonos
+  // CP-65: escritorio (1440) en los tres motores; las pruebas marcadas @movil corren en teléfonos
   // emulados (375 px, táctil y UA móvil). CI: Chromium en cada PR y todo en push a main.
   projects: [
     { name: 'chromium', grepInvert: /@movil/, use: { ...devices['Desktop Chrome'], viewport: ESCRITORIO } },

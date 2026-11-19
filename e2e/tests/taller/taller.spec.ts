@@ -120,11 +120,15 @@ test.describe('órdenes de trabajo', () => {
     await tabularHasta(page, siguiente);
     await page.keyboard.press('Enter');
 
-    // 4) Mecánico con espacio
-    await tabularHasta(page, page.getByRole('checkbox', { name: mecanico.nombre }));
+    // 4) Mecánico con espacio. Cada mecánico es un punto de Tab y las demás pruebas crean más
+    // (los tres navegadores comparten la BD en el CI): el tope crece con la lista
+    const mecanicoCheckbox = page.getByRole('checkbox', { name: mecanico.nombre });
+    await expect(mecanicoCheckbox).toBeVisible();
+    const pasos = (await page.getByRole('checkbox').count()) + 40;
+    await tabularHasta(page, mecanicoCheckbox, pasos);
     await page.keyboard.press('Space');
-    await expect(page.getByRole('checkbox', { name: mecanico.nombre })).toBeChecked();
-    await tabularHasta(page, siguiente);
+    await expect(mecanicoCheckbox).toBeChecked();
+    await tabularHasta(page, siguiente, pasos);
     await page.keyboard.press('Enter');
 
     // 5) Confirmar

@@ -22,7 +22,7 @@
 | F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #23 | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ✅ Terminada | #25 | `hk-chart` y `hk-command-palette` en el kit; impresión siempre en claro; capturas en `docs/capturas/f11` |
 | F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ✅ Terminada | #26 | Informe en `docs/test-reports/INFORME-PRUEBAS.md`; checklist OWASP y guion de usabilidad al lado |
-| F13 | Despliegue en VPS | ⬜ Pendiente | | |
+| F13 | Despliegue en VPS | 🟦 En curso | | |
 
 Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 

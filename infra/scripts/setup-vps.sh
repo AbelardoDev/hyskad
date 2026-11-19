@@ -97,7 +97,7 @@ EOF
 
   echo
   echo "Listo. Siguiente paso: desde otra terminal compruebe 'ssh -p $SSH_PORT deploy@<servidor>' y siga docs/DEPLOY.md."
-  echo "Cuando entre con la llave, puede correr: sudo $0 endurecer-ssh"
+  echo "Cuando entre con la llave, puede correr: sudo SSH_PORT=$SSH_PORT bash $0 endurecer-ssh"
 }
 
 endurecer_ssh() {

@@ -2,6 +2,9 @@ package com.hyskad.notificaciones.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.time.Duration;
 
@@ -10,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
+import org.springframework.test.web.servlet.MockMvc;
 
 import com.hyskad.support.FlujoOrdenes;
 import com.hyskad.support.IntegrationTest;
@@ -22,6 +26,9 @@ import tools.jackson.databind.JsonNode;
 @IntegrationTest
 @ExtendWith(OutputCaptureExtension.class)
 class FalloCorreoIT {
+
+    @Autowired
+    private MockMvc mvc;
 
     @Autowired
     private UsuariosDePrueba usuarios;
@@ -48,5 +55,14 @@ class FalloCorreoIT {
         String error = salida.getOut().lines().filter(l -> l.contains("No se pudo enviar el correo 'orden-lista'"))
                 .findFirst().orElseThrow();
         assertThat(error).containsPattern("\\[[0-9a-f-]{36}\\]").doesNotContain("@cliente.test");
+    }
+
+    // CP-54, F13: el healthcheck del contenedor no depende del SMTP; si lo hiciera, una caída del
+    // proveedor de correo dejaría el backend "unhealthy" y el despliegue se revertiría
+    @Test
+    void cp54ElHealthcheckSigueArribaSinSmtp() throws Exception {
+        mvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"));
     }
 }

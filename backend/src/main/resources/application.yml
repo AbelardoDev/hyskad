@@ -57,6 +57,11 @@ management:
   endpoint:
     health:
       show-details: never
+  # El SMTP es externo y su caída no detiene la operación (CP-54): no debe dejar el contenedor
+  # "unhealthy", porque eso frena el proxy y hace que el despliegue se revierta
+  health:
+    mail:
+      enabled: false
 
 springdoc:
   api-docs:

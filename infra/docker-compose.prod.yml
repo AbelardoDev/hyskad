@@ -1,0 +1,105 @@
+# Producción en el VPS (F13). Vive en /opt/hyskad junto al .env (nunca en el repositorio).
+#   cd /opt/hyskad && docker compose pull && docker compose up -d
+# Solo "proxy" publica puertos (80 y 443). MySQL queda en la red interna, sin puertos (IC7, CP-63).
+name: hyskad
+
+x-logs: &logs
+  logging:
+    driver: json-file
+    options:
+      max-size: "10m"
+      max-file: "5"
+
+services:
+  proxy:
+    image: ghcr.io/abelardodev/hyskad-proxy:${HYSKAD_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      DOMINIO: ${DOMINIO:?Defina DOMINIO en .env}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - certbot-conf:/etc/letsencrypt:ro
+      - certbot-www:/var/www/certbot:ro
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks: [publica, interna]
+    mem_limit: ${PROXY_MEM:-128m}
+    <<: *logs
+
+  backend:
+    image: ghcr.io/abelardodev/hyskad-backend:${HYSKAD_VERSION:-latest}
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/hyskad?useUnicode=true&characterEncoding=utf8&connectionTimeZone=UTC
+      DB_USER: ${DB_USER:-hyskad}
+      DB_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD en .env}
+      JWT_SECRET: ${JWT_SECRET:?Defina JWT_SECRET en .env}
+      APP_BASE_URL: https://${DOMINIO}
+      MAIL_HOST: ${MAIL_HOST:?Defina MAIL_HOST en .env}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:?Defina MAIL_FROM en .env}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks: [interna, salida]
+    mem_limit: ${BACKEND_MEM:-768m}
+    <<: *logs
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: hyskad
+      MYSQL_USER: ${DB_USER:-hyskad}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?Defina DB_PASSWORD en .env}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?Defina MYSQL_ROOT_PASSWORD en .env}
+      TZ: UTC
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+00:00
+      - --innodb-buffer-pool-size=${MYSQL_BUFFER_POOL:-256M}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u root -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks: [interna]
+    mem_limit: ${MYSQL_MEM:-768m}
+    <<: *logs
+
+  # Renueva el certificado con el método webroot (el proxy sirve /.well-known/acme-challenge/).
+  # El primer certificado se obtiene con scripts/init-letsencrypt.sh.
+  certbot:
+    image: certbot/certbot:v4.1.1
+    restart: unless-stopped
+    entrypoint: /bin/sh -c 'trap exit TERM; while :; do certbot renew --webroot -w /var/www/certbot --quiet; sleep 12h & wait $${!}; done'
+    volumes:
+      - certbot-conf:/etc/letsencrypt
+      - certbot-www:/var/www/certbot
+    networks: [publica]
+    mem_limit: 128m
+    <<: *logs
+
+networks:
+  # Sin salida a Internet: MySQL y el tráfico backend ↔ proxy
+  interna:
+    internal: true
+  # El backend necesita salir para el SMTP; no publica puertos
+  salida:
+  publica:
+
+volumes:
+  mysql-data:
+  certbot-conf:
+  certbot-www:

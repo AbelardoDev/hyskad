@@ -1,0 +1,146 @@
+# Despliegue en el VPS (F13). Se dispara con un tag v* (git tag v1.0.0 && git push --tags) o a mano.
+# Secretos del repositorio: VPS_HOST, VPS_PORT (22 si se omite), VPS_USER, VPS_SSH_KEY, VPS_KNOWN_HOSTS.
+# Variable del repositorio: DOMINIO (p. ej. hyskad.tudominio.com).
+name: Deploy
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Tag ya publicado a desplegar (p. ej. v1.0.0)'
+        required: true
+
+concurrency:
+  group: deploy-produccion
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+  actions: read
+
+env:
+  REGISTRO: ghcr.io/abelardodev
+  VERSION: ${{ github.event_name == 'push' && github.ref_name || inputs.version }}
+
+jobs:
+  # El commit del tag debe tener el CI en verde (corre en el push a main)
+  ci-en-verde:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Buscar un CI exitoso para el commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sha=$(gh api "repos/${{ github.repository }}/commits/${VERSION}" --jq .sha)
+          echo "Commit de ${VERSION}: $sha"
+          exitosos=$(gh run list -R "${{ github.repository }}" --workflow ci.yml --commit "$sha" \
+            --status success --json databaseId --jq length)
+          if [ "$exitosos" -eq 0 ]; then
+            echo "::error::El commit $sha no tiene el CI en verde; no se despliega."
+            exit 1
+          fi
+
+  imagenes:
+    needs: ci-en-verde
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        include:
+          - nombre: hyskad-backend
+            contexto: backend
+            dockerfile: backend/Dockerfile
+          - nombre: hyskad-proxy
+            contexto: .
+            dockerfile: frontend/Dockerfile
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.VERSION }}
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ github.token }}
+      - uses: docker/build-push-action@v7
+        with:
+          context: ${{ matrix.contexto }}
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ${{ env.REGISTRO }}/${{ matrix.nombre }}:${{ env.VERSION }}
+            ${{ env.REGISTRO }}/${{ matrix.nombre }}:latest
+          labels: |
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            org.opencontainers.image.version=${{ env.VERSION }}
+          cache-from: type=gha,scope=${{ matrix.nombre }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.nombre }}
+
+  desplegar:
+    needs: imagenes
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: produccion
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.VERSION }}
+
+      - name: Llave SSH
+        run: |
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+          cat >> ~/.ssh/config <<EOF
+          Host vps
+            HostName ${{ secrets.VPS_HOST }}
+            Port ${{ secrets.VPS_PORT || '22' }}
+            User ${{ secrets.VPS_USER }}
+            IdentityFile ~/.ssh/id_deploy
+            StrictHostKeyChecking yes
+          EOF
+
+      - name: Copiar compose y scripts a /opt/hyskad
+        run: |
+          scp infra/docker-compose.prod.yml vps:/opt/hyskad/docker-compose.yml
+          scp infra/scripts/desplegar.sh infra/scripts/backup-db.sh infra/scripts/restore-db.sh \
+              infra/scripts/init-letsencrypt.sh vps:/opt/hyskad/
+          ssh vps 'chmod 750 /opt/hyskad/*.sh'
+
+      - name: Desplegar (backup, pull, up y espera del healthcheck)
+        id: desplegar
+        run: |
+          # Token de un solo uso para bajar las imágenes de GHCR; se cierra la sesión al terminar
+          echo "${{ github.token }}" | ssh vps "docker login ghcr.io -u '${{ github.actor }}' --password-stdin"
+          status=0
+          ssh vps "/opt/hyskad/desplegar.sh '${VERSION}'" || status=$?
+          ssh vps 'docker logout ghcr.io' || true
+          exit $status
+
+      - name: Verificar desde fuera (Nginx sirve la SPA y enruta /api al backend)
+        id: verificar
+        env:
+          DOMINIO: ${{ vars.DOMINIO }}
+        run: |
+          for intento in 1 2 3 4 5 6; do
+            raiz=$(curl -s -o /dev/null -w '%{http_code}' "https://${DOMINIO}/")
+            api=$(curl -s -o /dev/null -w '%{http_code}' "https://${DOMINIO}/api/v1/auth/me")
+            echo "intento $intento: / → $raiz, /api/v1/auth/me → $api"
+            if [ "$raiz" = "200" ] && [ "$api" = "401" ]; then exit 0; fi
+            sleep 10
+          done
+          echo "::error::La verificación externa falló"
+          exit 1
+
+      # desplegar.sh ya revierte solo si el healthcheck falla; aquí, si falla la verificación externa
+      - name: Revertir si la verificación externa falló
+        if: failure() && steps.verificar.outcome == 'failure'
+        run: |
+          echo "${{ github.token }}" | ssh vps "docker login ghcr.io -u '${{ github.actor }}' --password-stdin" || true
+          ssh vps '/opt/hyskad/desplegar.sh --revertir' || true
+          ssh vps 'docker logout ghcr.io' || true

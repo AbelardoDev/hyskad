@@ -61,6 +61,32 @@ jobs:
       - run: npm test
       - run: npm run build
 
+  # F13: las imágenes de producción se construyen (sin publicarse) para detectar un Dockerfile
+  # roto en el PR y no al desplegar
+  imagenes:
+    name: imagenes
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        include:
+          - nombre: hyskad-backend
+            contexto: backend
+            dockerfile: backend/Dockerfile
+          - nombre: hyskad-proxy
+            contexto: .
+            dockerfile: frontend/Dockerfile
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/build-push-action@v7
+        with:
+          context: ${{ matrix.contexto }}
+          file: ${{ matrix.dockerfile }}
+          push: false
+          tags: ${{ matrix.nombre }}:ci
+          cache-from: type=gha,scope=${{ matrix.nombre }}
+
   e2e:
     name: e2e
     runs-on: ubuntu-latest

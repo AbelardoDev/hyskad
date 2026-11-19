@@ -19,6 +19,7 @@ desktop.ini
 .env
 .env.*
 !.env.example
+!.env.prod.example
 
 # --- Logs ---
 *.log

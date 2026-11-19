@@ -1,0 +1,11 @@
+# .dockerignore de frontend/Dockerfile. La imagen se construye desde la raíz del repositorio (necesita
+# infra/nginx), así que solo se envía lo que usa: el código del frontend y la configuración de Nginx.
+*
+!frontend/
+!infra/nginx/
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/coverage/
+frontend/Dockerfile*
+infra/nginx/e2e.conf.template

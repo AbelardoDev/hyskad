@@ -1,0 +1,9 @@
+target/
+.idea/
+.vscode/
+*.iml
+*.log
+src/test/
+dependency-check-suppressions.xml
+Dockerfile
+.dockerignore

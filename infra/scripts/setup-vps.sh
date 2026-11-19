@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Prepara un VPS Ubuntu (22.04 o 24.04) para HYSKAD (F13). Se corre como root (o con sudo).
+# Prepara un VPS Ubuntu (22.04 o posterior) para HYSKAD (F13). Se corre como root (o con sudo).
 #
-#   sudo ./setup-vps.sh base
-#       Zona horaria America/Bogota, actualizaciones automáticas, ufw (solo 22, 80 y 443),
+#   sudo SSH_PORT=2222 ./setup-vps.sh base
+#       Zona horaria America/Bogota, actualizaciones automáticas, ufw (solo SSH_PORT, 80 y 443),
 #       fail2ban para SSH, Docker Engine + Compose desde el repositorio oficial, usuario "deploy"
 #       (grupo docker, con las llaves SSH autorizadas del usuario que lo ejecuta), /opt/hyskad y
 #       el cron del backup diario. No toca la configuración de SSH.
@@ -10,7 +10,13 @@
 #   sudo ./setup-vps.sh endurecer-ssh
 #       Desactiva el ingreso por contraseña y el de root. Correrlo SOLO después de comprobar, desde
 #       otra terminal, que "ssh deploy@<servidor>" entra con la llave; si no, se pierde el acceso.
+#
+# SSH_PORT es el puerto en el que escucha sshd (22 si se omite). Si no coincide, ufw y fail2ban
+# protegen otro puerto y el firewall deja fuera la sesión SSH.
 set -euo pipefail
+
+SSH_PORT="${SSH_PORT:-22}"
+case "$SSH_PORT" in ''|*[!0-9]*) echo "SSH_PORT inválido: $SSH_PORT" >&2; exit 2 ;; esac
 
 [ "$(id -u)" -eq 0 ] || { echo "Ejecútelo como root (sudo)." >&2; exit 1; }
 paso() { echo; echo "==> $*"; }
@@ -27,18 +33,23 @@ base() {
   apt-get install -y -q ca-certificates curl gnupg ufw fail2ban unattended-upgrades
   dpkg-reconfigure -f noninteractive unattended-upgrades
 
-  paso "Firewall: solo SSH, HTTP y HTTPS"
+  paso "Firewall: solo SSH ($SSH_PORT), HTTP y HTTPS"
+  if ! ss -tln | grep -qE "[:.]$SSH_PORT[[:space:]]"; then
+    echo "sshd no escucha en el puerto $SSH_PORT; se cancela para no cortar el acceso." >&2
+    exit 1
+  fi
   ufw default deny incoming
   ufw default allow outgoing
-  ufw allow 22/tcp
+  ufw allow "$SSH_PORT/tcp"
   ufw allow 80/tcp
   ufw allow 443/tcp
   ufw --force enable
 
   paso "fail2ban para SSH"
-  cat > /etc/fail2ban/jail.d/sshd.local <<'EOF'
+  cat > /etc/fail2ban/jail.d/sshd.local <<EOF
 [sshd]
 enabled = true
+port = $SSH_PORT
 maxretry = 5
 findtime = 10m
 bantime = 1h
@@ -85,7 +96,7 @@ EOF
   chmod 644 /etc/cron.d/hyskad-backup
 
   echo
-  echo "Listo. Siguiente paso: desde otra terminal compruebe 'ssh deploy@<servidor>' y siga docs/DEPLOY.md."
+  echo "Listo. Siguiente paso: desde otra terminal compruebe 'ssh -p $SSH_PORT deploy@<servidor>' y siga docs/DEPLOY.md."
   echo "Cuando entre con la llave, puede correr: sudo $0 endurecer-ssh"
 }
 
@@ -100,7 +111,7 @@ PubkeyAuthentication yes
 EOF
   sshd -t
   systemctl reload ssh || systemctl reload sshd
-  echo "Hecho. No cierre esta sesión hasta comprobar en otra terminal que 'ssh deploy@<servidor>' entra."
+  echo "Hecho. No cierre esta sesión hasta comprobar en otra terminal que 'ssh -p $SSH_PORT deploy@<servidor>' entra."
 }
 
 case "${1:-}" in

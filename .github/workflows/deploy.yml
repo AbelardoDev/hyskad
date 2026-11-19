@@ -1,5 +1,5 @@
 # Despliegue en el VPS (F13). Se dispara con un tag v* (git tag v1.0.0 && git push --tags) o a mano.
-# Secretos del repositorio: VPS_HOST, VPS_USER, VPS_SSH_KEY, VPS_KNOWN_HOSTS.
+# Secretos del repositorio: VPS_HOST, VPS_PORT (22 si se omite), VPS_USER, VPS_SSH_KEY, VPS_KNOWN_HOSTS.
 # Variable del repositorio: DOMINIO (p. ej. hyskad.tudominio.com).
 name: Deploy
 
@@ -99,6 +99,7 @@ jobs:
           cat >> ~/.ssh/config <<EOF
           Host vps
             HostName ${{ secrets.VPS_HOST }}
+            Port ${{ secrets.VPS_PORT || '22' }}
             User ${{ secrets.VPS_USER }}
             IdentityFile ~/.ssh/id_deploy
             StrictHostKeyChecking yes

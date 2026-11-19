@@ -26,35 +26,39 @@ Todos los comandos de este documento se corren como `deploy` dentro de `/opt/hys
 
 ### 1.1 Requisitos
 
-- Un VPS Ubuntu 22.04 o 24.04 con al menos 2 GB de RAM (1 GB funciona con los ajustes de memoria de §9) y acceso SSH con llave.
-- Un subdominio (p. ej. `hyskad.tudominio.com`) con un registro **A** hacia la IP del VPS. Para comprobarlo: `dig +short hyskad.tudominio.com`.
+- Un VPS Ubuntu 22.04 o posterior con al menos 2 GB de RAM (1 GB funciona con los ajustes de memoria de §9) y acceso SSH con llave.
+- Un subdominio (p. ej. `hyskad.tudominio.com`) con un registro **A** hacia la IP del VPS. Para comprobarlo: `dig +short hyskad.tudominio.com` debe devolver **la IP del VPS**.
+- Si el DNS está en Cloudflare, el registro va en **"DNS only" (nube gris)**. Con el proxy de Cloudflare (nube naranja), Nginx vería la IP de Cloudflare en todas las peticiones: el rate limit del login quedaría compartido entre todos los usuarios y la auditoría registraría IPs de Cloudflare.
+- Los puertos 80 y 443 libres. Si el servidor ya tiene otro proxy (Nginx Proxy Manager, Caddy, Apache…), ver §10.
 - Una cuenta SMTP para los correos (Brevo, Gmail con contraseña de aplicación, etc.).
 
 ### 1.2 Preparar el servidor
 
-Desde tu equipo:
+Desde tu equipo. `<puerto>` es el puerto de SSH del servidor (22 si no lo cambiaste):
 
 ```bash
-scp infra/scripts/setup-vps.sh <usuario>@<ip>:/tmp/
-ssh <usuario>@<ip> 'sudo bash /tmp/setup-vps.sh base'
+scp -P <puerto> infra/scripts/setup-vps.sh <usuario>@<ip>:/tmp/
+ssh -t -p <puerto> <usuario>@<ip> 'sudo SSH_PORT=<puerto> bash /tmp/setup-vps.sh base'
 ```
+
+`SSH_PORT` debe ser el puerto en el que escucha `sshd`: es el único que el script abre en `ufw` y el que vigila `fail2ban`. Si `sshd` no escucha ahí, el script se detiene antes de activar el firewall.
 
 El script hace esto:
 - Pone la zona horaria America/Bogota.
-- Instala Docker, `ufw` (solo 22, 80 y 443), `fail2ban` y las actualizaciones automáticas.
+- Instala Docker (si no está), `ufw` (solo `SSH_PORT`, 80 y 443), `fail2ban` y las actualizaciones automáticas.
 - Crea el usuario `deploy` con tus mismas llaves SSH.
 - Crea `/opt/hyskad` y programa el backup diario a las 2:00.
 
 **Antes de seguir**, comprueba desde otra terminal que entras con la llave:
 
 ```bash
-ssh deploy@<ip>
+ssh -p <puerto> deploy@<ip>
 ```
 
 Solo si entras, desactiva el ingreso con contraseña y el de root. No cierres la sesión actual hasta comprobar otra vez que `deploy` entra:
 
 ```bash
-ssh <usuario>@<ip> 'sudo bash /tmp/setup-vps.sh endurecer-ssh'
+ssh -t -p <puerto> <usuario>@<ip> 'sudo SSH_PORT=<puerto> bash /tmp/setup-vps.sh endurecer-ssh'
 ```
 
 ### 1.3 Archivos en `/opt/hyskad`
@@ -62,10 +66,10 @@ ssh <usuario>@<ip> 'sudo bash /tmp/setup-vps.sh endurecer-ssh'
 Desde tu equipo, en la raíz del repositorio:
 
 ```bash
-scp infra/docker-compose.prod.yml deploy@<ip>:/opt/hyskad/docker-compose.yml
-scp infra/scripts/{desplegar,backup-db,restore-db,init-letsencrypt}.sh deploy@<ip>:/opt/hyskad/
-scp infra/.env.prod.example deploy@<ip>:/opt/hyskad/.env
-ssh deploy@<ip> 'chmod 750 /opt/hyskad/*.sh && chmod 600 /opt/hyskad/.env'
+scp -P <puerto> infra/docker-compose.prod.yml deploy@<ip>:/opt/hyskad/docker-compose.yml
+scp -P <puerto> infra/scripts/{desplegar,backup-db,restore-db,init-letsencrypt}.sh deploy@<ip>:/opt/hyskad/
+scp -P <puerto> infra/.env.prod.example deploy@<ip>:/opt/hyskad/.env
+ssh -p <puerto> deploy@<ip> 'chmod 750 /opt/hyskad/*.sh && chmod 600 /opt/hyskad/.env'
 ```
 
 Completa `/opt/hyskad/.env` en el servidor (`nano /opt/hyskad/.env`). Las instrucciones de cada variable están dentro del archivo. Genera las contraseñas y el secreto con `openssl rand -base64 24` y `openssl rand -base64 48`. Define `ADMIN_EMAIL` y `ADMIN_PASSWORD` para el primer administrador (§6).
@@ -77,17 +81,18 @@ El primer `docker compose` necesita las imágenes publicadas. Configura el repos
 1. **Settings → Environments → New environment `produccion`.** Opcional: exigir aprobación manual.
 2. **Settings → Secrets and variables → Actions:**
    - Secretos:
-     - `VPS_HOST`: IP o host del VPS.
+     - `VPS_HOST`: IP del VPS (no el dominio).
+     - `VPS_PORT`: puerto de SSH; si se omite, 22.
      - `VPS_USER`: `deploy`.
      - `VPS_SSH_KEY`: llave **privada** de un par dedicado al despliegue. Su llave pública va en `/home/deploy/.ssh/authorized_keys`.
-     - `VPS_KNOWN_HOSTS`: salida de `ssh-keyscan -t ed25519 <ip>`. Compárala con la huella que muestra el servidor (`ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`).
+     - `VPS_KNOWN_HOSTS`: salida de `ssh-keyscan -p <puerto> -t ed25519 <ip>` (con un puerto distinto de 22 la línea empieza por `[<ip>]:<puerto>`). Compárala con la huella que muestra el servidor (`ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`).
    - Variable: `DOMINIO`, p. ej. `hyskad.tudominio.com`.
 
 Para generar la llave del despliegue (sin frase de paso, solo para el pipeline):
 
 ```bash
 ssh-keygen -t ed25519 -f hyskad-deploy -C "github-actions hyskad" -N ""
-ssh-copy-id -i hyskad-deploy.pub deploy@<ip>
+ssh-copy-id -p <puerto> -i hyskad-deploy.pub deploy@<ip>
 # El contenido de hyskad-deploy va en VPS_SSH_KEY; después borra ese archivo de tu equipo
 ```
 
@@ -246,13 +251,14 @@ Si sospechas que robaron sesiones, después de rotarlo cierra todas: desactiva y
 | Síntoma | Causa probable | Qué hacer |
 |---|---|---|
 | `proxy` reinicia en bucle con `cannot load certificate` | No hay certificado todavía | `./init-letsencrypt.sh` (§1.5) |
-| `init-letsencrypt.sh` falla en el reto | El registro A no apunta al VPS o el puerto 80 está cerrado | `dig +short <dominio>`; `sudo ufw status`; el proveedor del VPS puede tener su propio firewall |
+| `init-letsencrypt.sh` falla en el reto | El registro A no apunta al VPS, el puerto 80 está cerrado u otro proxy lo ocupa | `dig +short <dominio>` (debe dar la IP del VPS, no la de Cloudflare); `sudo ufw status`; `sudo ss -tlnp \| grep -E ':(80\|443) '`; el proveedor del VPS puede tener su propio firewall |
+| `proxy` no arranca: `port is already allocated` | Otro contenedor o servicio tiene el 80 o el 443 | §10 |
 | 502 Bad Gateway | El backend no está sano | `docker compose ps`; `docker compose logs --tail 200 backend` |
 | El backend no arranca: `Defina … en .env` | Falta una variable obligatoria | Completar `.env` (ver `infra/.env.prod.example`) |
 | El backend no arranca: error de Flyway `validate` | La base tiene un esquema de otra versión | Ver §3 (rollback con migraciones) |
 | No llegan los correos | Credenciales SMTP o remitente no verificado | `docker compose logs backend \| grep -i mail`; revisar `MAIL_*` y el remitente en el proveedor |
 | Las notificaciones llegan tarde | Algo intermedio guarda en búfer el stream SSE | El bloque `/api/v1/notificaciones/stream` de `infra/nginx/prod.conf.template` debe tener `proxy_buffering off`; un CDN o proxy delante del VPS debe respetarlo |
-| Todos reciben 429 en el login | El rate limit ve una sola IP | Nginx debe enviar `X-Forwarded-For $remote_addr` y el backend usa `forward-headers-strategy: framework` (perfil `prod`) |
+| Todos reciben 429 en el login | El rate limit ve una sola IP | Si el dominio pasa por Cloudflare, ponerlo en "DNS only" (§1.1). Nginx debe enviar `X-Forwarded-For $remote_addr` y el backend usa `forward-headers-strategy: framework` (perfil `prod`) |
 | Error de CSP en la consola del navegador | Un script en línea nuevo en `index.html` | La imagen calcula los hashes al construirse; reconstruir y publicar. Nunca relajar la CSP con `unsafe-inline` para scripts |
 | Disco lleno | Imágenes viejas o backups | `docker image prune -f`; revisar `backups/` |
 
@@ -273,3 +279,18 @@ La JVM usa el 70 % del límite del contenedor como heap (`-XX:MaxRAMPercentage=7
 sudo fallocate -l 1G /swapfile && sudo chmod 600 /swapfile && sudo mkswap /swapfile && sudo swapon /swapfile
 echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
+
+## 10. Servidor con otros servicios
+
+HYSKAD necesita los puertos 80 y 443 para él solo (su Nginx termina el HTTPS y renueva el certificado). Si el servidor ya tiene otro proxy, hay que bajarlo antes del primer despliegue. Ejemplo con Nginx Proxy Manager en `/opt/nginx-proxy-manager`:
+
+```bash
+# 1. Respaldo de la configuración y los certificados (sirve para migrar los otros sitios después)
+sudo tar -czf /root/npm-respaldo-$(date +%Y%m%d).tar.gz -C /opt nginx-proxy-manager
+# 2. Anotar qué dominio iba a qué contenedor
+sudo grep -h -E 'server_name|set \$server|set \$port' /opt/nginx-proxy-manager/data/nginx/proxy_host/*.conf
+# 3. Bajarlo (los volúmenes y la carpeta quedan; "docker compose up -d" lo devuelve)
+cd /opt/nginx-proxy-manager && sudo docker compose down
+```
+
+Los sitios que dependían de ese proxy quedan fuera de línea hasta migrarlos. Para servirlos desde el Nginx de HYSKAD se agrega un bloque `server` por dominio en `infra/nginx/` (con su propio certificado en `init-letsencrypt.sh`), y sus contenedores se unen a la red del proxy. Eso es un cambio del repositorio: no editar la configuración dentro del contenedor.

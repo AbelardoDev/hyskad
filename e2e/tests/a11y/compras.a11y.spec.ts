@@ -7,6 +7,7 @@ for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad de compras y proveedores en tema ${tema}`, () => {
     test.use({ colorScheme: tema });
 
+    // CP-109
     test('nueva compra con errores y una fila llena', async ({ page }) => {
       await nuevaSesion(page, 'ALMACEN');
       await page.goto('/compras/nueva');
@@ -21,6 +22,7 @@ for (const tema of ['light', 'dark'] as const) {
       await sinViolacionesGraves(page);
     });
 
+    // CP-109
     test('proveedores y compras', async ({ page }) => {
       await nuevaSesion(page, 'ALMACEN');
       await page.goto('/proveedores');

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { crearUsuario, entrar, entrarPorFormulario, nuevaSesion } from './support/sesion';
+import { crearUsuario, entrar, entrarPorFormulario, nuevaSesion } from '../support/sesion';
 
 const MAILPIT = process.env['E2E_MAILPIT_URL'] ?? 'http://localhost:8026';
 
@@ -15,9 +15,11 @@ test.describe('sesión', () => {
 
     // Se captura el token de la respuesta del login (luego la app navega y el cuerpo ya no está).
     let accessToken = '';
+    let setCookie = '';
     await page.route('**/api/v1/auth/login', async (ruta) => {
       const respuesta = await ruta.fetch();
       accessToken = ((await respuesta.json()) as { accessToken: string }).accessToken;
+      setCookie = respuesta.headers()['set-cookie'] ?? '';
       await ruta.fulfill({ response: respuesta });
     });
     await entrarPorFormulario(page, usuario);
@@ -25,9 +27,12 @@ test.describe('sesión', () => {
     await expect(page).toHaveURL(/\/dashboard$/);
     await expect(page.getByRole('heading', { level: 1, name: /^Hola, / })).toBeVisible();
 
+    // Lo que manda el servidor (WebKit fuera de macOS no implementa SameSite y la reporta como None)
+    expect(setCookie).toMatch(/hk_refresh=[^;]+;.*HttpOnly/i);
+    expect(setCookie).toMatch(/SameSite=Strict/i);
+    expect(setCookie).toMatch(/Path=\/api\/v1\/auth/i);
     const refresh = (await context.cookies()).find((c) => c.name === 'hk_refresh');
     expect(refresh?.httpOnly).toBe(true);
-    expect(refresh?.sameSite).toBe('Strict');
 
     await page.reload();
     await expect(page.getByRole('heading', { level: 1, name: /^Hola, / })).toBeVisible();
@@ -41,6 +46,7 @@ test.describe('sesión', () => {
     expect(almacenado).not.toContain(accessToken.split('.')[2]);
   });
 
+  // CP-82
   test('login fallido muestra un mensaje genérico y no entra', async ({ page }) => {
     const usuario = await crearUsuario('VENDEDOR');
     await page.goto('/login');
@@ -52,6 +58,7 @@ test.describe('sesión', () => {
     await expect(page.getByRole('textbox', { name: 'Contraseña', exact: true })).toHaveValue('');
   });
 
+  // CP-82
   test('ante el 429 muestra cuánto esperar y bloquea el botón', async ({ page }) => {
     // CP-03 (el límite real) se prueba en la integración del backend; aquí, la reacción de la UI.
     await page.route('**/api/v1/auth/login', (ruta) =>
@@ -70,6 +77,7 @@ test.describe('sesión', () => {
     await expect(page.getByRole('button', { name: 'Entrar' })).toBeDisabled();
   });
 
+  // CP-84
   test('sin sesión, una ruta protegida pide login y luego vuelve a ella', async ({ page }) => {
     const usuario = await crearUsuario('ADMIN');
     await page.goto('/usuarios');
@@ -113,6 +121,7 @@ test.describe('sesión', () => {
     await expect(page).toHaveURL(/\/usuarios$/);
   });
 
+  // CP-84
   test('cerrar sesión revoca la cookie: recargar no recupera la sesión', async ({ page }) => {
     const usuario = await nuevaSesion(page, 'ALMACEN');
     await page.goto('/dashboard');
@@ -127,6 +136,7 @@ test.describe('sesión', () => {
     await expect(page).toHaveURL(/\/login\?returnUrl=%2Fdashboard$/);
   });
 
+  // CP-82
   test('recuperación de contraseña completa con el enlace del correo (Mailpit)', async ({
     page,
     request,
@@ -181,6 +191,7 @@ test.describe('sesión', () => {
 });
 
 test.describe('permisos', () => {
+  // CP-83
   test('un mecánico no ve "Usuarios" en el menú y por URL llega a la página 403', async ({ page }) => {
     await nuevaSesion(page, 'MECANICO');
     await page.goto('/dashboard');

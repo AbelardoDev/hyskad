@@ -144,6 +144,7 @@ function permisos(...area: Permiso[]): Partial<UsuarioSesion> {
   return { rol: 'VENDEDOR', permisos: ['DASHBOARD_VER', 'REPORTES_VER', ...area] };
 }
 
+// CP-133
 describe('Reportes', () => {
   it('solo muestra las pestañas del área del usuario y abre la primera', async () => {
     const m = await montar('/reportes', permisos('PRESUPUESTOS_GESTIONAR', 'PAGOS_REGISTRAR'));

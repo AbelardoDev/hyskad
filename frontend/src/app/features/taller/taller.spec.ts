@@ -247,6 +247,7 @@ describe('HkDiagnosticoForm', () => {
   });
 });
 
+// CP-119
 describe('OrdenesPage', () => {
   async function montar() {
     const http = configurar();

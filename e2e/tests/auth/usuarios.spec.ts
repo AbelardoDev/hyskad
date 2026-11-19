@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { nuevaSesion, UsuarioE2e } from './support/sesion';
+import { nuevaSesion, UsuarioE2e } from '../support/sesion';
 
 test.describe('administración de usuarios', () => {
   let yo: UsuarioE2e;
@@ -9,6 +9,7 @@ test.describe('administración de usuarios', () => {
     yo = await nuevaSesion(page, 'ADMIN');
   });
 
+  // CP-85
   test('crea un usuario en el drawer, lo encuentra y lo desactiva con confirmación', async ({ page }) => {
     const email = `e2e-ui-${Date.now()}@hyskad.test`;
     await page.goto('/usuarios');
@@ -44,6 +45,7 @@ test.describe('administración de usuarios', () => {
     await expect(fila).toContainText('Inactivo');
   });
 
+  // CP-85
   test('filtra por rol y no permite cambiar los propios permisos', async ({ page }) => {
     await page.goto('/usuarios');
     await page.getByRole('combobox', { name: 'Rol' }).selectOption('MECANICO');
@@ -67,7 +69,7 @@ test.describe('administración de usuarios', () => {
     await expect(page.getByRole('switch', { name: 'Gestionar usuarios y permisos' })).toBeDisabled();
   });
 
-  test.describe('en móvil (375 px)', () => {
+  test.describe('en móvil (375 px) @movil', () => {
     test.use({ viewport: { width: 375, height: 812 }, hasTouch: true });
 
     test('la acción principal flota sobre la barra inferior y la tabla pasa a tarjetas', async ({ page }) => {

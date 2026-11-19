@@ -103,6 +103,7 @@ class ReportesIT {
                 .andExpect(status().isBadRequest());
     }
 
+    // CP-132
     @Test
     void cp57InventarioConStockBajoYAgotadosExportableACsv() throws Exception {
         Producto bajo = catalogo.producto("5");
@@ -135,6 +136,7 @@ class ReportesIT {
         assertThat(lineas[1]).contains(";\"Pastillas de freno \"\"cerámicas\"\"\";").endsWith(";3;3;5;10000;30000;BAJO");
     }
 
+    // CP-131
     @Test
     void ventasConUtilidadBrutaYAgrupacionPorDiaEnBogota() throws Exception {
         UsuariosDePrueba.Creado cajero = usuarios.crear(Rol.ADMIN);
@@ -168,6 +170,7 @@ class ReportesIT {
         assertThat(csv).contains("2026-03-09 23:30").contains(";53550;30000;15000").doesNotContain("53.550");
     }
 
+    // CP-133
     @Test
     void cadaReporteExigeSuPermiso() throws Exception {
         String almacen = usuarios.bearer(usuarios.crear(Rol.ALMACEN).id());

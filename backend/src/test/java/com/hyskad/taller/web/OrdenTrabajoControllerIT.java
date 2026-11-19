@@ -202,6 +202,7 @@ class OrdenTrabajoControllerIT {
         mvc.perform(con(get(BASE + "/" + id(suya)), mecanicoBearer)).andExpect(status().isOk());
     }
 
+    // CP-115
     @Test
     void cadaTransicionQuedaEnElHistorialConUsuarioYNotaYPublicaElEvento() throws Exception {
         JsonNode orden = asignar(crearOrden(moto(), 100), mecanico.id());
@@ -263,6 +264,7 @@ class OrdenTrabajoControllerIT {
                 .andExpect(jsonPath("$.code").value("TRANSICION_INVALIDA"));
     }
 
+    // CP-116
     @Test
     void accionesPermitidasSegunRolEstadoYAsignacion() throws Exception {
         JsonNode orden = asignar(crearOrden(moto(), 100), mecanico.id());
@@ -307,6 +309,7 @@ class OrdenTrabajoControllerIT {
                 .andExpect(jsonPath("$.accionesPermitidas.transiciones").value(empty()));
     }
 
+    // CP-117
     @Test
     void dosEdicionesSobreLaMismaVersionNoPasanAmbas() throws Exception {
         JsonNode orden = crearOrden(moto(), 100);

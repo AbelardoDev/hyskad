@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-import { crearClienteConMoto, dvNit, nitUnico, placaUnica } from './support/datos';
-import { nuevaSesion } from './support/sesion';
+import { crearClienteConMoto, dvNit, nitUnico, placaUnica } from '../support/datos';
+import { nuevaSesion } from '../support/sesion';
 
 test.describe('clientes y motocicletas', () => {
+  // CP-90, CP-92
   test('crea un cliente con NIT, le agrega una moto y la encuentra por placa en minúsculas y con guion', async ({
     page,
   }) => {
@@ -53,6 +54,7 @@ test.describe('clientes y motocicletas', () => {
     await expect(page.getByText('Sin servicios registrados')).toBeVisible();
   });
 
+  // CP-89
   test('cambia el propietario de una moto con confirmación', async ({ page }) => {
     const placa = placaUnica();
     const vendedor = await crearClienteConMoto(`Vende ${placa}`, placa);

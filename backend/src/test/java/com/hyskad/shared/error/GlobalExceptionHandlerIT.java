@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import com.hyskad.support.IntegrationTest;
 
+// CP-70
 @IntegrationTest
 class GlobalExceptionHandlerIT {
 
@@ -151,12 +152,19 @@ class GlobalExceptionHandlerIT {
         }
 
         @Test
+        void unClienteDesconectadoNoRecibeNiRegistraUnError() throws Exception {
+            mvc.perform(get(BASE + "/cliente-desconectado")).andExpect(content().string(""));
+        }
+
+        // CP-74
+        @Test
         void reutilizaElRequestIdRecibido() throws Exception {
             mvc.perform(get(BASE + "/no-encontrado").header("X-Request-Id", "abc-123"))
                     .andExpect(header().string("X-Request-Id", "abc-123"))
                     .andExpect(jsonPath("$.requestId").value("abc-123"));
         }
 
+        // CP-74
         @Test
         void ignoraUnRequestIdInseguro() throws Exception {
             mvc.perform(get(BASE + "/no-encontrado").header("X-Request-Id", "<script>"))

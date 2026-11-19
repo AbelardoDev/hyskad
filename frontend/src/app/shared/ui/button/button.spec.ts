@@ -37,6 +37,7 @@ async function montar() {
   return { fixture, el, principal, enviar, icono, enlace: el.querySelector<HTMLElement>('a')! };
 }
 
+// CP-79
 describe('HkButton', () => {
   it('renderiza el contenido, el ícono y type="button" por defecto', async () => {
     const { principal, enviar } = await montar();

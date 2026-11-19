@@ -8,6 +8,7 @@ for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad de F11 en tema ${tema}`, () => {
     test.use({ colorScheme: tema });
 
+    // CP-64, CP-137
     test('dashboard, reportes y configuración del admin', async ({ page }) => {
       // Recorre siete pantallas con axe en cada una
       test.slow();
@@ -31,6 +32,7 @@ for (const tema of ['light', 'dark'] as const) {
       await sinViolacionesGraves(page);
     });
 
+    // CP-137
     test('vista del mecánico en el dashboard', async ({ page }) => {
       const mecanico = await crearUsuario('MECANICO');
       await nuevaOrdenAsignada(mecanico.id);

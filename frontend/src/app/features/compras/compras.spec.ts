@@ -10,6 +10,7 @@ import { calcularTotales, subtotalLinea } from '../../core/utils/dinero';
 import { hoyEnBogota } from '../../core/utils/formato';
 import { diferenciaCosto, NuevaCompraPage } from './nueva-compra-page';
 
+// CP-107
 describe('calcularTotales (espejo de RN-04)', () => {
   it('suma líneas con centavos y redondea el IVA a pesos HALF_UP', () => {
     expect(subtotalLinea(2.5, 17500.33)).toBe(43750.83);
@@ -36,6 +37,7 @@ describe('calcularTotales (espejo de RN-04)', () => {
   });
 });
 
+// CP-108
 describe('diferenciaCosto (aviso de más de 30 %)', () => {
   it.each([
     [13001, 10000, 0.3001],

@@ -1,12 +1,13 @@
 import { expect, test } from '@playwright/test';
 
-import { sinViolacionesGraves } from './support/axe';
-import { crearClienteConMoto, placaUnica } from './support/datos';
-import { nuevaSesion } from './support/sesion';
+import { sinViolacionesGraves } from '../support/axe';
+import { crearClienteConMoto, placaUnica } from '../support/datos';
+import { nuevaSesion } from '../support/sesion';
 
 test.describe('paleta de comandos', () => {
   test.use({ viewport: { width: 1440, height: 900 } });
 
+  // CP-135
   test('Ctrl+K busca una placa y lleva al detalle de la moto [RF29]', async ({ page }) => {
     const placa = placaUnica();
     const { motoId } = await crearClienteConMoto(`Paleta ${placa}`, placa);

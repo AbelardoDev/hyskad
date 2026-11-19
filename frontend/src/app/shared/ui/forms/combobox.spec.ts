@@ -37,6 +37,7 @@ async function montar() {
   return { fixture, input, teclear, opciones, anfitrion: fixture.componentInstance };
 }
 
+// CP-79
 describe('HkCombobox', () => {
   it('expone el patrón ARIA de combobox y abre la lista con flecha abajo', async () => {
     const { input, teclear, opciones } = await montar();

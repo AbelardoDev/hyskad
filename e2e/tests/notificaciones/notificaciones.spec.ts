@@ -1,8 +1,8 @@
 import { Browser, expect, Page, test } from '@playwright/test';
 
-import { sinViolacionesGraves } from './support/axe';
-import { crearClienteConMoto, placaUnica } from './support/datos';
-import { apiComoAdmin, crearUsuario, entrar, UsuarioE2e } from './support/sesion';
+import { sinViolacionesGraves } from '../support/axe';
+import { crearClienteConMoto, placaUnica } from '../support/datos';
+import { apiComoAdmin, crearUsuario, entrar, UsuarioE2e } from '../support/sesion';
 
 async function sesionAparte(browser: Browser, usuario: UsuarioE2e, opciones = {}): Promise<Page> {
   const contexto = await browser.newContext(opciones);

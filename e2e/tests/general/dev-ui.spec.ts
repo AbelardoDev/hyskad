@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-import { nuevaSesion } from './support/sesion';
+import { nuevaSesion } from '../support/sesion';
 
 // El shell exige sesión: cada prueba entra con un admin propio (cambiar idioma lo guarda en su cuenta).
 test.beforeEach(async ({ page }) => {
@@ -14,6 +14,7 @@ test.describe('galería /dev/ui', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Kit de interfaz' })).toBeVisible();
   });
 
+  // CP-76
   test('alterna el tema y se mantiene tras recargar', async ({ page }) => {
     const html = page.locator('html');
     await expect(html).not.toHaveClass(/dark/);
@@ -31,6 +32,7 @@ test.describe('galería /dev/ui', () => {
     await expect(html).not.toHaveClass(/dark/);
   });
 
+  // CP-76
   test('el tema "Sistema" sigue a prefers-color-scheme', async ({ page }) => {
     await page.getByTestId('tema-system').click();
     await page.emulateMedia({ colorScheme: 'dark' });
@@ -39,6 +41,7 @@ test.describe('galería /dev/ui', () => {
     await expect(page.locator('html')).not.toHaveClass(/dark/);
   });
 
+  // CP-77
   test('alterna el idioma, actualiza <html lang> y se mantiene tras recargar', async ({ page }) => {
     // Con sesión, el idioma se guarda en la cuenta y es el que se aplica al recuperar la sesión.
     const guardado = page.waitForResponse('**/api/v1/auth/me/preferencias');

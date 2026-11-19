@@ -37,6 +37,7 @@ class ConsecutivoServiceIT {
         assertThat(numero(segundo)).isEqualTo(numero(primero) + 1);
     }
 
+    // CP-71
     @Test
     void siLaTransaccionSeRevierteElNumeroNoSeConsume() {
         String antes = tx.execute(estado -> service.siguiente(TipoConsecutivo.PRESUPUESTO));
@@ -55,6 +56,7 @@ class ConsecutivoServiceIT {
                 .isInstanceOf(IllegalTransactionStateException.class);
     }
 
+    // CP-71
     @Test
     void diezHilosConcurrentesObtienenNumerosDistintosYSinHuecos() throws Exception {
         int hilos = 10;

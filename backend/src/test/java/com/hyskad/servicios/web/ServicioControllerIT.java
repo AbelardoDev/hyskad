@@ -29,6 +29,7 @@ import com.hyskad.usuarios.domain.Rol;
 import tools.jackson.databind.ObjectMapper;
 
 /** Catálogo de servicios del taller (RF16). */
+// CP-120
 @IntegrationTest
 class ServicioControllerIT {
 

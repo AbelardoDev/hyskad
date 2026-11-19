@@ -1,9 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import { crearClienteConMoto, placaUnica } from './support/datos';
-import { crearUsuario, entrar, nuevaSesion } from './support/sesion';
+import { crearClienteConMoto, placaUnica } from '../support/datos';
+import { crearUsuario, entrar, nuevaSesion } from '../support/sesion';
+import { tabularHasta } from '../support/teclado';
 
 test.describe('órdenes de trabajo', () => {
+  // CP-118
   test('recepción completa → asignar mecánico → el mecánico ve solo su orden y registra el diagnóstico', async ({
     page,
     browser,
@@ -84,6 +86,55 @@ test.describe('órdenes de trabajo', () => {
     await contexto.close();
   });
 
+  // CP-64
+  test('recepción de una moto solo con el teclado', async ({ page }) => {
+    const placa = placaUnica();
+    const cliente = await crearClienteConMoto(`Teclado ${placa}`, placa);
+    const mecanico = await crearUsuario('MECANICO');
+    await nuevaSesion(page, 'VENDEDOR');
+    await page.goto('/ordenes/nueva');
+    const siguiente = page.getByRole('button', { name: 'Siguiente' });
+
+    // 1) Cliente: escribir, la primera opción queda activa y Enter la elige
+    await tabularHasta(page, page.getByRole('combobox', { name: 'Cliente' }));
+    await page.keyboard.type(`Teclado ${placa}`);
+    await expect(page.getByRole('option', { name: new RegExp(cliente.nombreCompleto) })).toBeVisible();
+    await page.keyboard.press('Enter');
+    await tabularHasta(page, siguiente);
+    await page.keyboard.press('Enter');
+
+    // 2) Moto: el foco va al título del paso; la moto se elige con espacio
+    await expect(page.getByRole('heading', { name: 'Motocicleta' })).toBeFocused();
+    await tabularHasta(page, page.getByRole('radio', { name: /Honda CB 190R/ }));
+    await page.keyboard.press('Space');
+    await tabularHasta(page, siguiente);
+    await page.keyboard.press('Enter');
+
+    // 3) Datos de ingreso
+    await tabularHasta(page, page.getByLabel('Kilometraje de ingreso'));
+    await page.keyboard.type('8000');
+    await tabularHasta(page, page.getByLabel('Motivo de ingreso'));
+    await page.keyboard.type('Revisión general');
+    await tabularHasta(page, page.getByLabel('Descripción del problema'));
+    await page.keyboard.type('Pierde potencia en subida');
+    await tabularHasta(page, siguiente);
+    await page.keyboard.press('Enter');
+
+    // 4) Mecánico con espacio
+    await tabularHasta(page, page.getByRole('checkbox', { name: mecanico.nombre }));
+    await page.keyboard.press('Space');
+    await expect(page.getByRole('checkbox', { name: mecanico.nombre })).toBeChecked();
+    await tabularHasta(page, siguiente);
+    await page.keyboard.press('Enter');
+
+    // 5) Confirmar
+    await expect(page.getByText('Pierde potencia en subida')).toBeVisible();
+    await tabularHasta(page, page.getByRole('button', { name: 'Recibir moto' }));
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('heading', { level: 1, name: /Orden OT-\d{6}/ })).toBeVisible();
+  });
+
+  // CP-119
   test('el tablero cambia a kanban y conserva los filtros en la URL', async ({ page }) => {
     const placa = placaUnica();
     const cliente = await crearClienteConMoto(`Kanban ${placa}`, placa);

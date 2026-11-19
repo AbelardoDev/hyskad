@@ -96,6 +96,7 @@ class ClienteControllerIT {
                 .andExpect(status().isForbidden());
     }
 
+    // CP-88
     @Test
     void mecanicoConsultaClientes() throws Exception {
         long id = crear(persona(Identificadores.cedula(), "Mario", "Consulta", "3001234567"));
@@ -209,6 +210,7 @@ class ClienteControllerIT {
                 .andExpect(status().isCreated());
     }
 
+    // CP-91
     @Test
     void editarConservaLaFechaDeAutorizacionYRetirarlaLaBorra() throws Exception {
         String cedula = Identificadores.cedula();

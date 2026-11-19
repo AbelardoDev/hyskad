@@ -13,6 +13,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.math.BigDecimal;
 
+import jakarta.persistence.EntityManagerFactory;
+
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +74,9 @@ class ItemsPresupuestosIT {
     @Autowired
     private ApplicationEvents eventos;
 
+    @Autowired
+    private EntityManagerFactory emf;
+
     private String admin;
     private String vendedor;
     private UsuariosDePrueba.Creado mecanico;
@@ -105,6 +112,26 @@ class ItemsPresupuestosIT {
                 .containsExactly("ORDEN_REPUESTO_AGREGADO", "ORDEN_REPUESTO_AGREGADO", "ORDEN_REPUESTO_QUITADO");
     }
 
+    // CP-59: el detalle no hace una consulta por repuesto (antes: 89 sentencias con 80 repuestos)
+    @Test
+    void elDetalleDeUnaOrdenNoHaceUnaConsultaPorRepuesto() throws Exception {
+        JsonNode orden = ordenEnDiagnostico();
+        for (int i = 0; i < 10; i++) {
+            orden = repuesto(orden, conStock("10"), "1", vendedor);
+        }
+        Statistics estadisticas = emf.unwrap(SessionFactory.class).getStatistics();
+        estadisticas.setStatisticsEnabled(true);
+        estadisticas.clear();
+        try {
+            assertThat(obtener(orden, vendedor).get("repuestos")).hasSize(10);
+            // Con N+1 serían unas 18 (una por producto); con carga por lotes, una para todos
+            assertThat(estadisticas.getPrepareStatementCount()).isLessThanOrEqualTo(12);
+        } finally {
+            estadisticas.setStatisticsEnabled(false);
+        }
+    }
+
+    // CP-122
     @Test
     void cambiarLaCantidadAjustaLaReservaPorLaDiferencia() throws Exception {
         Producto p = conStock("10");
@@ -119,6 +146,7 @@ class ItemsPresupuestosIT {
         }
     }
 
+    // CP-124
     @Test
     void sinDisponibleNoSeAgregaNadaYUnProductoReservadoNoSeDesactiva() throws Exception {
         Producto p = conStock("3");
@@ -137,6 +165,7 @@ class ItemsPresupuestosIT {
                 .andExpect(jsonPath("$.code").value("RESERVA_PENDIENTE"));
     }
 
+    // CP-125
     @Test
     void cp41LosItemsSoloCambianEnDiagnosticoYElMecanicoNoAsignadoNoLosToca() throws Exception {
         Producto p = conStock("5");
@@ -224,6 +253,7 @@ class ItemsPresupuestosIT {
         assertThat(eventos.stream(PresupuestoEnviado.class)).hasSize(2);
     }
 
+    // CP-126
     @Test
     void cp43ElPresupuestoAprobadoPasaLaOrdenAReparacionYSuTotalEsElDeLaOrden() throws Exception {
         Producto p = conStock("10");
@@ -260,6 +290,7 @@ class ItemsPresupuestosIT {
         assertThat(catalogo.obtener(a.getId()).getStockActual()).isEqualByComparingTo("5");
     }
 
+    // CP-123
     @Test
     void cancelarUnaOrdenConTresRepuestosLiberaTodasLasReservasYReemplazaElPresupuesto() throws Exception {
         Producto a = conStock("5");
@@ -302,6 +333,7 @@ class ItemsPresupuestosIT {
                 .satisfies(e -> assertThat(e.total()).isEqualByComparingTo(total));
     }
 
+    // CP-127
     @Test
     void siUnRepuestoNoPuedeSalirAlFinalizarNoSaleNinguno() throws Exception {
         Producto a = conStock("10");

@@ -3,6 +3,7 @@ package com.hyskad.shared.error;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,6 +60,11 @@ class ErroresDePruebaController {
     @GetMapping("/integridad")
     void integridad() {
         throw new DataIntegrityViolationException("Duplicate entry 'secreto' for key 'uq_tabla_campo'");
+    }
+
+    @GetMapping("/cliente-desconectado")
+    void clienteDesconectado() throws AsyncRequestNotUsableException {
+        throw new AsyncRequestNotUsableException("Servlet container error notification for disconnected client");
     }
 
     @GetMapping("/inesperado")

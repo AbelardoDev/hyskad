@@ -64,6 +64,7 @@ async function esperarBusqueda(m: ReturnType<typeof montar>) {
   m.fixture.detectChanges();
 }
 
+// CP-135
 describe('HkCommandPalette', () => {
   it('sin escribir ofrece las acciones rápidas que permite el rol', () => {
     const admin = montar();

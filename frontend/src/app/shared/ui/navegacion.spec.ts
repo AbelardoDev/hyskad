@@ -15,6 +15,7 @@ async function crear<T>(tipo: new () => T) {
 const tecla = (el: Element, key: string) =>
   el.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
 
+// CP-79
 describe('HkTabs', () => {
   @Component({
     imports: [HkTabs],

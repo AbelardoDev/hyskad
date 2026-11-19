@@ -19,6 +19,7 @@ function simularMatchMedia(oscuro: boolean) {
   };
 }
 
+// CP-76
 describe('ThemeService', () => {
   const html = document.documentElement;
   let meta: HTMLMetaElement;

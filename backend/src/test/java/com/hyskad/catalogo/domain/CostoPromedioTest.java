@@ -20,6 +20,7 @@ class CostoPromedioTest {
         assertThat(CostoPromedio.calcular(d("10"), d("10000"), d("10"), d("12000"))).isEqualByComparingTo("11000");
     }
 
+    // CP-95
     @Test
     void sinStockElCostoEsElDeLaEntradaAunqueElPromedioAnteriorSeaOtro() {
         assertThat(CostoPromedio.calcular(d("0"), d("8000"), d("5"), d("12000"))).isEqualTo(d("12000.00"));

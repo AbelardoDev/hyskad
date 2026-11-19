@@ -93,6 +93,7 @@ class ProductoTest {
         assertThat(p.getEstadoStock()).isEqualTo(EstadoStock.AGOTADO);
     }
 
+    // CP-98
     @Test
     void inactivoNoAdmiteNingunMovimientoYNoSeDesactivaConReservas() {
         Producto p = producto("0");

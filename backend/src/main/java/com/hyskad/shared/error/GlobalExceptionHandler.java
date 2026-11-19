@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 import org.springframework.context.MessageSourceResolvable;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.InvalidDataAccessApiUsageException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.core.PropertyReferenceException;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.async.AsyncRequestNotUsableException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -139,6 +141,22 @@ public class GlobalExceptionHandler {
         return responder(problema, ex);
     }
 
+    /**
+     * Spring Data rechaza un {@code ?sort=} que no es una propiedad simple (p. ej. con SQL) antes de
+     * armar la consulta: es un parámetro inválido del cliente, no un error interno (F12, CP-61).
+     * Cualquier otro uso indebido de la API de datos sigue siendo un error del servidor.
+     */
+    @ExceptionHandler(InvalidDataAccessApiUsageException.class)
+    ResponseEntity<ProblemDetail> usoInvalidoDeDatos(InvalidDataAccessApiUsageException ex,
+            HttpServletRequest request) {
+        if (ex.getMessage() == null || !ex.getMessage().startsWith("Sort expression")) {
+            return inesperado(ex, request);
+        }
+        ProblemDetail problema = problema(ErrorCode.PARAMETRO_INVALIDO, "El orden pedido no es válido", request);
+        problema.setProperty("errors", List.of(new ErrorCampo("sort", "TIPO_INVALIDO")));
+        return responder(problema, ex);
+    }
+
     @ExceptionHandler(MissingServletRequestParameterException.class)
     ResponseEntity<ProblemDetail> parametroFaltante(MissingServletRequestParameterException ex,
             HttpServletRequest request) {
@@ -200,6 +218,15 @@ public class GlobalExceptionHandler {
      * Cualquier otra excepción. Las de Spring MVC que ya traen su status (406, 413...) lo conservan;
      * el resto es un 500 sin detalles internos.
      */
+    /**
+     * El cliente cerró la conexión (p. ej. el stream SSE de notificaciones al cerrar la pestaña): no hay
+     * a quién responder, así que no se escribe nada ni se registra como error.
+     */
+    @ExceptionHandler(AsyncRequestNotUsableException.class)
+    void clienteDesconectado(AsyncRequestNotUsableException ex, HttpServletRequest request) {
+        log.debug("Cliente desconectado en {}: {}", request.getRequestURI(), ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     ResponseEntity<ProblemDetail> inesperado(Exception ex, HttpServletRequest request) {
         if (ex instanceof ErrorResponse errorSpring && !errorSpring.getStatusCode().is5xxServerError()) {

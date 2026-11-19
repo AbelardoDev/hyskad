@@ -8,9 +8,12 @@ for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad de clientes y motos en tema ${tema}`, () => {
     test.use({ colorScheme: tema });
 
+    // CP-94
     test('/clientes con el drawer de nuevo cliente', async ({ page }) => {
       await nuevaSesion(page, 'VENDEDOR');
+      // Se busca el cliente semilla: las demás pruebas crean muchos clientes que llenan la página
       await page.goto('/clientes');
+      await page.getByRole('searchbox').fill('Mensajería');
       await expect(page.getByRole('table')).toContainText('Mensajería Rápida del Sinú');
       await sinViolacionesGraves(page);
 
@@ -21,6 +24,7 @@ for (const tema of ['light', 'dark'] as const) {
       await sinViolacionesGraves(page);
     });
 
+    // CP-94
     test('ficha de cliente y de moto', async ({ page }) => {
       const placa = placaUnica();
       const { clienteId, motoId } = await crearClienteConMoto(`Axe ${placa}`, placa);
@@ -38,6 +42,7 @@ for (const tema of ['light', 'dark'] as const) {
       await sinViolacionesGraves(page);
     });
 
+    // CP-94
     test('/motocicletas', async ({ page }) => {
       await nuevaSesion(page, 'VENDEDOR');
       await page.goto('/motocicletas');

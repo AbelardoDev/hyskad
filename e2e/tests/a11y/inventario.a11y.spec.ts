@@ -7,6 +7,7 @@ for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad de inventario en tema ${tema}`, () => {
     test.use({ colorScheme: tema });
 
+    // CP-64, CP-103
     test('/inventario con el drawer de producto y el de ajuste', async ({ page }) => {
       await nuevaSesion(page, 'ALMACEN');
       await page.goto('/inventario');
@@ -29,6 +30,7 @@ for (const tema of ['light', 'dark'] as const) {
       await sinViolacionesGraves(page);
     });
 
+    // CP-103
     test('ficha del producto con movimientos y listado global', async ({ page }) => {
       await nuevaSesion(page, 'ALMACEN');
       await page.goto('/inventario');

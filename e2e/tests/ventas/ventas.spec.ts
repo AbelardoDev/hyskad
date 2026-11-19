@@ -1,9 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-import { cargarStock, crearProducto, stockDe } from './support/datos';
-import { nuevaSesion } from './support/sesion';
+import { cargarStock, crearProducto, stockDe } from '../support/datos';
+import { nuevaSesion } from '../support/sesion';
 
 test.describe('ventas de mostrador', () => {
+  // CP-34
   test('venta en efectivo con cambio → comprobante → anulación como admin → stock restituido', async ({
     page,
     browser,
@@ -63,6 +64,7 @@ test.describe('ventas de mostrador', () => {
     await contextoAdmin.close();
   });
 
+  // CP-112
   test('una venta de 3 productos solo con teclado', async ({ page }) => {
     const sufijo = Date.now().toString(36).toUpperCase();
     const productos = await Promise.all(
@@ -99,6 +101,7 @@ test.describe('ventas de mostrador', () => {
     for (const p of productos) expect(await stockDe(p.id)).toBe(3);
   });
 
+  // CP-113
   test('la lista muestra las ventas del día con sus totales y filtra las propias', async ({ page }) => {
     await nuevaSesion(page, 'VENDEDOR');
     await page.goto('/ventas');

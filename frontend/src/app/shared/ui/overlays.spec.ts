@@ -41,6 +41,7 @@ class ModalPrueba {
 })
 class DrawerPrueba {}
 
+// CP-79
 describe('DialogosService + HkModal / HkDrawer', () => {
   it('abre un modal accesible: role dialog, aria-modal y título enlazado', async () => {
     const ref = TestBed.inject(DialogosService).abrirModal(ModalPrueba);

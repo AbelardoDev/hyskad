@@ -8,6 +8,7 @@ for (const tema of ['light', 'dark'] as const) {
   test.describe(`accesibilidad de ventas en tema ${tema}`, () => {
     test.use({ colorScheme: tema });
 
+    // CP-64, CP-114
     test('punto de venta con un producto en el carrito y lista de ventas', async ({ page }) => {
       await nuevaSesion(page, 'VENDEDOR');
       await page.goto('/ventas/nueva');
@@ -26,6 +27,7 @@ for (const tema of ['light', 'dark'] as const) {
       await sinViolacionesGraves(page);
     });
 
+    // CP-114
     test('detalle y comprobante de una venta', async ({ page }) => {
       const producto = await crearProducto(`Axe venta ${Date.now().toString(36)}`);
       await cargarStock(producto.id, 2, 20000);

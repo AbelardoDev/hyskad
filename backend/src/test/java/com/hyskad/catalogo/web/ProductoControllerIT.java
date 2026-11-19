@@ -143,6 +143,7 @@ class ProductoControllerIT {
                 .andExpect(jsonPath("$.errors[0].code").value("PROPIEDAD_DESCONOCIDA"));
     }
 
+    // CP-99
     @Test
     void mecanicoYVendedorVenProductosSinCostoPromedio() throws Exception {
         Producto p = catalogo.producto("1");

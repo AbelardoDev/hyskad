@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test';
 
-import { nuevaSesion } from './support/sesion';
+import { nuevaSesion } from '../support/sesion';
 
 const unico = () => `${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`.toUpperCase();
 
 test.describe('catálogo e inventario', () => {
+  // CP-101
   test('crea un producto, le hace un ajuste de entrada y ve el movimiento y el stock', async ({ page }) => {
     await nuevaSesion(page, 'ALMACEN');
     const codigo = `E2E-${unico()}`;
@@ -66,6 +67,7 @@ test.describe('catálogo e inventario', () => {
     await expect(ajuste.getByRole('button', { name: 'Registrar ajuste' })).toBeDisabled();
   });
 
+  // CP-99
   test('el mecánico ve productos sin costo y sin acciones de gestión', async ({ page }) => {
     await nuevaSesion(page, 'MECANICO');
     await page.goto('/inventario');

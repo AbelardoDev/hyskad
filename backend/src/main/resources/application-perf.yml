@@ -1,0 +1,35 @@
+# Perfil SOLO para las pruebas de rendimiento (infra/docker-compose.perf.yml + infra/k6).
+# BD con los datos semilla de dev y los 12 meses de infra/perf/datos-perf.sql.
+spring:
+  datasource:
+    url: ${DB_URL:jdbc:mysql://localhost:3308/hyskad_perf?useUnicode=true&characterEncoding=utf8&connectionTimeZone=UTC}
+    username: ${DB_USER:hyskad}
+    password: ${DB_PASSWORD:hyskad_perf}
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1027}
+  flyway:
+    locations: classpath:db/migration,classpath:db/dev-data
+  jpa:
+    properties:
+      hibernate:
+        # Estadísticas de Hibernate (consultas, entidades y colecciones cargadas) para buscar N+1;
+        # durante la carga con k6 van apagadas.
+        generate_statistics: ${HIBERNATE_STATS:false}
+
+logging:
+  level:
+    # HIBERNATE_SQL=debug registra cada sentencia con el X-Request-Id de la petición: contarlas por
+    # petición muestra un N+1 (ver infra/k6/README.md). Apagado durante la carga.
+    org.hibernate.SQL: ${HIBERNATE_SQL:warn}
+
+hyskad:
+  base-url: ${APP_BASE_URL:http://localhost:4200}
+  mail-from: ${MAIL_FROM:no-reply@hyskad.local}
+  jwt:
+    secret: ${JWT_SECRET:Zp4kR8wN2qL6vB0xT5mH9cJ3yF7sD1gA6uE0iO4lK8nM2bV5cX9zQ3wR7tY1pS6d}
+  auth:
+    # Sin HTTPS en la máquina de pruebas: la cookie no puede llevar Secure.
+    cookie-secure: false
+    # Los usuarios virtuales de k6 inician sesión desde la misma IP.
+    rate-limit: false

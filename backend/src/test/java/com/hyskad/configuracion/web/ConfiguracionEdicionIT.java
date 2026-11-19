@@ -117,6 +117,7 @@ class ConfiguracionEdicionIT {
                 .andExpect(status().isForbidden());
     }
 
+    // CP-136
     @Test
     void conLaAlertaDeStockApagadaNoSeNotificaElStockBajo() throws Exception {
         Long almacen = usuarios.crear(Rol.ALMACEN).id();

@@ -23,4 +23,6 @@ if (hashes.length === 0) {
   process.exit(1);
 }
 
-process.stdout.write(`# Generado por scripts/csp-hashes.mjs; no editar\nset $csp_script_hashes "${hashes.join(' ')}";\n`);
+process.stdout.write(
+  `# Generado por scripts/csp-hashes.mjs; no editar\nset $csp_script_hashes "${hashes.join(' ')}";\n`,
+);

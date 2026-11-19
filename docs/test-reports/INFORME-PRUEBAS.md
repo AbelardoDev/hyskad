@@ -36,7 +36,7 @@ Todas las cifras de este informe salen de corridas reales. Lo que no se ejecutó
 | E2E | Playwright, 5 proyectos | 276 ejecuciones (90 por navegador de escritorio, 3 por teléfono) | 276 aprobadas (ver §4) |
 | Accesibilidad | `@axe-core/playwright` (dentro de las E2E) | 5 suites en claro y oscuro | 0 violaciones serias o críticas |
 | Rendimiento | k6 | 2 escenarios | Umbrales cumplidos (ver §5) |
-| Seguridad | Integración, E2E, `npm audit`, revisión de logs, Dependency-Check | ver §6 | Aprobado; Dependency-Check en curso |
+| Seguridad | Integración, E2E, `npm audit`, revisión de logs, Dependency-Check | ver §6 | Aprobado (Dependency-Check: 0 tras subir el conector MySQL) |
 | Usabilidad | Sesión guiada | 4 tareas | No ejecutado |
 
 Comandos usados: `./mvnw verify` en `backend/`; `npm run lint`, `npm test -- --coverage` y `npm run build` en `frontend/`; `npx playwright test` con los cinco proyectos en `e2e/`; `k6 run` en `infra/k6/`.
@@ -78,6 +78,8 @@ Corrida del 2026-11-18 contra el entorno `docker-compose.e2e.yml`: Nginx en :430
 | **Total** | | **233 / 276 (84,4 %)** | **43 / 43** | **276 / 276** |
 
 **Análisis de la primera corrida.** De los 43 fallos, 40 fueron timeouts de 30 s y 3 fueron esperas de 5 s que vencieron en WebKit: dos encabezados que no aparecieron a tiempo y la recepción solo con teclado. Durante esa corrida la máquina tenía otras tres cargas al mismo tiempo: OWASP Dependency-Check, `npm install` y la medición de cobertura de Vitest. Además, los tres navegadores corrían en paralelo con los workers por defecto. Los 43 pasaron al repetirlos sin cambiar código, así que se clasifican como inestabilidad por carga del equipo y no como defectos. En el CI, cada PR corre solo Chromium y el push a `main` corre los tres navegadores con 2 reintentos.
+
+**CI:** después del merge de F12 (PR #26), el push a `main` corrió las E2E en Chromium, Firefox, WebKit y los dos teléfonos (run 44425815823): en verde.
 
 La suite está organizada por flujos (`auth`, `clientes`, `inventario`, `compras`, `ventas`, `taller`, `notificaciones`, `reportes`, `general`, más `a11y`). No usa esperas fijas (`waitForTimeout`), y los localizadores van por rol y texto accesible.
 
@@ -130,7 +132,7 @@ La evidencia por punto está en el checklist `docs/test-reports/seguridad-owasp.
 | Autenticación (A07) | Rate limit (sexto login → 429; cuarto pedido de recuperación → 429), rotación del refresh token con revocación de la familia, mensaje genérico |
 | Configuración (A05) | En producción: Swagger y OpenAPI → 404, actuator solo `health`, errores sin stacktrace, `ddl-auto=validate` (`ConfiguracionProduccionTest` y verificación en vivo del 2026-11-17) |
 | Componentes vulnerables (A06), frontend | `npm audit --omit=dev`: 0 vulnerabilidades (también en `e2e/`) |
-| Componentes vulnerables (A06), backend | OWASP Dependency-Check (`./mvnw -Pseguridad dependency-check:check`): **en curso**. La descarga inicial de la base del NVD sin clave de API iba en el 16 % al cerrar este informe. El resultado se agregará en una actualización |
+| Componentes vulnerables (A06), backend | OWASP Dependency-Check (`./mvnw -Pseguridad dependency-check:check`, 76 dependencias). Primera corrida (2026-11-18): 6 hallazgos. 4 reales en `mysql-connector-j` 9.7.0, el que trae Spring Boot 4.1.2: CVE-2026-60586 (7,7), CVE-2026-60623 (7,1), CVE-2026-60624 (6,5) y CVE-2026-61082 (6,5). 2 falsos positivos por coincidencia de nombre: CVE-2025-7962 en `angus-activation` (es de Jakarta Mail < 2.0.2; Angus Mail está en 2.0.5) y CVE-2025-15104 en `hibernate-validator` (es de validator.nu). Corrección: conector a 26.10.0 (`mysql.version`) y supresiones justificadas en `backend/dependency-check-suppressions.xml`. Segunda corrida: **0 vulnerabilidades** (2 suprimidas), con `./mvnw verify` en verde con el conector nuevo |
 | Logs sin datos sensibles (A09) | `infra/scripts/revisar-logs.sh` sobre el log del backend de la corrida E2E del 2026-11-18: 0 contraseñas, hashes, tokens JWT, cabeceras `Authorization`, cookies de refresh, tokens de recuperación ni correos; 0 líneas `ERROR`. Ese log tiene 250 líneas. La revisión anterior, sobre 145.650 líneas, también dio 0 hallazgos |
 | Cabeceras HTTPS, HSTS, CSP y puertos (CP-62, CP-63) | No ejecutado: requieren el Nginx y el VPS de F13 |
 
@@ -158,6 +160,7 @@ Las dos pruebas pasan en los tres navegadores.
 | N+1 al cargar el detalle de una orden y al agregar repuestos (89 y 100 sentencias) | Media | Carga por lotes de Hibernate (9 y 20 sentencias) | `ItemsPresupuestosIT` |
 | Cerrar una pestaña con el stream SSE dejaba un `ERROR` con stacktrace en el log (382 por corrida E2E) | Baja | `GlobalExceptionHandler` ignora la desconexión del cliente | Revisión de logs en el CI |
 | Índice duplicado en `movimiento_inventario` (aviso 1831 de MySQL) | Baja | Migración V12 | `./mvnw verify` (Flyway sobre MySQL 8.4) |
+| `mysql-connector-j` 9.7.0 con 4 CVE, 2 de severidad alta | Alta | Conector 26.10.0 | Dependency-Check (0 vulnerabilidades) y `./mvnw verify` |
 | Falso positivo en la prueba de inyección: un parámetro `q` inexistente en motos y ventas devolvía todo según los datos de otras clases | Baja (de la prueba) | Cargas en los parámetros reales de cada listado y datos propios | `SeguridadIT` |
 
 ### Abiertos
@@ -172,5 +175,4 @@ Quedan dos observaciones de F11 que no son defectos funcionales:
 
 1. **F13:** ejecutar CP-62 (cabeceras en producción), CP-63 (HTTPS y puerto 3306 cerrado), CP-66 (backup y restauración) y CP-67 (despliegue desde cero).
 2. **CP-68:** hacer la sesión de usabilidad con usuarios reales y llenar la tabla de `usabilidad.md`.
-3. Agregar a la §6 el resultado de OWASP Dependency-Check. Con una `NVD_API_KEY` la primera descarga tarda unos minutos.
-4. Confirmar en el CI la corrida con los tres navegadores en el push a `main`, después del merge de F12.
+3. Quitar `mysql.version` del `pom.xml` cuando Spring Boot gestione un conector corregido, y repetir Dependency-Check en cada fase. Con una `NVD_API_KEY` la actualización de la base tarda unos minutos.

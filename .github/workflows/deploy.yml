@@ -127,9 +127,11 @@ jobs:
         env:
           DOMINIO: ${{ vars.DOMINIO }}
         run: |
+          # Con "bash -e", un curl que falla (TLS, timeout, conexión rechazada) cortaría el bucle en el
+          # primer intento; "|| true" deja el código 000 y reintenta
           for intento in 1 2 3 4 5 6; do
-            raiz=$(curl -s -o /dev/null -w '%{http_code}' "https://${DOMINIO}/")
-            api=$(curl -s -o /dev/null -w '%{http_code}' "https://${DOMINIO}/api/v1/auth/me")
+            raiz=$(curl -s --max-time 15 -o /dev/null -w '%{http_code}' "https://${DOMINIO}/" || true)
+            api=$(curl -s --max-time 15 -o /dev/null -w '%{http_code}' "https://${DOMINIO}/api/v1/auth/me" || true)
             echo "intento $intento: / → $raiz, /api/v1/auth/me → $api"
             if [ "$raiz" = "200" ] && [ "$api" = "401" ]; then exit 0; fi
             sleep 10

@@ -295,4 +295,46 @@ sudo grep -h -E 'server_name|set \$server|set \$port' /opt/nginx-proxy-manager/d
 cd /opt/nginx-proxy-manager && sudo docker compose down
 ```
 
-Los sitios que dependían de ese proxy quedan fuera de línea hasta migrarlos. Para servirlos desde el Nginx de HYSKAD se agrega un bloque `server` por dominio en `infra/nginx/` (con su propio certificado en `init-letsencrypt.sh`), y sus contenedores se unen a la red del proxy. Eso es un cambio del repositorio: no editar la configuración dentro del contenedor.
+Los sitios que dependían de ese proxy quedan fuera de línea hasta migrarlos.
+
+### 10.1 Servir otros sitios desde el proxy de HYSKAD
+
+Los otros sitios no son parte de HYSKAD, así que su configuración vive **solo en el servidor** y no en el repositorio. Son dos archivos en `/opt/hyskad`:
+
+- `sitios.conf`: bloques `server` de Nginx para esos dominios.
+  - Puerto 80: el reto ACME y un 301 a HTTPS.
+  - Puerto 443: `proxy_pass` a cada contenedor, elegido con un `map $host`. Se usa `resolver 127.0.0.11` y el destino va en una variable. Así Nginx resuelve el contenedor en cada petición: si un sitio está caído responde 502, pero el proxy (y HYSKAD) sigue arrancando.
+- `docker-compose.override.yml`: monta `sitios.conf` en `/etc/nginx/conf.d/` del proxy y une el proxy a la red Docker de esos contenedores (`external: true`). Compose lo combina solo con `docker-compose.yml`, así que `desplegar.sh` y el pipeline lo respetan sin cambios. El pipeline solo reemplaza `docker-compose.yml`.
+
+```yaml
+services:
+  proxy:
+    volumes:
+      - ./sitios.conf:/etc/nginx/conf.d/sitios.conf:ro
+    networks: [publica, interna, sitios]
+networks:
+  sitios:
+    name: proxy          # la red donde están los contenedores de los sitios
+    external: true
+```
+
+Pasos, en este orden. Si `sitios.conf` apunta a un certificado que no existe, Nginx no arranca:
+
+```bash
+cd /opt/hyskad
+# 1. Certificado con todos los dominios. El server del puerto 80 de HYSKAD ya atiende el reto ACME
+#    de cualquier host. Probar primero con --dry-run.
+docker compose run --rm --no-deps --entrypoint certbot certbot certonly --webroot -w /var/www/certbot \
+  --cert-name sitios -d dominio1 -d dominio2 ... --email <correo> --agree-tos --no-eff-email --non-interactive
+# 2. Validar sin tocar el proxy en marcha
+docker compose -f docker-compose.yml -f override.nuevo.yml run --rm --no-deps -T proxy nginx -t
+# 3. Aplicar (el proxy se recrea; HYSKAD queda unos segundos sin servicio)
+mv override.nuevo.yml docker-compose.override.yml && docker compose up -d proxy
+```
+
+El contenedor certbot renueva este certificado junto con el de HYSKAD, y el proxy recarga cada 6 horas. Para agregar un dominio después:
+1. Agrégalo al `map` y a los dos `server_name` de `sitios.conf`.
+2. Vuelve a emitir el certificado con todos los dominios y `--expand`.
+3. Ejecuta `docker compose exec proxy nginx -s reload`.
+
+Con DNS a través del proxy de Cloudflare (nube naranja), el modo SSL debe ser **Full (strict)**. El reto HTTP-01 pasa por Cloudflare sin problema. Si la red externa desaparece, el proxy no arranca: para volver a la configuración de solo HYSKAD, renombra `docker-compose.override.yml` y ejecuta `docker compose up -d proxy`.

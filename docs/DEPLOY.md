@@ -104,6 +104,8 @@ El primer tag publica las imágenes y despliega. El certificado todavía no exis
 # 1. Publica las imágenes: en tu equipo, sobre main con el CI en verde
 git tag v1.0.0 && git push origin v1.0.0
 #    El job "desplegar" de esta primera corrida falla porque el proxy no tiene certificado; es lo esperado.
+#    Espera a que la corrida termine (incluida su reversión) antes del paso 2: si corren a la vez,
+#    el pipeline recrea los contenedores en mitad de init-letsencrypt.sh y deja HYSKAD_VERSION=latest.
 
 # 2. En el servidor
 cd /opt/hyskad

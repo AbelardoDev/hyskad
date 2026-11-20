@@ -2,8 +2,8 @@
 
 | Dato | Valor |
 |---|---|
-| Fecha de las corridas | 2026-11-17 (k6 y verificación de configuración) y 2026-11-18 (resto) |
-| Versión | rama `feature/f12-calidad`, commit `41201fd` |
+| Fecha de las corridas | 2026-11-17 (k6 y verificación de configuración), 2026-11-18 (resto) y 2026-11-19 (producción, F13) |
+| Versión | rama `feature/f12-calidad`, commit `41201fd`; producción: `v1.0.0` (commit `c6112b4`) |
 | Plan de referencia | `docs/TEST-PLAN.md` (138 casos, §6) |
 | Entorno | Windows 11, Docker Desktop; MySQL 8.4 en contenedor (Testcontainers para integración, `docker-compose.e2e.yml` para E2E, `docker-compose.perf.yml` para k6) |
 | Responsable | Claude Code, con revisión del autor del proyecto |
@@ -15,14 +15,14 @@ Todas las cifras de este informe salen de corridas reales. Lo que no se ejecutó
 | Indicador | Valor |
 |---|---|
 | Casos en el catálogo | 138 |
-| Ejecutados | 133 |
-| Aprobados | 133 |
+| Ejecutados | 137 |
+| Aprobados | 137 |
 | Fallidos | 0 |
-| No ejecutados | 5 (CP-62, CP-63, CP-66, CP-67: dependen del servidor de F13; CP-68: sesión con usuarios reales) |
+| No ejecutados | 1 (CP-68: sesión con usuarios reales) |
 | **Aprobación (aprobados / ejecutados)** | **100 %** |
-| Aprobación sobre el catálogo completo (aprobados / 138) | 96,4 % |
+| Aprobación sobre el catálogo completo (aprobados / 138) | 99,3 % |
 
-**Conclusión frente al objetivo:** se cumple el criterio de aceptación de `TEST-PLAN.md` §3: al menos el 90 % de los casos ejecutados aprobados, y ningún caso de prioridad Alta fallido en seguridad, inventario, pagos o integridad. El resultado se mantiene aunque los 5 casos pendientes se cuenten como no aprobados (96,4 %). Antes de la entrega final quedan por ejecutar los 4 casos de F13 y la sesión de usabilidad.
+**Conclusión frente al objetivo:** se cumple el criterio de aceptación de `TEST-PLAN.md` §3: al menos el 90 % de los casos ejecutados aprobados, y ningún caso de prioridad Alta fallido en seguridad, inventario, pagos o integridad. El resultado se mantiene aunque el caso pendiente se cuente como no aprobado (99,3 %). Antes de la entrega final queda la sesión de usabilidad.
 
 ## 2. Resumen por nivel
 
@@ -134,7 +134,7 @@ La evidencia por punto está en el checklist `docs/test-reports/seguridad-owasp.
 | Componentes vulnerables (A06), frontend | `npm audit --omit=dev`: 0 vulnerabilidades (también en `e2e/`) |
 | Componentes vulnerables (A06), backend | OWASP Dependency-Check (`./mvnw -Pseguridad dependency-check:check`, 76 dependencias). Primera corrida (2026-11-18): 6 hallazgos. 4 reales en `mysql-connector-j` 9.7.0, el que trae Spring Boot 4.1.2: CVE-2026-60586 (7,7), CVE-2026-60623 (7,1), CVE-2026-60624 (6,5) y CVE-2026-61082 (6,5). 2 falsos positivos por coincidencia de nombre: CVE-2025-7962 en `angus-activation` (es de Jakarta Mail < 2.0.2; Angus Mail está en 2.0.5) y CVE-2025-15104 en `hibernate-validator` (es de validator.nu). Corrección: conector a 26.10.0 (`mysql.version`) y supresiones justificadas en `backend/dependency-check-suppressions.xml`. Segunda corrida: **0 vulnerabilidades** (2 suprimidas), con `./mvnw verify` en verde con el conector nuevo |
 | Logs sin datos sensibles (A09) | `infra/scripts/revisar-logs.sh` sobre el log del backend de la corrida E2E del 2026-11-18: 0 contraseñas, hashes, tokens JWT, cabeceras `Authorization`, cookies de refresh, tokens de recuperación ni correos; 0 líneas `ERROR`. Ese log tiene 250 líneas. La revisión anterior, sobre 145.650 líneas, también dio 0 hallazgos |
-| Cabeceras HTTPS, HSTS, CSP y puertos (CP-62, CP-63) | No ejecutado: requieren el Nginx y el VPS de F13 |
+| Cabeceras HTTPS, HSTS, CSP y puertos (CP-62, CP-63) | Aprobado en producción (2026-11-19, ver §11) |
 
 ## 7. Accesibilidad (CP-64)
 
@@ -173,6 +173,23 @@ Quedan dos observaciones de F11 que no son defectos funcionales:
 
 ## 10. Pendientes antes de la entrega final
 
-1. **F13:** ejecutar CP-62 (cabeceras en producción), CP-63 (HTTPS y puerto 3306 cerrado), CP-66 (backup y restauración) y CP-67 (despliegue desde cero).
-2. **CP-68:** hacer la sesión de usabilidad con usuarios reales y llenar la tabla de `usabilidad.md`.
-3. Quitar `mysql.version` del `pom.xml` cuando Spring Boot gestione un conector corregido, y repetir Dependency-Check en cada fase. Con una `NVD_API_KEY` la actualización de la base tarda unos minutos.
+1. **CP-68:** hacer la sesión de usabilidad con usuarios reales y llenar la tabla de `usabilidad.md`.
+2. Quitar `mysql.version` del `pom.xml` cuando Spring Boot gestione un conector corregido, y repetir Dependency-Check en cada fase. Con una `NVD_API_KEY` la actualización de la base tarda unos minutos.
+
+## 11. Producción (F13, 2026-11-19)
+
+Servidor: VPS Ubuntu (2 vCPU, 3,7 GB), `https://hyskad.ab8a.pro`, versión `v1.0.0`.
+
+| Caso | Verificación | Resultado |
+|---|---|---|
+| CP-62 | `curl -I` y `openssl s_client` desde fuera; SSL Labs | Certificado de Let's Encrypt válido; HSTS de 2 años, CSP con hashes, `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy` y `Permissions-Policy`; TLS 1.0/1.1 rechazados, 1.2/1.3 aceptados; HTTP/2 por ALPN; `/api/docs` y `/actuator/health` → 404; **SSL Labs A+** sin avisos |
+| CP-63 | Conexión TCP desde Internet; `docker port`; `ss -ltn` en el host | HTTP → 301 a HTTPS conservando la ruta; 3306, 33060 y 8080 cerrados; MySQL y backend sin puertos publicados, solo en la red `internal` de Docker; únicamente el proxy publica 80 y 443 |
+| CP-66 | `backup-db.sh` y `restore-db.sh --en hyskad_prueba` | Cron diario a las 2:00; backup verificado en 1 s (8 KB, base recién creada); restauración en base limpia en 1 s con 28 tablas, 12 migraciones Flyway y las mismas filas de `usuario`; base de prueba borrada después |
+| CP-67 | Runbook §1.5 + workflow Deploy + `e2e/produccion/humo.spec.ts` | Tag `v1.0.0` publica las imágenes en GHCR; certificado con `init-letsencrypt.sh` (staging y real); Deploy manual en verde; humo en Chromium (1440 px) e iPhone 13: login, dashboard, stream de notificaciones 200, token fuera del almacenamiento del navegador y **0 violaciones de CSP**; correo real de recuperación recibido con el logo |
+
+Defectos encontrados en el primer despliegue:
+
+| Defecto | Severidad | Corrección |
+|---|---|---|
+| La verificación externa del workflow terminaba en el primer intento si `curl` fallaba (con `bash -e`), sin reintentar | Media | `\|\| true` y `--max-time 15` en cada `curl` |
+| El runbook no advertía que el primer job `desplegar` y `init-letsencrypt.sh` pueden correr a la vez: el pipeline recreó los contenedores a mitad del script y su reversión dejó `HYSKAD_VERSION=latest` | Baja | Nota en `docs/DEPLOY.md` §1.5: esperar a que termine la primera corrida |

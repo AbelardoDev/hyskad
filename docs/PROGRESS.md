@@ -22,11 +22,19 @@
 | F10 | Notificaciones en tiempo real, correos y auditoría | ✅ Terminada | #23 | SSE con ticket; Nginx sin búfer para el stream (repetir en F13); capturas en `docs/capturas/f10` |
 | F11 | Reportes, dashboard, búsqueda global y configuración | ✅ Terminada | #25 | `hk-chart` y `hk-command-palette` en el kit; impresión siempre en claro; capturas en `docs/capturas/f11` |
 | F12 | Calidad: E2E, accesibilidad, rendimiento y seguridad | ✅ Terminada | #26 | Informe en `docs/test-reports/INFORME-PRUEBAS.md`; checklist OWASP y guion de usabilidad al lado |
-| F13 | Despliegue en VPS | 🟦 En curso | | |
+| F13 | Despliegue en VPS | ✅ Terminada | #30 | `https://hyskad.ab8a.pro` (`v1.0.0`, SSL Labs A+); runbook en `docs/DEPLOY.md` |
 
 Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 
 ## Sesión actual / última sesión
+
+- **Fase:** F13 ✅ (cerrada 2026-11-19; código en el PR #30, cierre y corrección del workflow en el PR de `fix/deploy-verificacion`)
+- **Rama:** `feature/f13-despliegue` → `main` (#30); `fix/deploy-verificacion` → `main`
+- **Hecho:** imágenes Docker del backend (JRE 25, jar en capas, usuario sin privilegios, healthcheck) y del proxy (Nginx 1.28 con el build de Angular y hashes CSP calculados al construir) publicadas en GHCR; Nginx de producción (HTTP solo para ACME y 301, HTTP/2, TLS 1.2/1.3, HSTS, CSP, `/api/docs` y `/actuator` bloqueados, stream SSE sin búfer, `X-Forwarded-For` = `$remote_addr`); `docker-compose.prod.yml` con MySQL en red `internal`; `setup-vps.sh`, `init-letsencrypt.sh`, `desplegar.sh` (backup, pull, up, espera del healthcheck y reversión), `backup-db.sh` (cron diario) y `restore-db.sh`; workflow Deploy por tag `v*` o a mano; healthcheck independiente del SMTP (CP-54); runbook `docs/DEPLOY.md`. Producción en `https://hyskad.ab8a.pro` con `v1.0.0`: Nginx Proxy Manager retirado del VPS, certificado real de Let's Encrypt (renovación automática con certbot), primer administrador con la contraseña ya cambiada y `ADMIN_PASSWORD` borrado del `.env`. Verificación: CP-62 (cabeceras, TLS, **SSL Labs A+**), CP-63 (301 y 3306/33060/8080 cerrados desde Internet), CP-66 (backup y restauración en base limpia, 1 s cada uno), CP-67 (Deploy manual en verde y `e2e/produccion/humo.spec.ts` en Chromium e iPhone 13 sin violaciones de CSP) y correo real de recuperación recibido. Defectos del primer despliegue: la verificación externa no reintentaba si `curl` fallaba (corregido) y la carrera entre el primer job `desplegar` y `init-letsencrypt.sh` (nota en el runbook). 137 de 138 casos aprobados.
+- **Siguiente paso concreto:** desactivar el usuario de prueba del smoke test en producción; hacer la sesión de usabilidad (CP-68) y llenar `usabilidad.md`; migrar al nuevo proxy los sitios estáticos que servía Nginx Proxy Manager (DEPLOY §10).
+- **Bloqueos o dudas:** CP-68 espera la sesión con usuarios reales. El usuario enviará una plantilla para el informe de pruebas. Los sitios estáticos del VPS siguen sin publicarse desde que se retiró Nginx Proxy Manager. Recomendado: copia de los backups fuera del VPS (DEPLOY §5.3).
+
+### Sesión anterior (F12)
 
 - **Fase:** F12 ✅ (cerrada 2026-11-18, PR #26)
 - **Rama:** `feature/f12-calidad` → `main`
@@ -98,6 +106,9 @@ Leyenda: ⬜ Pendiente · 🟦 En curso · ✅ Terminada
 - 2026-11-18 · F12 · Los casos que dependen del servidor (CP-62, CP-63, CP-66, CP-67) y la sesión con usuarios (CP-68) quedan como `No ejecutado` y el porcentaje se calcula sobre los ejecutados (también se informa sobre los 138) · el plan define aprobados / ejecutados; no se inventan resultados.
 - 2026-11-18 · F12 · Los 43 fallos E2E de la primera corrida local (timeouts con Dependency-Check, `npm install` y la cobertura corriendo a la vez) se repitieron con 2 workers y se informan por separado · ninguno falló al repetirse sin cambios de código.
 - 2026-11-18 · F12 · `mysql-connector-j` se fija en 26.10.0 por encima de Spring Boot 4.1.2 (que trae 9.7.0, con CVE altos) · es la misma dependencia; quitar la propiedad cuando Boot gestione una versión corregida.
+- 2026-11-19 · F13 · El proxy (Nginx + estáticos de Angular) es una sola imagen y los hashes de la CSP se calculan al construirla · sin `'unsafe-inline'` en `script-src` aunque el `index.html` tenga scripts en línea (tema y Beasties).
+- 2026-11-19 · F13 · El VPS es compartido: se retiró Nginx Proxy Manager (respaldo en el servidor) y el proxy de HYSKAD ocupa 80/443 · los demás sitios se migrarán después a ese proxy (DEPLOY §10).
+- 2026-11-19 · F13 · Las imágenes de GHCR son públicas (heredan la visibilidad del repo) · el servidor las baja sin `docker login`.
 - 2026-11-18 · F12 · Dependency-Check va en un perfil Maven aparte (`-Pseguridad`), fuera del build normal y del CI · la primera descarga del NVD tarda mucho sin clave de API.
 - 2026-11-17 · F12 · Carga por lotes de Hibernate (`default_batch_fetch_size=50`) en vez de `JOIN FETCH` por consulta · corrige el N+1 en todas las asociaciones perezosas sin tocar cada repositorio.
 - 2026-11-17 · F11 · Cada reporte exige `REPORTES_VER` más el permiso de su área (servicios: `PRESUPUESTOS_GESTIONAR`; inventario con costos: `PRODUCTOS_GESTIONAR`; ventas con utilidad: `VENTAS_ANULAR`; cuentas: `PAGOS_REGISTRAR`) y el frontend muestra solo esas pestañas; `/reportes` abre la primera permitida · ARCHITECTURE §5 da el alcance por rol y los permisos son la regla, no el nombre del rol.
@@ -246,7 +257,6 @@ pm-cache-hk`.
 - Aviso de Mockito por auto-attach del agente en las pruebas del backend (JDK 25); sin impacto por ahora.
 - Las E2E locales con los tres navegadores en paralelo y otras cargas en la máquina exceden el timeout de 30 s (F12: 40 de 276); con 2 workers pasan. En el CI hay 2 reintentos.
 - La campana de notificaciones muestra un estado vacío hasta F10.
-- Detrás de Nginx (F13) el rate limit verá la IP del proxy: configurar `server.forward-headers-strategy` y confiar solo en el proxy propio.
 - `GET /motocicletas/{id}/historial` devuelve `[]` con la estructura final (`HistorialServicio`); se llena en F09C (CP-21).
 - El texto de autorización de datos (RN-45) está en las traducciones; hacerlo configurable en F11.
 - Presupuesto del bundle inicial: aviso subido a 900 kB en F06 (hoy 843 kB). Si vuelve a acercarse, cambiar el registro de íconos (p. ej. SVG por URL) en vez de seguir subiéndolo.
